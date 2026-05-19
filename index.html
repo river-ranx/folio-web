@@ -491,6 +491,19 @@
       box-shadow: 0 10px 28px -8px rgba(238, 127, 31, 0.7), 0 2px 4px rgba(238, 127, 31, 0.15);
     }
 
+    /* "Coming soon" — looks like CTA but inert */
+    .btn-soon {
+      cursor: default;
+      opacity: 0.92;
+    }
+    .btn-soon:hover {
+      transform: none;
+      background: var(--accent);
+      box-shadow: 0 8px 24px -8px rgba(238, 127, 31, 0.55), 0 2px 4px rgba(238, 127, 31, 0.12);
+    }
+    .btn-soon:active { transform: none; }
+    .btn-soon svg { opacity: 0.95; }
+
     .btn-ghost {
       background: transparent;
       color: var(--text);
@@ -1386,9 +1399,9 @@
         <h1>One&nbsp;app.<br><span class="serif">See every file.</span></h1>
         <p class="hero-subtitle" data-i18n="hero.subtitle">让你的 Mac 安静下来。把所有你常用的文件——文档、表格、演示稿、PDF、笔记、图片、音乐与视频——全部装进一个窗口。</p>
         <div class="hero-cta">
-          <a href="#download" class="btn btn-accent">
-            <span data-i18n="btn.download">下载 macOS 版</span>
-            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          <a href="#" class="btn btn-accent btn-soon" aria-disabled="true" onclick="event.preventDefault()">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            <span data-i18n="btn.download">即将到来</span>
           </a>
           <a href="#showcase" class="btn btn-ghost" data-i18n="btn.explore">
             探索功能
@@ -1717,9 +1730,9 @@
         <h2 class="reveal">One app.<span class="serif">See every file.</span></h2>
         <p class="reveal" data-i18n="cta.body">让你的 Mac 安静下来。一个窗口，看完所有文件。</p>
         <div class="cta-buttons reveal">
-          <a href="#" class="btn btn-accent">
-            <span data-i18n="btn.download">下载 macOS 版</span>
-            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          <a href="#" class="btn btn-accent btn-soon" aria-disabled="true" onclick="event.preventDefault()">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            <span data-i18n="btn.download">即将到来</span>
           </a>
           <a href="#" class="btn btn-ghost">
             <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -1777,7 +1790,7 @@
         'nav.faq': '常见问题',
         'nav.cta': '下载 Folio',
 
-        'btn.download': '下载 macOS 版',
+        'btn.download': '即将到来',
         'btn.explore': '探索功能',
         'btn.changelog': '更新日志',
 
@@ -1902,7 +1915,7 @@
         'nav.faq': 'FAQ',
         'nav.cta': 'Get Folio',
 
-        'btn.download': 'Download for Mac',
+        'btn.download': 'Coming soon',
         'btn.explore': 'Explore features',
         'btn.changelog': 'Changelog',
 
