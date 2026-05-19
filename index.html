@@ -1,0 +1,2177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Folio — One app. See every file.</title>
+  <meta name="description" content="Folio 让你的 Mac 安静下来。把所有你常用的文件——文档、表格、演示稿、PDF、笔记、图片、音乐与视频——全部装进一个窗口。">
+  <meta property="og:title" content="Folio — One app. See every file.">
+  <meta property="og:description" content="The universal viewer for Mac. 一个窗口，看完所有文件。">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/landings/01-hero.png">
+  <meta name="theme-color" content="#FBF6EE" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0B0907" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="icon" type="image/png" href="assets/app-icon.png">
+  <link rel="apple-touch-icon" href="assets/app-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ===== Reset ===== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* ===== Design Tokens — Light (default, matches Folio landings) ===== */
+    :root {
+      --bg: #FBF6EE;
+      --bg-elevated: #FFFAF1;
+      --bg-subtle: rgba(110, 75, 30, 0.045);
+      --bg-hover: rgba(110, 75, 30, 0.075);
+      --bg-cream: #F6E8D4;
+      --bg-cream-soft: #FCEFDB;
+      --border: rgba(110, 75, 30, 0.12);
+      --border-strong: rgba(110, 75, 30, 0.20);
+      --text: #1E1A14;
+      --text-dim: #6E614E;
+      --text-mute: #978872;
+      --accent: #EE7F1F;
+      --accent-strong: #D26A0D;
+      --accent-soft: rgba(238, 127, 31, 0.10);
+      --accent-glow: rgba(238, 127, 31, 0.20);
+      --nav-bg: rgba(251, 246, 238, 0.78);
+      --halo-1: rgba(238, 127, 31, 0.30);
+      --halo-2: rgba(255, 195, 130, 0.26);
+      --halo-3: rgba(255, 230, 195, 0.20);
+      --grid-line: rgba(110, 75, 30, 0.05);
+      --shadow-card: 0 1px 2px rgba(60, 40, 20, 0.04), 0 0 0 1px var(--border);
+      --shadow-window: 0 24px 60px rgba(60, 40, 20, 0.14), 0 8px 24px rgba(60, 40, 20, 0.07);
+      --shadow-pop: 0 14px 36px -10px rgba(60, 40, 20, 0.22), 0 0 0 1px var(--border);
+      --theme-icon-sun: none;
+      --theme-icon-moon: block;
+    }
+
+    /* ===== Dark mode overrides ===== */
+    html.dark {
+      --bg: #0B0907;
+      --bg-elevated: #131110;
+      --bg-subtle: rgba(255, 230, 200, 0.04);
+      --bg-hover: rgba(255, 230, 200, 0.07);
+      --bg-cream: #1A1611;
+      --bg-cream-soft: #15120F;
+      --border: rgba(255, 222, 195, 0.10);
+      --border-strong: rgba(255, 222, 195, 0.17);
+      --text: #FAF6F0;
+      --text-dim: #A29586;
+      --text-mute: #6C6357;
+      --accent: #FF9A4A;
+      --accent-strong: #FFAD68;
+      --accent-soft: rgba(255, 154, 74, 0.14);
+      --accent-glow: rgba(255, 154, 74, 0.30);
+      --nav-bg: rgba(11, 9, 7, 0.72);
+      --halo-1: rgba(255, 154, 74, 0.36);
+      --halo-2: rgba(255, 196, 130, 0.18);
+      --halo-3: rgba(255, 220, 160, 0.14);
+      --grid-line: rgba(255, 222, 195, 0.05);
+      --shadow-card: 0 1px 0 rgba(255,255,255,0.04) inset, 0 0 0 1px var(--border);
+      --shadow-window: 0 24px 60px rgba(0, 0, 0, 0.45), 0 8px 24px rgba(0, 0, 0, 0.25);
+      --shadow-pop: 0 14px 36px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--border);
+      --theme-icon-sun: block;
+      --theme-icon-moon: none;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      letter-spacing: -0.011em;
+      transition: background 0.3s ease, color 0.3s ease;
+      overflow-x: hidden;
+      font-feature-settings: "ss01", "cv11";
+    }
+
+    body.loading * {
+      transition: none !important;
+      animation: none !important;
+    }
+
+    /* ===== Typography ===== */
+    h1, h2, h3, h4 {
+      color: var(--text);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    h1 { font-weight: 700; letter-spacing: -0.04em; }
+
+    .serif {
+      font-family: 'Instrument Serif', 'Iowan Old Style', 'Georgia', serif;
+      font-style: italic;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .eyebrow::before {
+      content: '';
+      width: 12px;
+      height: 1px;
+      background: var(--text-mute);
+    }
+
+    .accent { color: var(--accent); }
+    .mute { color: var(--text-dim); }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ===== Layout ===== */
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 28px;
+    }
+
+    .container-wide {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 28px;
+    }
+
+    section {
+      padding: 96px 0;
+      scroll-margin-top: 72px;
+      position: relative;
+    }
+
+    .section-head {
+      max-width: 680px;
+      margin: 0 auto 56px;
+      text-align: center;
+    }
+
+    .section-head .eyebrow { margin-bottom: 18px; }
+
+    .section-head h2 {
+      font-size: clamp(34px, 4.6vw, 52px);
+      margin-bottom: 16px;
+    }
+
+    .section-head p {
+      font-size: 17px;
+      color: var(--text-dim);
+      line-height: 1.55;
+    }
+
+    /* ===== Navigation ===== */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border-bottom: 1px solid transparent;
+      transition: background 0.25s ease, border-color 0.25s ease, backdrop-filter 0.25s ease;
+    }
+
+    .navbar.scrolled {
+      background: var(--nav-bg);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom-color: var(--border);
+    }
+
+    .navbar-inner {
+      width: 100%;
+      max-width: 1240px;
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      font-size: 16px;
+      letter-spacing: -0.015em;
+    }
+
+    .brand img {
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-dim);
+      transition: color 0.15s ease;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-dim);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .icon-btn:hover {
+      background: var(--bg-hover);
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .icon-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    .icon-sun { display: var(--theme-icon-sun); }
+    .icon-moon { display: var(--theme-icon-moon); }
+
+    /* ===== Language switcher ===== */
+    .lang-switch {
+      position: relative;
+    }
+
+    .lang-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 34px;
+      padding: 0 12px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: -0.005em;
+      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .lang-trigger:hover {
+      background: var(--bg-hover);
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .lang-trigger svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .lang-trigger .caret {
+      width: 10px;
+      height: 10px;
+      stroke-width: 2.2;
+      opacity: 0.7;
+      transition: transform 0.2s ease;
+    }
+
+    .lang-switch.open .caret { transform: rotate(180deg); }
+
+    .lang-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      min-width: 160px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 6px;
+      box-shadow: var(--shadow-pop);
+      opacity: 0;
+      transform: translateY(-4px);
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      z-index: 110;
+    }
+
+    .lang-switch.open .lang-menu {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .lang-menu button {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text);
+      text-align: left;
+      border-radius: 6px;
+      transition: background 0.15s ease;
+    }
+
+    .lang-menu button:hover { background: var(--bg-hover); }
+
+    .lang-menu button[aria-current="true"] {
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .lang-menu button .check {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0;
+    }
+
+    .lang-menu button[aria-current="true"] .check { opacity: 1; }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      height: 34px;
+      padding: 0 16px;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #FFFFFF;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: -0.005em;
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+
+    .nav-cta:hover { background: var(--accent-strong); }
+
+    .mobile-toggle {
+      display: none;
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: transparent;
+      cursor: pointer;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .mobile-toggle span {
+      width: 16px;
+      height: 1.5px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: transform 0.25s ease, opacity 0.2s ease;
+    }
+
+    .mobile-toggle.open span:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
+    .mobile-toggle.open span:nth-child(2) { opacity: 0; }
+    .mobile-toggle.open span:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 64px;
+      left: 0;
+      right: 0;
+      z-index: 99;
+      background: var(--nav-bg);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 28px 20px;
+    }
+
+    .mobile-menu.open { display: block; }
+
+    .mobile-menu a {
+      display: block;
+      padding: 12px 0;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .mobile-menu a:last-child { border-bottom: none; }
+
+    /* ===== Buttons ===== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 46px;
+      padding: 0 24px;
+      border-radius: 10px;
+      font-size: 14.5px;
+      font-weight: 600;
+      letter-spacing: -0.005em;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.15s ease, box-shadow 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn:active { transform: translateY(0.5px); }
+
+    .btn-accent {
+      background: var(--accent);
+      color: #FFFFFF;
+      box-shadow: 0 8px 24px -8px rgba(238, 127, 31, 0.55), 0 2px 4px rgba(238, 127, 31, 0.12);
+    }
+
+    .btn-accent:hover {
+      background: var(--accent-strong);
+      box-shadow: 0 10px 28px -8px rgba(238, 127, 31, 0.7), 0 2px 4px rgba(238, 127, 31, 0.15);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border-color: var(--border-strong);
+    }
+
+    .btn-ghost:hover {
+      background: var(--bg-hover);
+      border-color: var(--text-mute);
+    }
+
+    .btn svg {
+      width: 15px;
+      height: 15px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ===== Hero ===== */
+    .hero {
+      position: relative;
+      padding: 152px 0 64px;
+      text-align: center;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, var(--bg-cream-soft) 0%, transparent 65%),
+        var(--bg);
+    }
+
+    html.dark .hero {
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, var(--bg-cream) 0%, transparent 65%),
+        var(--bg);
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .hero-bg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle at center, var(--grid-line) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 30%, transparent 75%);
+      -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 30%, transparent 75%);
+    }
+
+    .halo {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      will-change: transform;
+    }
+
+    .halo-primary {
+      width: 720px;
+      height: 520px;
+      background: var(--halo-1);
+      top: -180px;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0.95;
+      animation: haloPulse 14s ease-in-out infinite;
+    }
+
+    .halo-secondary {
+      width: 420px;
+      height: 320px;
+      background: var(--halo-2);
+      top: 120px;
+      left: 8%;
+      opacity: 0.8;
+      animation: haloDrift1 18s ease-in-out infinite;
+    }
+
+    .halo-tertiary {
+      width: 460px;
+      height: 340px;
+      background: var(--halo-3);
+      top: 60px;
+      right: 6%;
+      opacity: 0.85;
+      animation: haloDrift2 22s ease-in-out infinite;
+    }
+
+    @keyframes haloPulse {
+      0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.95; }
+      50%      { transform: translateX(-50%) scale(1.08); opacity: 1; }
+    }
+    @keyframes haloDrift1 {
+      0%, 100% { transform: translate(0, 0); }
+      50%      { transform: translate(60px, -40px); }
+    }
+    @keyframes haloDrift2 {
+      0%, 100% { transform: translate(0, 0); }
+      50%      { transform: translate(-70px, 30px); }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .hero-content > * {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+
+    .hero-content.loaded > * {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .hero-content.loaded .hero-icon { transition: opacity 0.5s ease 0.05s, transform 0.5s ease 0.05s; }
+    .hero-content.loaded .hero-badge { transition: opacity 0.4s ease 0.15s, transform 0.4s ease 0.15s; }
+    .hero-content.loaded h1 { transition: opacity 0.5s ease 0.25s, transform 0.5s ease 0.25s; }
+    .hero-content.loaded .hero-subtitle { transition: opacity 0.5s ease 0.38s, transform 0.5s ease 0.38s; }
+    .hero-content.loaded .hero-cta { transition: opacity 0.5s ease 0.48s, transform 0.5s ease 0.48s; }
+    .hero-content.loaded .hero-meta { transition: opacity 0.4s ease 0.58s, transform 0.4s ease 0.58s; }
+
+    .hero-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 18px;
+      box-shadow: 0 16px 40px rgba(238, 127, 31, 0.22), 0 4px 10px rgba(60, 40, 20, 0.10);
+      margin-bottom: 30px;
+    }
+
+    html.dark .hero-icon {
+      box-shadow: 0 16px 48px rgba(255, 154, 74, 0.28), 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 28px;
+      padding: 0 14px 0 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-soft);
+      color: var(--accent);
+      font-size: 12.5px;
+      font-weight: 600;
+      letter-spacing: -0.005em;
+      margin-bottom: 28px;
+    }
+
+    .hero-badge .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .hero h1 {
+      font-size: clamp(46px, 8vw, 96px);
+      line-height: 1.0;
+      margin-bottom: 22px;
+      max-width: 14ch;
+    }
+
+    .hero h1 .serif {
+      color: var(--accent);
+      font-size: 1.05em;
+      display: inline-block;
+    }
+
+    .hero-subtitle {
+      font-size: 19px;
+      color: var(--text-dim);
+      max-width: 580px;
+      line-height: 1.55;
+      margin-bottom: 36px;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+
+    .hero-meta {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 12px;
+      color: var(--text-mute);
+    }
+
+    .hero-meta .sep {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--text-mute);
+      opacity: 0.6;
+    }
+
+    /* ===== Hero Window ===== */
+    .hero-window {
+      max-width: 1100px;
+      margin: 56px auto 0;
+      padding: 0 28px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-window-inner {
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow-window);
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      position: relative;
+    }
+
+    .hero-window-inner img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* ===== Showcase banner ===== */
+    .showcase-banner {
+      padding: 32px 0 96px;
+    }
+
+    .banner-card {
+      max-width: 1160px;
+      margin: 0 auto;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow-window);
+      border: 1px solid var(--border);
+      position: relative;
+    }
+
+    .banner-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* ===== Split section ===== */
+    .split {
+      padding: 96px 0;
+    }
+
+    .split + .split { padding-top: 32px; }
+
+    .split-inner {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) minmax(420px, 1.45fr);
+      gap: 64px;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 28px;
+    }
+
+    .split.reverse .split-inner {
+      grid-template-columns: minmax(420px, 1.45fr) minmax(260px, 1fr);
+    }
+
+    .split.reverse .split-text { order: 2; }
+
+    .split-text { max-width: 460px; }
+
+    .split-text .eyebrow { margin-bottom: 16px; }
+
+    .split-text h2 {
+      font-size: clamp(32px, 4vw, 46px);
+      line-height: 1.05;
+      margin-bottom: 18px;
+      letter-spacing: -0.025em;
+    }
+
+    .split-text h2 .serif {
+      display: block;
+      color: var(--accent);
+      font-size: 1em;
+      letter-spacing: -0.015em;
+      margin-top: 4px;
+    }
+
+    .split-text p {
+      font-size: 16px;
+      color: var(--text-dim);
+      line-height: 1.65;
+      margin-bottom: 24px;
+    }
+
+    .split-text ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .split-text ul li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14.5px;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .split-text ul li::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-top: 9px;
+      flex-shrink: 0;
+    }
+
+    .split-image {
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: var(--shadow-window);
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      position: relative;
+      transition: transform 0.5s ease;
+    }
+
+    .split-image:hover { transform: translateY(-4px); }
+
+    .split-image img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* ===== Pillars ===== */
+    .pillars { padding: 64px 0 96px; }
+
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 28px;
+    }
+
+    .pillar {
+      padding: 28px 24px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--bg-elevated);
+      transition: border-color 0.2s ease, transform 0.25s ease, background 0.2s ease, box-shadow 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .pillar:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px -12px var(--accent-glow);
+    }
+
+    .pillar-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #FFFFFF;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .pillar h3 {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+    }
+
+    .pillar p {
+      font-size: 13.5px;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+
+    /* ===== Features ===== */
+    .features {
+      padding: 96px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-subtle);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .feature {
+      padding: 26px 24px;
+      background: var(--bg);
+      transition: background 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .feature:hover { background: var(--bg-subtle); }
+
+    .feature-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--accent-soft);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+      color: var(--accent);
+    }
+
+    .feature-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .feature h3 {
+      font-size: 15.5px;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+    }
+
+    .feature p {
+      font-size: 13.5px;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+
+    /* ===== Formats marquee ===== */
+    .formats-strip {
+      padding: 72px 0;
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .formats-strip .container { text-align: center; }
+
+    .formats-strip .eyebrow { margin-bottom: 14px; }
+
+    .formats-strip h3 {
+      font-size: clamp(22px, 2.8vw, 28px);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 28px;
+      color: var(--text);
+    }
+
+    .formats-marquee {
+      position: relative;
+      mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+      -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+      overflow: hidden;
+    }
+
+    .formats-track {
+      display: flex;
+      gap: 10px;
+      animation: marquee 38s linear infinite;
+      width: max-content;
+    }
+
+    .format-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 38px;
+      padding: 0 18px;
+      border-radius: 999px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      transition: border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .format-chip:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .format-chip .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ===== FAQ ===== */
+    .faq { padding: 120px 0; }
+
+    .faq-list {
+      max-width: 760px;
+      margin: 0 auto;
+      border-top: 1px solid var(--border);
+    }
+
+    .faq-item { border-bottom: 1px solid var(--border); }
+
+    .faq-q {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 24px 0;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text);
+      text-align: left;
+      letter-spacing: -0.012em;
+      transition: color 0.2s ease;
+    }
+
+    .faq-q:hover { color: var(--accent); }
+
+    .faq-icon {
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+      margin-left: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      transition: transform 0.3s ease, background 0.2s ease;
+    }
+
+    .faq-icon svg {
+      width: 12px;
+      height: 12px;
+      stroke: var(--text-dim);
+      fill: none;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .faq-item.open .faq-icon {
+      transform: rotate(180deg);
+      background: var(--accent-soft);
+    }
+
+    .faq-item.open .faq-icon svg { stroke: var(--accent); }
+
+    .faq-a {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.3s ease;
+    }
+
+    .faq-item.open .faq-a {
+      max-height: 500px;
+      padding-bottom: 24px;
+    }
+
+    .faq-a p {
+      font-size: 14.5px;
+      color: var(--text-dim);
+      line-height: 1.7;
+    }
+
+    /* ===== CTA ===== */
+    .cta-section {
+      padding: 120px 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      border-top: 1px solid var(--border);
+      background:
+        radial-gradient(ellipse 60% 50% at 50% 0%, var(--bg-cream-soft) 0%, transparent 70%),
+        var(--bg);
+    }
+
+    html.dark .cta-section {
+      background:
+        radial-gradient(ellipse 60% 50% at 50% 0%, var(--bg-cream) 0%, transparent 70%),
+        var(--bg);
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 720px;
+      height: 340px;
+      background: radial-gradient(ellipse at center top, var(--accent-glow) 0%, transparent 70%);
+      filter: blur(40px);
+      z-index: 0;
+    }
+
+    .cta-section > .container { position: relative; z-index: 1; }
+
+    .cta-section h2 {
+      font-size: clamp(36px, 5vw, 60px);
+      margin-bottom: 18px;
+      letter-spacing: -0.035em;
+      line-height: 1.05;
+    }
+
+    .cta-section h2 .serif {
+      color: var(--accent);
+      display: block;
+      margin-top: 6px;
+    }
+
+    .cta-section > .container > p {
+      font-size: 17px;
+      color: var(--text-dim);
+      margin-bottom: 36px;
+      max-width: 520px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 36px;
+    }
+
+    .cta-links {
+      display: flex;
+      gap: 28px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .cta-links a {
+      font-size: 13.5px;
+      color: var(--text-dim);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s ease;
+    }
+
+    .cta-links a:hover { color: var(--text); }
+
+    .cta-links svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ===== Footer ===== */
+    footer {
+      padding: 56px 0 48px;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .footer-inner .brand { font-weight: 600; }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      list-style: none;
+    }
+
+    .footer-links a {
+      font-size: 13px;
+      color: var(--text-dim);
+      transition: color 0.2s ease;
+    }
+
+    .footer-links a:hover { color: var(--text); }
+
+    .footer-copy {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 12px;
+      color: var(--text-mute);
+    }
+
+    /* ===== Reveal ===== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-d1 { transition-delay: 0.08s; }
+    .reveal-d2 { transition-delay: 0.16s; }
+    .reveal-d3 { transition-delay: 0.24s; }
+    .reveal-d4 { transition-delay: 0.32s; }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 1024px) {
+      .split-inner,
+      .split.reverse .split-inner {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      .split.reverse .split-text { order: 0; }
+      .pillars-grid { grid-template-columns: repeat(2, 1fr); }
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      section { padding: 72px 0; }
+      .hero { padding: 120px 0 56px; }
+      .hero-window { margin-top: 40px; }
+      .nav-links { display: none; }
+      .nav-cta { display: none; }
+      .lang-trigger { padding: 0 8px; }
+      .mobile-toggle { display: flex; }
+      .pillars-grid { grid-template-columns: 1fr; padding: 0 20px; }
+      .features-grid { grid-template-columns: 1fr 1fr; }
+      .container, .container-wide { padding: 0 20px; }
+      .split-inner { padding: 0 20px; gap: 32px; }
+      .footer-inner { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .hero-subtitle { font-size: 17px; }
+      .section-head { margin-bottom: 44px; }
+      .split { padding: 64px 0; }
+    }
+
+    @media (max-width: 480px) {
+      .hero h1 { font-size: 44px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .hero-cta { flex-direction: column; width: 100%; }
+      .hero-cta .btn { width: 100%; }
+      .split-text h2 { font-size: 30px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+      }
+      .halo { animation: none !important; }
+      .formats-track { animation: none !important; }
+      .reveal { opacity: 1; transform: none; }
+      .hero-content > * { opacity: 1; transform: none; }
+    }
+
+    /* Chinese text flow */
+    html[lang^="zh"] p,
+    html[lang^="zh"] .faq-a p,
+    html[lang^="zh"] .feature p,
+    html[lang^="zh"] .pillar p,
+    html[lang^="zh"] .split-text p {
+      word-break: keep-all;
+      overflow-wrap: break-word;
+    }
+  </style>
+</head>
+<body class="loading">
+  <!-- Navigation -->
+  <nav class="navbar" role="navigation">
+    <div class="navbar-inner">
+      <a href="#" class="brand">
+        <img src="assets/app-icon.png" alt="Folio" width="26" height="26">
+        Folio
+      </a>
+      <ul class="nav-links">
+        <li><a href="#showcase" data-i18n="nav.formats">所有格式</a></li>
+        <li><a href="#features" data-i18n="nav.features">功能</a></li>
+        <li><a href="#themes" data-i18n="nav.themes">主题</a></li>
+        <li><a href="#faq" data-i18n="nav.faq">常见问题</a></li>
+      </ul>
+      <div class="nav-right">
+        <!-- Language switcher -->
+        <div class="lang-switch" id="langSwitch">
+          <button class="lang-trigger" type="button" aria-haspopup="menu" aria-expanded="false" onclick="toggleLangMenu(event)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+            <span id="langLabel">中文</span>
+            <svg class="caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="lang-menu" role="menu" id="langMenu">
+            <button type="button" role="menuitemradio" data-lang="zh" onclick="setLang('zh')">
+              <svg class="check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+              中文
+            </button>
+            <button type="button" role="menuitemradio" data-lang="en" onclick="setLang('en')">
+              <svg class="check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+              English
+            </button>
+          </div>
+        </div>
+
+        <button class="icon-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+          <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21.752 15.002A9.718 9.718 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24"><path d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM7.5 12a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0Zm11.394-5.834a.75.75 0 0 0-1.06-1.06l-1.591 1.59a.75.75 0 1 0 1.06 1.061l1.591-1.59Zm-1.06 11.668a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 1 0-1.061 1.06l1.59 1.591ZM12 18a.75.75 0 0 1 .75.75V21a.75.75 0 0 1-1.5 0v-2.25A.75.75 0 0 1 12 18Zm-7.834-5.16a.75.75 0 0 0 0-1.5H2.25a.75.75 0 0 0 0 1.5h1.916ZM6.343 17.834a.75.75 0 0 0-1.06-1.06l-1.591 1.59a.75.75 0 1 0 1.06 1.061l1.591-1.59ZM3.692 4.63a.75.75 0 0 0 0 1.06l1.59 1.591a.75.75 0 0 0 1.061-1.06L4.752 4.63a.75.75 0 0 0-1.06 0ZM18 12a.75.75 0 0 1 .75-.75h2.25a.75.75 0 0 1 0 1.5h-2.25A.75.75 0 0 1 18 12Z"/></svg>
+        </button>
+        <a href="#download" class="nav-cta" data-i18n="nav.cta">下载 Folio</a>
+        <button class="mobile-toggle" onclick="toggleMobileMenu()" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#showcase" onclick="closeMobileMenu()" data-i18n="nav.formats">所有格式</a>
+    <a href="#features" onclick="closeMobileMenu()" data-i18n="nav.features">功能</a>
+    <a href="#themes" onclick="closeMobileMenu()" data-i18n="nav.themes">主题</a>
+    <a href="#faq" onclick="closeMobileMenu()" data-i18n="nav.faq">常见问题</a>
+    <a href="#download" onclick="closeMobileMenu()" data-i18n="nav.cta">下载 Folio</a>
+  </div>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-bg" aria-hidden="true">
+      <div class="halo halo-primary"></div>
+      <div class="halo halo-secondary"></div>
+      <div class="halo halo-tertiary"></div>
+    </div>
+    <div class="container">
+      <div class="hero-content" id="heroContent">
+        <img src="assets/app-icon.png" alt="Folio" class="hero-icon">
+        <div class="hero-badge">
+          <span class="dot"></span>
+          The universal viewer for Mac
+        </div>
+        <h1>One&nbsp;app.<br><span class="serif">See every file.</span></h1>
+        <p class="hero-subtitle" data-i18n="hero.subtitle">让你的 Mac 安静下来。把所有你常用的文件——文档、表格、演示稿、PDF、笔记、图片、音乐与视频——全部装进一个窗口。</p>
+        <div class="hero-cta">
+          <a href="#download" class="btn btn-accent">
+            <span data-i18n="btn.download">下载 macOS 版</span>
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          </a>
+          <a href="#showcase" class="btn btn-ghost" data-i18n="btn.explore">
+            探索功能
+          </a>
+        </div>
+        <div class="hero-meta">
+          <span>macOS 15+</span>
+          <span class="sep"></span>
+          <span data-i18n="hero.meta.devices">全系列 Mac 适用</span>
+          <span class="sep"></span>
+          <span data-i18n="hero.meta.free">Beta 免费使用</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-window reveal">
+      <div class="hero-window-inner">
+        <img src="assets/welcome/folio-welcome.png" alt="Folio welcome window" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <main>
+    <!-- Pillars -->
+    <section class="pillars" id="features">
+      <div class="pillars-grid">
+        <div class="pillar reveal reveal-d1">
+          <span class="pillar-num">1</span>
+          <h3>Multi-Workspace</h3>
+          <p data-i18n="pillar.1.body">每个项目一个标签页。一键切换，回到上次离开的地方——文件夹、滚动位置、上次打开的文件，都还在那里。</p>
+        </div>
+        <div class="pillar reveal reveal-d2">
+          <span class="pillar-num">2</span>
+          <h3>All Formats, One App</h3>
+          <p data-i18n="pillar.2.body">一个 app 顶替十几个。文档、表格、演示稿、PDF、笔记、图片、音乐、视频——直接打开就能看。</p>
+        </div>
+        <div class="pillar reveal reveal-d3">
+          <span class="pillar-num">3</span>
+          <h3>Full-Text Search</h3>
+          <p data-i18n="pillar.3.body">搜的不只是文件名。笔记里的一句话、表格里的一个数字都能直接命中——跨所有打开的工作空间。</p>
+        </div>
+        <div class="pillar reveal reveal-d4">
+          <span class="pillar-num">4</span>
+          <h3>Markdown Editor</h3>
+          <p data-i18n="pillar.4.body">像阅读发表后的文章一样写作。无需分屏预览，所写即所见。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Showcase banner -->
+    <section class="showcase-banner" id="showcase">
+      <div class="section-head reveal" style="margin-bottom:48px;">
+        <span class="eyebrow">universal viewer</span>
+        <h2><span data-i18n="banner.h2.line1">一个 app，</span><span class="serif accent" data-i18n="banner.h2.serif">看见每个文件。</span></h2>
+        <p data-i18n="banner.body">不再在十几个应用之间反复切换。Folio 用一个窗口承接你所有的文件。</p>
+      </div>
+      <div class="banner-card reveal reveal-d1">
+        <img src="assets/landings/01-hero.png" alt="Folio — One app. See every file." loading="lazy">
+      </div>
+    </section>
+
+    <!-- Split 1: Code Reading -->
+    <section class="split reveal">
+      <div class="split-inner">
+        <div class="split-text">
+          <span class="eyebrow">code reading</span>
+          <h2><span data-i18n="split.code.h2.line1">优雅的代码阅读</span><span class="serif" data-i18n="split.code.h2.serif">fully yours.</span></h2>
+          <p data-i18n="split.code.body">主流编程语言一应俱全。语法着色清爽、缩进对齐整齐——让代码读起来像读散文一样舒服。</p>
+          <ul>
+            <li data-i18n="split.code.li1">主流编程语言全覆盖</li>
+            <li data-i18n="split.code.li2">舒服的字号、行距与配色，长时间阅读不累</li>
+            <li data-i18n="split.code.li3">文件夹并排浏览，需要时随时切换</li>
+          </ul>
+        </div>
+        <div class="split-image">
+          <img src="assets/landings/02-code-reading.png" alt="Folio elegant code reading" loading="lazy">
+        </div>
+      </div>
+    </section>
+
+    <!-- Split 2: Image Viewer -->
+    <section class="split reverse reveal">
+      <div class="split-inner">
+        <div class="split-image">
+          <img src="assets/landings/03-image-viewer.png" alt="Folio image viewer" loading="lazy">
+        </div>
+        <div class="split-text">
+          <span class="eyebrow">image viewer</span>
+          <h2><span data-i18n="split.image.h2.line1">所有图片格式</span><span class="serif" data-i18n="split.image.h2.serif">just one viewer.</span></h2>
+          <p data-i18n="split.image.body">再大的图也是秒开。手机照片、相机原图、网络图片、动图、矢量图——一键打开，可缩放、查看拍摄信息、在文件夹里前后翻页。</p>
+          <ul>
+            <li data-i18n="split.image.li1">从手机随手拍到相机原片，常见格式都能看</li>
+            <li data-i18n="split.image.li2">超大图秒开，无需等待</li>
+            <li data-i18n="split.image.li3">方向键翻页，空格键快速预览</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Split 3: Markdown -->
+    <section class="split reveal">
+      <div class="split-inner">
+        <div class="split-text">
+          <span class="eyebrow">markdown</span>
+          <h2><span data-i18n="split.md.h2.line1">Markdown 像</span><span class="serif" data-i18n="split.md.h2.serif">natural writing.</span></h2>
+          <p data-i18n="split.md.body">边写边见。标题、列表、表格、代码块立刻自动美化，没有分屏预览的割裂。内置离线翻译，写作的同时切换语言。</p>
+          <ul>
+            <li data-i18n="split.md.li1">所写即所见，整洁清爽</li>
+            <li data-i18n="split.md.li2">数学公式、流程图、代码块自动美化</li>
+            <li data-i18n="split.md.li3">多语言翻译，离线就能用</li>
+          </ul>
+        </div>
+        <div class="split-image">
+          <img src="assets/landings/04-markdown.png" alt="Folio markdown editor" loading="lazy">
+        </div>
+      </div>
+    </section>
+
+    <!-- Split 4: Office & PDF -->
+    <section class="split reverse reveal">
+      <div class="split-inner">
+        <div class="split-image">
+          <img src="assets/landings/05-office-pdf.png" alt="Folio Office docs and PDF" loading="lazy">
+        </div>
+        <div class="split-text">
+          <span class="eyebrow">office &amp; pdf</span>
+          <h2><span data-i18n="split.office.h2.line1">Office 与 PDF</span><span class="serif" data-i18n="split.office.h2.serif">open in one click.</span></h2>
+          <p data-i18n="split.office.body">不用等 Office 启动。Word、Excel、PowerPoint、Pages、Numbers、Keynote 和 PDF——双击就能看，干干净净。</p>
+          <ul>
+            <li data-i18n="split.office.li1">支持 Word、Excel、PowerPoint、Pages、Numbers、Keynote</li>
+            <li data-i18n="split.office.li2">PDF 内文搜索、目录跳转、关键词高亮</li>
+            <li data-i18n="split.office.li3">长文档秒开，滚动顺滑</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Split 5: Video -->
+    <section class="split reveal">
+      <div class="split-inner">
+        <div class="split-text">
+          <span class="eyebrow">video player</span>
+          <h2><span data-i18n="split.video.h2.line1">每段视频</span><span class="serif" data-i18n="split.video.h2.serif">one smooth player.</span></h2>
+          <p data-i18n="split.video.body">主流视频格式直接播放，不用等转码。键盘快捷键、字幕、画中画一应俱全，省电不发烫。</p>
+          <ul>
+            <li data-i18n="split.video.li1">省电流畅，不烫手不卡顿</li>
+            <li data-i18n="split.video.li2">字幕文件一拖即用</li>
+            <li data-i18n="split.video.li3">音频文件也能看到声音波形</li>
+          </ul>
+        </div>
+        <div class="split-image">
+          <img src="assets/landings/06-video.png" alt="Folio video player" loading="lazy">
+        </div>
+      </div>
+    </section>
+
+    <!-- Formats marquee -->
+    <section class="formats-strip">
+      <div class="container reveal">
+        <span class="eyebrow">supported formats</span>
+        <h3 data-i18n="formats.h3">14 种格式，一个窗口看完</h3>
+      </div>
+      <div class="formats-marquee" aria-hidden="true">
+        <div class="formats-track" id="formatsTrack">
+          <!-- Filled by JS to support both languages -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Themes -->
+    <section class="split reverse reveal" id="themes" style="padding-top:96px;">
+      <div class="split-inner">
+        <div class="split-image">
+          <img src="assets/landings/07-themes.png" alt="Folio themes" loading="lazy">
+        </div>
+        <div class="split-text">
+          <span class="eyebrow">themes</span>
+          <h2><span data-i18n="split.themes.h2.line1">你的 Folio</span><span class="serif" data-i18n="split.themes.h2.serif">your color, 15 themes.</span></h2>
+          <p data-i18n="split.themes.body">细腻的界面质感，搭配 15 套精心调校的主题。从奶油米到午夜黑、从苔藓绿到墨水蓝——每个文件都有最合适的阅读色温。</p>
+          <ul>
+            <li data-i18n="split.themes.li1">15 套精心调校的主题</li>
+            <li data-i18n="split.themes.li2">深浅自动跟随系统</li>
+            <li data-i18n="split.themes.li3">字体、行高、阅读宽度都能自己调</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- More features -->
+    <section class="features">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow" data-i18n="more.eyebrow">还有更多</span>
+          <h2><span data-i18n="more.h2.line1">不只是看，更是</span><span class="serif accent" data-i18n="more.h2.serif">用得顺手。</span></h2>
+          <p data-i18n="more.body">每一个细节，都为了让你在文件之间穿梭得更安静、更专注。</p>
+        </div>
+        <div class="features-grid">
+          <div class="feature reveal">
+            <div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+            <h3 data-i18n="feat.tabs.h">访达式标签</h3>
+            <p data-i18n="feat.tabs.p">每个工作空间记得你的滚动位置和上次打开的文件。</p>
+          </div>
+          <div class="feature reveal">
+            <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+            <h3 data-i18n="feat.search.h">秒找任何东西</h3>
+            <p data-i18n="feat.search.p">按内容搜索，不止文件名。笔记里的一句话也能瞬间命中。</p>
+          </div>
+          <div class="feature reveal">
+            <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
+            <h3 data-i18n="feat.folders.h">多文件夹并列</h3>
+            <p data-i18n="feat.folders.p">几个项目同时挂着，左边一棵清晰的文件树。</p>
+          </div>
+          <div class="feature reveal">
+            <div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div>
+            <h3 data-i18n="feat.glass.h">细腻玻璃质感</h3>
+            <p data-i18n="feat.glass.p">与系统美学一脉相承的优雅界面。</p>
+          </div>
+          <div class="feature reveal">
+            <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <h3 data-i18n="feat.3d.h">3D 模型与字体预览</h3>
+            <p data-i18n="feat.3d.p">三维模型可以转着看，字体可以一目了然地试。</p>
+          </div>
+          <div class="feature reveal">
+            <div class="feature-icon"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg></div>
+            <h3 data-i18n="feat.tables.h">表格与数据</h3>
+            <p data-i18n="feat.tables.p">电子表格与数据表直接查看、排序、筛选。</p>
+          </div>
+          <div class="feature reveal">
+            <div class="feature-icon"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+            <h3 data-i18n="feat.code.h">代码语法着色</h3>
+            <p data-i18n="feat.code.p">几乎你能想到的编程语言都已经准备好。</p>
+          </div>
+          <div class="feature reveal">
+            <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+            <h3 data-i18n="feat.translate.h">Markdown 翻译</h3>
+            <p data-i18n="feat.translate.p">一键把笔记切换成另一种语言，离线快速。</p>
+          </div>
+          <div class="feature reveal">
+            <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+            <h3 data-i18n="feat.focus.h">无干扰阅读</h3>
+            <p data-i18n="feat.focus.p">透明标题栏、阅读宽度可调，让文字成为主角。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq" id="faq">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow" data-i18n="faq.eyebrow">常见问题</span>
+          <h2 data-i18n="faq.h2">仍有疑问？</h2>
+        </div>
+        <div class="faq-list">
+          <div class="faq-item reveal">
+            <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+              <span data-i18n="faq.q1">Folio 是什么？</span>
+              <span class="faq-icon"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+            </button>
+            <div class="faq-a" role="region">
+              <p data-i18n="faq.a1">Folio 是一款 Mac 文件浏览器。一个应用里就能打开文档、表格、演示稿、PDF、笔记、代码、图片、音乐和视频——把你日常要切换的十几个 app 收纳进一个安静、专注的窗口。</p>
+            </div>
+          </div>
+          <div class="faq-item reveal">
+            <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+              <span data-i18n="faq.q2">和「预览.app」/ Quick Look 有什么不同？</span>
+              <span class="faq-icon"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+            </button>
+            <div class="faq-a" role="region">
+              <p data-i18n="faq.a2">系统自带的预览只能「看一眼就关」。Folio 是为长时间停留打造的工作空间：多标签、跨文件搜索、双向编辑笔记、15 套阅读主题——把「打开一下就走」变成「打开就能开始工作」。</p>
+            </div>
+          </div>
+          <div class="faq-item reveal">
+            <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+              <span data-i18n="faq.q3">我可以用它编辑文件吗？</span>
+              <span class="faq-icon"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+            </button>
+            <div class="faq-a" role="region">
+              <p data-i18n="faq.a3">可以。笔记和代码完全可编辑。Office 文档与 PDF 目前是高保真预览，下一版本会开放标注与表单填写。</p>
+            </div>
+          </div>
+          <div class="faq-item reveal">
+            <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+              <span data-i18n="faq.q4">支持哪些 macOS 版本？</span>
+              <span class="faq-icon"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+            </button>
+            <div class="faq-a" role="region">
+              <p data-i18n="faq.a4">Folio 支持 macOS 15 及以上版本，全系列 Mac 都能流畅运行。</p>
+            </div>
+          </div>
+          <div class="faq-item reveal">
+            <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+              <span data-i18n="faq.q5">搜索一万个文件的文件夹会不会很慢？</span>
+              <span class="faq-icon"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+            </button>
+            <div class="faq-a" role="region">
+              <p data-i18n="faq.a5">Folio 在你打开文件夹时就悄悄准备好，之后只在文件变化时跟进。一万个文件的大文件夹，输入即可命中——你不会感觉到它在工作。</p>
+            </div>
+          </div>
+          <div class="faq-item reveal">
+            <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+              <span data-i18n="faq.q6">我的数据安全吗？</span>
+              <span class="faq-icon"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+            </button>
+            <div class="faq-a" role="region">
+              <p data-i18n="faq.a6">所有处理都在你的电脑上完成。Folio 不会把你的文件内容上传到任何地方——这是默认行为，没有「关闭云同步」的开关。</p>
+            </div>
+          </div>
+          <div class="faq-item reveal">
+            <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+              <span data-i18n="faq.q7">是否免费？</span>
+              <span class="faq-icon"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+            </button>
+            <div class="faq-a" role="region">
+              <p data-i18n="faq.a7">Folio 当前是 Beta 版，完全免费下载使用。正式版定价将在公开发布前公布；Beta 用户会获得忠诚度优惠。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="cta-section" id="download">
+      <div class="container">
+        <span class="eyebrow reveal" style="margin-bottom:20px;" data-i18n="cta.eyebrow">准备好了吗？</span>
+        <h2 class="reveal">One app.<span class="serif">See every file.</span></h2>
+        <p class="reveal" data-i18n="cta.body">让你的 Mac 安静下来。一个窗口，看完所有文件。</p>
+        <div class="cta-buttons reveal">
+          <a href="#" class="btn btn-accent">
+            <span data-i18n="btn.download">下载 macOS 版</span>
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          </a>
+          <a href="#" class="btn btn-ghost">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span data-i18n="btn.changelog">更新日志</span>
+          </a>
+        </div>
+        <div class="cta-links reveal">
+          <a href="#" rel="noopener">
+            <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            <span data-i18n="cta.community">加入社区</span>
+          </a>
+          <a href="#" rel="noopener">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span data-i18n="cta.docs">文档</span>
+          </a>
+          <a href="#" rel="noopener">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <span data-i18n="cta.email">邮件订阅</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container-wide">
+      <div class="footer-inner">
+        <div class="brand">
+          <img src="assets/app-icon.png" alt="Folio" width="22" height="22">
+          Folio
+        </div>
+        <ul class="footer-links">
+          <li><a href="#showcase" data-i18n="nav.formats">所有格式</a></li>
+          <li><a href="#features" data-i18n="nav.features">功能</a></li>
+          <li><a href="#themes" data-i18n="nav.themes">主题</a></li>
+          <li><a href="#faq" data-i18n="nav.faq">常见问题</a></li>
+          <li><a href="#download" data-i18n="footer.download">下载</a></li>
+        </ul>
+        <span class="footer-copy" data-i18n="footer.copy">© 2026 Folio · 为 macOS 而生</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ===== i18n dictionary =====
+    const I18N = {
+      zh: {
+        'document.title': 'Folio — 一个应用，看见每个文件',
+        'document.description': 'Folio 让你的 Mac 安静下来。把所有你常用的文件——文档、表格、演示稿、PDF、笔记、图片、音乐与视频——全部装进一个窗口。',
+
+        'nav.formats': '所有格式',
+        'nav.features': '功能',
+        'nav.themes': '主题',
+        'nav.faq': '常见问题',
+        'nav.cta': '下载 Folio',
+
+        'btn.download': '下载 macOS 版',
+        'btn.explore': '探索功能',
+        'btn.changelog': '更新日志',
+
+        'hero.subtitle': '让你的 Mac 安静下来。把所有你常用的文件——文档、表格、演示稿、PDF、笔记、图片、音乐与视频——全部装进一个窗口。',
+        'hero.meta.devices': '全系列 Mac 适用',
+        'hero.meta.free': 'Beta 免费使用',
+
+        'pillar.1.body': '每个项目一个标签页。一键切换，回到上次离开的地方——文件夹、滚动位置、上次打开的文件，都还在那里。',
+        'pillar.2.body': '一个 app 顶替十几个。文档、表格、演示稿、PDF、笔记、图片、音乐、视频——直接打开就能看。',
+        'pillar.3.body': '搜的不只是文件名。笔记里的一句话、表格里的一个数字都能直接命中——跨所有打开的工作空间。',
+        'pillar.4.body': '像阅读发表后的文章一样写作。无需分屏预览，所写即所见。',
+
+        'banner.h2.line1': '一个 app，',
+        'banner.h2.serif': '看见每个文件。',
+        'banner.body': '不再在十几个应用之间反复切换。Folio 用一个窗口承接你所有的文件。',
+
+        'split.code.h2.line1': '优雅的代码阅读',
+        'split.code.h2.serif': 'fully yours.',
+        'split.code.body': '主流编程语言一应俱全。语法着色清爽、缩进对齐整齐——让代码读起来像读散文一样舒服。',
+        'split.code.li1': '主流编程语言全覆盖',
+        'split.code.li2': '舒服的字号、行距与配色，长时间阅读不累',
+        'split.code.li3': '文件夹并排浏览，需要时随时切换',
+
+        'split.image.h2.line1': '所有图片格式',
+        'split.image.h2.serif': 'just one viewer.',
+        'split.image.body': '再大的图也是秒开。手机照片、相机原图、网络图片、动图、矢量图——一键打开，可缩放、查看拍摄信息、在文件夹里前后翻页。',
+        'split.image.li1': '从手机随手拍到相机原片，常见格式都能看',
+        'split.image.li2': '超大图秒开，无需等待',
+        'split.image.li3': '方向键翻页，空格键快速预览',
+
+        'split.md.h2.line1': 'Markdown 像',
+        'split.md.h2.serif': 'natural writing.',
+        'split.md.body': '边写边见。标题、列表、表格、代码块立刻自动美化，没有分屏预览的割裂。内置离线翻译，写作的同时切换语言。',
+        'split.md.li1': '所写即所见，整洁清爽',
+        'split.md.li2': '数学公式、流程图、代码块自动美化',
+        'split.md.li3': '多语言翻译，离线就能用',
+
+        'split.office.h2.line1': 'Office 与 PDF',
+        'split.office.h2.serif': 'open in one click.',
+        'split.office.body': '不用等 Office 启动。Word、Excel、PowerPoint、Pages、Numbers、Keynote 和 PDF——双击就能看，干干净净。',
+        'split.office.li1': '支持 Word、Excel、PowerPoint、Pages、Numbers、Keynote',
+        'split.office.li2': 'PDF 内文搜索、目录跳转、关键词高亮',
+        'split.office.li3': '长文档秒开，滚动顺滑',
+
+        'split.video.h2.line1': '每段视频',
+        'split.video.h2.serif': 'one smooth player.',
+        'split.video.body': '主流视频格式直接播放，不用等转码。键盘快捷键、字幕、画中画一应俱全，省电不发烫。',
+        'split.video.li1': '省电流畅，不烫手不卡顿',
+        'split.video.li2': '字幕文件一拖即用',
+        'split.video.li3': '音频文件也能看到声音波形',
+
+        'formats.h3': '14 种格式，一个窗口看完',
+
+        'split.themes.h2.line1': '你的 Folio',
+        'split.themes.h2.serif': 'your color, 15 themes.',
+        'split.themes.body': '细腻的界面质感，搭配 15 套精心调校的主题。从奶油米到午夜黑、从苔藓绿到墨水蓝——每个文件都有最合适的阅读色温。',
+        'split.themes.li1': '15 套精心调校的主题',
+        'split.themes.li2': '深浅自动跟随系统',
+        'split.themes.li3': '字体、行高、阅读宽度都能自己调',
+
+        'more.eyebrow': '还有更多',
+        'more.h2.line1': '不只是看，更是',
+        'more.h2.serif': '用得顺手。',
+        'more.body': '每一个细节，都为了让你在文件之间穿梭得更安静、更专注。',
+
+        'feat.tabs.h':      '访达式标签',
+        'feat.tabs.p':      '每个工作空间记得你的滚动位置和上次打开的文件。',
+        'feat.search.h':    '秒找任何东西',
+        'feat.search.p':    '按内容搜索，不止文件名。笔记里的一句话也能瞬间命中。',
+        'feat.folders.h':   '多文件夹并列',
+        'feat.folders.p':   '几个项目同时挂着，左边一棵清晰的文件树。',
+        'feat.glass.h':     '细腻玻璃质感',
+        'feat.glass.p':     '与系统美学一脉相承的优雅界面。',
+        'feat.3d.h':        '3D 模型与字体预览',
+        'feat.3d.p':        '三维模型可以转着看，字体可以一目了然地试。',
+        'feat.tables.h':    '表格与数据',
+        'feat.tables.p':    '电子表格与数据表直接查看、排序、筛选。',
+        'feat.code.h':      '代码语法着色',
+        'feat.code.p':      '几乎你能想到的编程语言都已经准备好。',
+        'feat.translate.h': 'Markdown 翻译',
+        'feat.translate.p': '一键把笔记切换成另一种语言，离线快速。',
+        'feat.focus.h':     '无干扰阅读',
+        'feat.focus.p':     '透明标题栏、阅读宽度可调，让文字成为主角。',
+
+        'faq.eyebrow': '常见问题',
+        'faq.h2': '仍有疑问？',
+        'faq.q1': 'Folio 是什么？',
+        'faq.a1': 'Folio 是一款 Mac 文件浏览器。一个应用里就能打开文档、表格、演示稿、PDF、笔记、代码、图片、音乐和视频——把你日常要切换的十几个 app 收纳进一个安静、专注的窗口。',
+        'faq.q2': '和「预览.app」/ Quick Look 有什么不同？',
+        'faq.a2': '系统自带的预览只能「看一眼就关」。Folio 是为长时间停留打造的工作空间：多标签、跨文件搜索、双向编辑笔记、15 套阅读主题——把「打开一下就走」变成「打开就能开始工作」。',
+        'faq.q3': '我可以用它编辑文件吗？',
+        'faq.a3': '可以。笔记和代码完全可编辑。Office 文档与 PDF 目前是高保真预览，下一版本会开放标注与表单填写。',
+        'faq.q4': '支持哪些 macOS 版本？',
+        'faq.a4': 'Folio 支持 macOS 15 及以上版本，全系列 Mac 都能流畅运行。',
+        'faq.q5': '搜索一万个文件的文件夹会不会很慢？',
+        'faq.a5': 'Folio 在你打开文件夹时就悄悄准备好，之后只在文件变化时跟进。一万个文件的大文件夹，输入即可命中——你不会感觉到它在工作。',
+        'faq.q6': '我的数据安全吗？',
+        'faq.a6': '所有处理都在你的电脑上完成。Folio 不会把你的文件内容上传到任何地方——这是默认行为，没有「关闭云同步」的开关。',
+        'faq.q7': '是否免费？',
+        'faq.a7': 'Folio 当前是 Beta 版，完全免费下载使用。正式版定价将在公开发布前公布；Beta 用户会获得忠诚度优惠。',
+
+        'cta.eyebrow': '准备好了吗？',
+        'cta.body': '让你的 Mac 安静下来。一个窗口，看完所有文件。',
+        'cta.community': '加入社区',
+        'cta.docs': '文档',
+        'cta.email': '邮件订阅',
+
+        'footer.download': '下载',
+        'footer.copy': '© 2026 Folio · 为 macOS 而生',
+
+        'lang.label': '中文',
+        'formats.list': ['PDF','Word','Excel','PowerPoint','Pages','Numbers','Keynote','Markdown','代码','图片','音频','视频','3D 模型','数据表','CSV','字体','压缩包']
+      },
+
+      en: {
+        'document.title': 'Folio — One app. See every file.',
+        'document.description': 'Folio turns your Mac into one quiet, focused workspace. Documents, spreadsheets, slides, PDFs, notes, images, audio and video — all in a single window.',
+
+        'nav.formats': 'Formats',
+        'nav.features': 'Features',
+        'nav.themes': 'Themes',
+        'nav.faq': 'FAQ',
+        'nav.cta': 'Get Folio',
+
+        'btn.download': 'Download for Mac',
+        'btn.explore': 'Explore features',
+        'btn.changelog': 'Changelog',
+
+        'hero.subtitle': 'Turn your Mac into one quiet, focused workspace. Documents, spreadsheets, slides, PDFs, notes, images, music and video — all in a single window.',
+        'hero.meta.devices': 'Made for every Mac',
+        'hero.meta.free': 'Free during Beta',
+
+        'pillar.1.body': 'Every project gets its own tab. One click switches — your work is always where you left it: folder, scroll position, last opened file, all preserved.',
+        'pillar.2.body': 'One app replaces a dozen. Documents, spreadsheets, slides, PDFs, notes, images, music, video — open and read instantly.',
+        'pillar.3.body': 'Search reaches inside files, not just filenames. A single line in your notes or a number in a spreadsheet — found instantly, across every open workspace.',
+        'pillar.4.body': 'Read like a published page. Write without a preview pane — what you write is what you see.',
+
+        'banner.h2.line1': 'One app,',
+        'banner.h2.serif': 'see every file.',
+        'banner.body': 'Stop jumping between a dozen apps. Folio holds everything in one window.',
+
+        'split.code.h2.line1': 'Elegant code reading,',
+        'split.code.h2.serif': 'fully yours.',
+        'split.code.body': 'Every popular programming language is ready. Crisp syntax colors, tidy indentation — code reads like prose, not a wall of text.',
+        'split.code.li1': 'Covers every popular programming language',
+        'split.code.li2': 'Comfortable sizing and spacing for long reading',
+        'split.code.li3': 'Browse multiple folders side by side',
+
+        'split.image.h2.line1': 'All image formats,',
+        'split.image.h2.serif': 'just one viewer.',
+        'split.image.body': 'Even huge files open instantly. Phone shots, camera raw, web images, GIFs, vector files — open, zoom, read details, and flip through a folder.',
+        'split.image.li1': 'From phone shots to camera raw, all common formats',
+        'split.image.li2': 'Huge files open in a blink',
+        'split.image.li3': 'Arrow keys browse, space for quick look',
+
+        'split.md.h2.line1': 'Markdown that flows like',
+        'split.md.h2.serif': 'natural writing.',
+        'split.md.body': 'Write naturally, see results instantly. Headers, lists, tables, code blocks render as you type — no preview pane required. Offline translation built in.',
+        'split.md.li1': 'What you write is what you see',
+        'split.md.li2': 'Math, diagrams, code blocks rendered beautifully',
+        'split.md.li3': 'Translate locally — no internet required',
+
+        'split.office.h2.line1': 'Office docs and PDF,',
+        'split.office.h2.serif': 'open in one click.',
+        'split.office.body': "No waiting for Office to launch. Word, Excel, PowerPoint, Pages, Numbers, Keynote and PDFs — double-click and read, clean and clear.",
+        'split.office.li1': 'Word, Excel, PowerPoint, Pages, Numbers, Keynote',
+        'split.office.li2': 'Search inside PDFs, jump by outline, highlight matches',
+        'split.office.li3': 'Long documents open instantly, scroll smoothly',
+
+        'split.video.h2.line1': 'Every video,',
+        'split.video.h2.serif': 'one smooth player.',
+        'split.video.body': 'All major formats play instantly — no conversion needed. Keyboard shortcuts, subtitles, picture-in-picture, and easy on the battery.',
+        'split.video.li1': 'Smooth playback, easy on the battery',
+        'split.video.li2': 'Drop in a subtitle file and go',
+        'split.video.li3': 'Audio files show their waveform',
+
+        'formats.h3': '14 file types, one window',
+
+        'split.themes.h2.line1': 'Your Folio,',
+        'split.themes.h2.serif': 'your color, 15 themes.',
+        'split.themes.body': 'A delicate interface paired with 15 thoughtfully tuned themes — from cream and midnight to moss and ink. Every file finds its own light.',
+        'split.themes.li1': '15 carefully tuned themes',
+        'split.themes.li2': 'Auto-switch with system appearance',
+        'split.themes.li3': 'Customize font, line height, reading width',
+
+        'more.eyebrow': 'more',
+        'more.h2.line1': 'Not just to view,',
+        'more.h2.serif': 'but to use.',
+        'more.body': 'Every detail is tuned so moving between files feels quiet and focused.',
+
+        'feat.tabs.h':      'Finder-style tabs',
+        'feat.tabs.p':      'Each workspace remembers your scroll position and last opened file.',
+        'feat.search.h':    'Find anything in seconds',
+        'feat.search.p':    'Search by content, not just filenames. Even a single line in your notes.',
+        'feat.folders.h':   'Side-by-side folders',
+        'feat.folders.p':   'Mount several projects at once with a clean, clear file tree.',
+        'feat.glass.h':     'Crystalline interface',
+        'feat.glass.p':     'An elegant interface aligned with system aesthetics.',
+        'feat.3d.h':        '3D models & fonts',
+        'feat.3d.p':        'Rotate 3D models, preview fonts at a glance.',
+        'feat.tables.h':    'Tables & data',
+        'feat.tables.p':    'View, sort and filter spreadsheets and data tables.',
+        'feat.code.h':      'Syntax-colored code',
+        'feat.code.p':      'Just about every programming language is ready out of the box.',
+        'feat.translate.h': 'Markdown translation',
+        'feat.translate.p': 'Translate notes with one tap — fast, and fully offline.',
+        'feat.focus.h':     'Distraction-free reading',
+        'feat.focus.p':     'Transparent titlebar, adjustable width — your content is the star.',
+
+        'faq.eyebrow': 'FAQ',
+        'faq.h2': 'Still curious?',
+        'faq.q1': 'What is Folio?',
+        'faq.a1': 'Folio is a universal file viewer for Mac. One app opens documents, spreadsheets, slides, PDFs, notes, code, images, music and video — replacing the dozen apps you usually juggle, in one quiet, focused window.',
+        'faq.q2': 'How is it different from Preview / Quick Look?',
+        'faq.a2': 'macOS Preview is built for a quick glance. Folio is built to stay: tabs, cross-file search, two-way editing for notes, and 15 reading themes — turning "peek and close" into "open and work".',
+        'faq.q3': 'Can I edit files in it?',
+        'faq.a3': 'Yes. Notes and code are fully editable. Office files and PDFs are high-fidelity preview today; annotation and form filling are coming next.',
+        'faq.q4': 'Which macOS versions are supported?',
+        'faq.a4': 'Folio supports macOS 15 and above, and runs smoothly on every Mac.',
+        'faq.q5': 'Will searching a folder of 10,000 files be slow?',
+        'faq.a5': "Folio quietly prepares when you open a folder, then only catches up on changes. Even folders with 10,000 files respond as you type — you won't notice it working.",
+        'faq.q6': 'Is my data safe?',
+        'faq.a6': 'Everything happens on your Mac. Folio never uploads your files anywhere — it is the default, with no cloud toggle to switch off.',
+        'faq.q7': 'Is it free?',
+        'faq.a7': 'Folio is free during Beta. Pricing will be announced before public release; Beta users receive a loyalty discount.',
+
+        'cta.eyebrow': 'ready?',
+        'cta.body': 'Make your Mac quiet. One window for every file.',
+        'cta.community': 'Join community',
+        'cta.docs': 'Docs',
+        'cta.email': 'Email updates',
+
+        'footer.download': 'Download',
+        'footer.copy': '© 2026 Folio · Made for macOS',
+
+        'lang.label': 'English',
+        'formats.list': ['PDF','Word','Excel','PowerPoint','Pages','Numbers','Keynote','Markdown','Code','Images','Audio','Video','3D Models','Databases','CSV','Fonts','Archives']
+      }
+    };
+
+    function detectInitialLang() {
+      const saved = localStorage.getItem('lang');
+      if (saved && I18N[saved]) return saved;
+      const sys = (navigator.language || 'en').toLowerCase();
+      if (sys.startsWith('zh')) return 'zh';
+      return 'en';
+    }
+
+    function applyI18n(lang) {
+      const dict = I18N[lang] || I18N.en;
+      document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+      document.title = dict['document.title'];
+
+      const descMeta = document.querySelector('meta[name="description"]');
+      if (descMeta) descMeta.setAttribute('content', dict['document.description']);
+      const ogTitle = document.querySelector('meta[property="og:title"]');
+      if (ogTitle) ogTitle.setAttribute('content', dict['document.title']);
+      const ogDesc = document.querySelector('meta[property="og:description"]');
+      if (ogDesc) ogDesc.setAttribute('content', dict['document.description']);
+
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        const val = dict[key];
+        if (typeof val === 'string') el.textContent = val;
+      });
+
+      // Formats marquee
+      const track = document.getElementById('formatsTrack');
+      if (track) {
+        const list = dict['formats.list'] || [];
+        // Duplicate for seamless loop
+        const html = [...list, ...list].map(name =>
+          `<span class="format-chip"><span class="dot"></span>${name}</span>`
+        ).join('');
+        track.innerHTML = html;
+      }
+
+      // Language switcher label & active state
+      const label = document.getElementById('langLabel');
+      if (label) label.textContent = dict['lang.label'];
+      document.querySelectorAll('#langMenu button[data-lang]').forEach(btn => {
+        btn.setAttribute('aria-current', btn.dataset.lang === lang ? 'true' : 'false');
+      });
+    }
+
+    function setLang(lang) {
+      if (!I18N[lang]) return;
+      localStorage.setItem('lang', lang);
+      applyI18n(lang);
+      closeLangMenu();
+    }
+
+    function toggleLangMenu(e) {
+      e.stopPropagation();
+      const el = document.getElementById('langSwitch');
+      const trigger = el.querySelector('.lang-trigger');
+      const isOpen = el.classList.toggle('open');
+      trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    }
+
+    function closeLangMenu() {
+      const el = document.getElementById('langSwitch');
+      if (!el) return;
+      el.classList.remove('open');
+      const trigger = el.querySelector('.lang-trigger');
+      if (trigger) trigger.setAttribute('aria-expanded', 'false');
+    }
+
+    document.addEventListener('click', (e) => {
+      const sw = document.getElementById('langSwitch');
+      if (sw && !sw.contains(e.target)) closeLangMenu();
+    });
+
+    // ===== Loading transitions =====
+    window.addEventListener('load', () => {
+      requestAnimationFrame(() => {
+        document.body.classList.remove('loading');
+        setTimeout(() => {
+          document.getElementById('heroContent').classList.add('loaded');
+        }, 80);
+      });
+    });
+
+    // ===== Theme =====
+    function updateThemeColor(isDark) {
+      document.querySelectorAll('meta[name="theme-color"]').forEach(m => m.remove());
+      const meta = document.createElement('meta');
+      meta.name = 'theme-color';
+      meta.content = isDark ? '#0B0907' : '#FBF6EE';
+      document.head.appendChild(meta);
+    }
+
+    (function bootstrap() {
+      // Theme
+      const savedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+      if (isDark) document.documentElement.classList.add('dark');
+      updateThemeColor(isDark);
+
+      // Language (apply before paint)
+      applyI18n(detectInitialLang());
+    })();
+
+    function toggleTheme() {
+      document.documentElement.classList.toggle('dark');
+      const isDark = document.documentElement.classList.contains('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      updateThemeColor(isDark);
+    }
+
+    // ===== Navbar scrolled =====
+    const navbar = document.querySelector('.navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 12) navbar.classList.add('scrolled');
+      else navbar.classList.remove('scrolled');
+    }, { passive: true });
+
+    // ===== Mobile menu =====
+    function toggleMobileMenu() {
+      document.querySelector('.mobile-toggle').classList.toggle('open');
+      document.getElementById('mobileMenu').classList.toggle('open');
+    }
+
+    function closeMobileMenu() {
+      document.querySelector('.mobile-toggle').classList.remove('open');
+      document.getElementById('mobileMenu').classList.remove('open');
+    }
+
+    // ===== Scroll reveal =====
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    // ===== FAQ accordion =====
+    function toggleFaq(button) {
+      const item = button.parentElement;
+      const wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(el => {
+        el.classList.remove('open');
+        el.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
+      });
+      if (!wasOpen) {
+        item.classList.add('open');
+        button.setAttribute('aria-expanded', 'true');
+      }
+    }
+  </script>
+</body>
+</html>

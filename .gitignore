@@ -1,0 +1,23 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs / tmp
+*.log
+.cache/
+.tmp/
+
+# Node (none today, but in case a tool sneaks in)
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
