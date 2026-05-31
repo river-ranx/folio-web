@@ -1,0 +1,77 @@
+{
+  "$schema": "https://design-tokens.org/schema.json",
+  "$description": "Folio marketing site (folio-web) design tokens — extracted 1:1 from index.html :root / html.dark. DTCG format. Light is default; dark values noted per-token where they diverge.",
+  "color": {
+    "$type": "color",
+    "bg":            { "$value": "#FBF6EE", "$description": "Page background (cream). dark: #0B0907", "$extensions": { "anydesign.confidence": "high", "anydesign.dark": "#0B0907" } },
+    "bg-elevated":   { "$value": "#FFFAF1", "$description": "Cards, menus, device windows. dark: #131110", "$extensions": { "anydesign.confidence": "high", "anydesign.dark": "#131110" } },
+    "bg-subtle":     { "$value": "rgba(110,75,30,0.045)", "$description": "Feature band wash / hover tint. dark: rgba(255,230,200,0.04)", "$extensions": { "anydesign.confidence": "high" } },
+    "bg-hover":      { "$value": "rgba(110,75,30,0.075)", "$description": "Hover fill on ghost/icon buttons. dark: rgba(255,230,200,0.07)", "$extensions": { "anydesign.confidence": "high" } },
+    "bg-cream":      { "$value": "#F6E8D4", "$description": "Warm hero gradient stop (dark hero). dark: #1A1611", "$extensions": { "anydesign.confidence": "high" } },
+    "bg-cream-soft": { "$value": "#FCEFDB", "$description": "Hero/CTA radial gradient inner stop. dark: #15120F", "$extensions": { "anydesign.confidence": "high" } },
+    "border":        { "$value": "rgba(110,75,30,0.12)", "$description": "Hairline borders, grid gaps. dark: rgba(255,222,195,0.10)", "$extensions": { "anydesign.confidence": "high" } },
+    "border-strong": { "$value": "rgba(110,75,30,0.20)", "$description": "Ghost button border. dark: rgba(255,222,195,0.17)", "$extensions": { "anydesign.confidence": "high" } },
+    "text":          { "$value": "#1E1A14", "$description": "Primary text. dark: #FAF6F0", "$extensions": { "anydesign.confidence": "high", "anydesign.dark": "#FAF6F0" } },
+    "text-dim":      { "$value": "#6E614E", "$description": "Secondary / body copy. dark: #A29586. AA pass (5.6:1 light)", "$extensions": { "anydesign.confidence": "high", "anydesign.dark": "#A29586" } },
+    "text-mute":     { "$value": "#978872", "$description": "Meta/footer/mono small text. dark: #6C6357. AA-normal FAIL (3.21:1 light / 3.37:1 dark)", "$extensions": { "anydesign.confidence": "high", "anydesign.a11y": "fails-AA-normal" } },
+    "accent":        { "$value": "#EE7F1F", "$description": "Brand amber. CTA fill, accent words, dots, icons. dark: #FF9A4A", "$extensions": { "anydesign.confidence": "high", "anydesign.dark": "#FF9A4A" } },
+    "accent-strong": { "$value": "#D26A0D", "$description": "CTA hover fill. dark: #FFAD68", "$extensions": { "anydesign.confidence": "high", "anydesign.dark": "#FFAD68" } },
+    "accent-soft":   { "$value": "rgba(238,127,31,0.10)", "$description": "Badge/feature-icon background tint. dark: rgba(255,154,74,0.14)", "$extensions": { "anydesign.confidence": "high" } },
+    "accent-glow":   { "$value": "rgba(238,127,31,0.20)", "$description": "Dot ring glow, pillar hover shadow, CTA halo. dark: rgba(255,154,74,0.30)", "$extensions": { "anydesign.confidence": "high" } },
+    "nav-bg":        { "$value": "rgba(251,246,238,0.78)", "$description": "Scrolled navbar (backdrop-blur). dark: rgba(11,9,7,0.72)", "$extensions": { "anydesign.confidence": "high" } },
+    "on-accent":     { "$value": "#FFFFFF", "$description": "Text/icon on accent fill. ⚠ low contrast: 2.73:1 light / 2.11:1 dark — see design-a11y.md", "$extensions": { "anydesign.confidence": "high", "anydesign.a11y": "fails-AA" } }
+  },
+  "decor": {
+    "$type": "color",
+    "halo-1":    { "$value": "rgba(238,127,31,0.30)", "$description": "Primary hero halo (blur 90px). dark: rgba(255,154,74,0.36)" },
+    "halo-2":    { "$value": "rgba(255,195,130,0.26)", "$description": "Secondary drifting halo. dark: rgba(255,196,130,0.18)" },
+    "halo-3":    { "$value": "rgba(255,230,195,0.20)", "$description": "Tertiary drifting halo. dark: rgba(255,220,160,0.14)" },
+    "grid-line": { "$value": "rgba(110,75,30,0.05)", "$description": "Hero dot-grid (28px radial), masked ellipse. dark: rgba(255,222,195,0.05)" }
+  },
+  "typography": {
+    "$type": "typography",
+    "display":     { "$value": { "fontFamily": "Inter", "fontWeight": 700, "fontSize": "clamp(46px,8vw,96px)", "lineHeight": 1.0, "letterSpacing": "-0.04em" }, "$description": "Hero h1" },
+    "h2-section":  { "$value": { "fontFamily": "Inter", "fontWeight": 600, "fontSize": "clamp(34px,4.6vw,52px)", "lineHeight": 1.1, "letterSpacing": "-0.02em" }, "$description": "Centered section heads" },
+    "h2-split":    { "$value": { "fontFamily": "Inter", "fontWeight": 600, "fontSize": "clamp(32px,4vw,46px)", "lineHeight": 1.05, "letterSpacing": "-0.025em" }, "$description": "Split-section headings" },
+    "serif-accent":{ "$value": { "fontFamily": "Instrument Serif", "fontStyle": "italic", "fontWeight": 400, "letterSpacing": "-0.01em" }, "$description": "Italic serif amber accent inside headings — the brand signature" },
+    "body":        { "$value": { "fontFamily": "Inter", "fontWeight": 400, "fontSize": "16px", "lineHeight": 1.5, "letterSpacing": "-0.011em" }, "$description": "Body copy" },
+    "body-sm":     { "$value": { "fontFamily": "Inter", "fontWeight": 400, "fontSize": "13.5px", "lineHeight": 1.6 }, "$description": "Card/feature/pillar copy" },
+    "eyebrow-mono":{ "$value": { "fontFamily": "JetBrains Mono", "fontWeight": 500, "fontSize": "12px", "letterSpacing": "0.02em", "textTransform": "uppercase" }, "$description": "Section eyebrow labels" },
+    "meta-mono":   { "$value": { "fontFamily": "JetBrains Mono", "fontWeight": 400, "fontSize": "12px" }, "$description": "Hero meta, footer copy, format chips" }
+  },
+  "fontFamily": {
+    "$type": "fontFamily",
+    "sans":  { "$value": ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"] },
+    "serif": { "$value": ["Instrument Serif", "Iowan Old Style", "Georgia", "serif"] },
+    "mono":  { "$value": ["JetBrains Mono", "ui-monospace", "monospace"] }
+  },
+  "space": {
+    "$type": "dimension",
+    "base":  { "$value": "4px" },
+    "scale": { "$value": ["4px","8px","10px","12px","14px","16px","18px","24px","28px","32px","56px","64px","96px","120px"], "$description": "Observed multiples; section rhythm = 96px, head→content = 56px" }
+  },
+  "radius": {
+    "$type": "dimension",
+    "sm":   { "$value": "8px", "$description": "nav controls, icon-btn, lang-trigger" },
+    "md":   { "$value": "10px", "$description": "buttons, lang-menu" },
+    "lg":   { "$value": "14px", "$description": "pillar / feature cards" },
+    "xl":   { "$value": "16px", "$description": "hero device window" },
+    "2xl":  { "$value": "24px", "$description": "showcase banner card" },
+    "pill": { "$value": "999px", "$description": "badge, format chip" }
+  },
+  "shadow": {
+    "$type": "shadow",
+    "card":   { "$value": "0 1px 2px rgba(60,40,20,0.04), 0 0 0 1px rgba(110,75,30,0.12)", "$description": "Hairline + faint drop. dark: inset top highlight + hairline" },
+    "window": { "$value": "0 24px 60px rgba(60,40,20,0.14), 0 8px 24px rgba(60,40,20,0.07)", "$description": "Device windows, banner, split images" },
+    "pop":    { "$value": "0 14px 36px -10px rgba(60,40,20,0.22), 0 0 0 1px rgba(110,75,30,0.12)", "$description": "Lang menu popover" },
+    "cta":    { "$value": "0 8px 24px -8px rgba(238,127,31,0.55), 0 2px 4px rgba(238,127,31,0.12)", "$description": "Accent button glow (amber-tinted)" }
+  },
+  "motion": {
+    "$type": "duration",
+    "micro":   { "$value": "150ms", "$description": "hover color/transform" },
+    "base":    { "$value": "200ms", "$description": "buttons, menu fades" },
+    "theme":   { "$value": "300ms", "$description": "light/dark crossfade" },
+    "reveal":  { "$value": "700ms", "$description": "scroll-reveal translateY(18px)+fade" },
+    "halo":    { "$value": "14000ms", "$description": "hero halo pulse/drift loops (14–22s)" }
+  }
+}

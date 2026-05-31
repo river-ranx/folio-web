@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- 标记 JS 可用：仅当本脚本执行（JS 开启）才给 <html> 加 .js，
+       入场/滚动显形动画都挂在 html.js 下 → 无 JS / 慢载时内容默认可见，不再首屏以下整片空白。 -->
+  <script>document.documentElement.classList.add('js');</script>
   <title>Folio — One app. See every file.</title>
   <meta name="description" content="Folio 让你的 Mac 安静下来。把所有你常用的文件——文档、表格、演示稿、PDF、笔记、图片、音乐与视频——全部装进一个窗口。">
   <meta property="og:title" content="Folio — One app. See every file.">
@@ -17,7 +20,7 @@
   <link rel="apple-touch-icon" href="assets/app-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     /* ===== Reset ===== */
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -39,6 +42,10 @@
       --accent-strong: #D26A0D;
       --accent-soft: rgba(238, 127, 31, 0.10);
       --accent-glow: rgba(238, 127, 31, 0.20);
+      /* 主 CTA 按钮（白字）— 浅色用更深的琥珀，白字达 WCAG AA 大字 3.62:1（品牌琥珀 #EE7F1F 仅 2.73:1） */
+      --btn-accent-bg: var(--accent-strong);
+      --btn-accent-bg-hover: #B85C09;
+      --btn-accent-fg: #FFFFFF;
       --nav-bg: rgba(251, 246, 238, 0.78);
       --halo-1: rgba(238, 127, 31, 0.30);
       --halo-2: rgba(255, 195, 130, 0.26);
@@ -68,6 +75,10 @@
       --accent-strong: #FFAD68;
       --accent-soft: rgba(255, 154, 74, 0.14);
       --accent-glow: rgba(255, 154, 74, 0.30);
+      /* 暗色：亮琥珀做底（白字仅 2.11:1），改用深字 → ≈9:1。hover 再提亮一档更跳。 */
+      --btn-accent-bg: var(--accent);
+      --btn-accent-bg-hover: var(--accent-strong);
+      --btn-accent-fg: #1A1611;
       --nav-bg: rgba(11, 9, 7, 0.72);
       --halo-1: rgba(255, 154, 74, 0.36);
       --halo-2: rgba(255, 196, 130, 0.18);
@@ -397,15 +408,15 @@
       height: 34px;
       padding: 0 16px;
       border-radius: 8px;
-      background: var(--accent);
-      color: #FFFFFF;
+      background: var(--btn-accent-bg);
+      color: var(--btn-accent-fg);
       font-size: 13px;
       font-weight: 600;
       letter-spacing: -0.005em;
       transition: background 0.2s ease, transform 0.15s ease;
     }
 
-    .nav-cta:hover { background: var(--accent-strong); }
+    .nav-cta:hover { background: var(--btn-accent-bg-hover); }
 
     .mobile-toggle {
       display: none;
@@ -481,13 +492,13 @@
     .btn:active { transform: translateY(0.5px); }
 
     .btn-accent {
-      background: var(--accent);
-      color: #FFFFFF;
+      background: var(--btn-accent-bg);
+      color: var(--btn-accent-fg);
       box-shadow: 0 8px 24px -8px rgba(238, 127, 31, 0.55), 0 2px 4px rgba(238, 127, 31, 0.12);
     }
 
     .btn-accent:hover {
-      background: var(--accent-strong);
+      background: var(--btn-accent-bg-hover);
       box-shadow: 0 10px 28px -8px rgba(238, 127, 31, 0.7), 0 2px 4px rgba(238, 127, 31, 0.15);
     }
 
@@ -498,7 +509,7 @@
     }
     .btn-soon:hover {
       transform: none;
-      background: var(--accent);
+      background: var(--btn-accent-bg);
       box-shadow: 0 8px 24px -8px rgba(238, 127, 31, 0.55), 0 2px 4px rgba(238, 127, 31, 0.12);
     }
     .btn-soon:active { transform: none; }
@@ -619,12 +630,12 @@
       align-items: center;
     }
 
-    .hero-content > * {
+    html.js .hero-content > * {
       opacity: 0;
       transform: translateY(12px);
     }
 
-    .hero-content.loaded > * {
+    html.js .hero-content.loaded > * {
       opacity: 1;
       transform: translateY(0);
     }
@@ -1251,12 +1262,15 @@
 
     /* ===== Reveal ===== */
     .reveal {
-      opacity: 0;
-      transform: translateY(18px);
       transition: opacity 0.7s ease, transform 0.7s ease;
     }
 
-    .reveal.visible {
+    html.js .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+
+    html.js .reveal.visible {
       opacity: 1;
       transform: translateY(0);
     }
@@ -1312,8 +1326,8 @@
       }
       .halo { animation: none !important; }
       .formats-track { animation: none !important; }
-      .reveal { opacity: 1; transform: none; }
-      .hero-content > * { opacity: 1; transform: none; }
+      .reveal { opacity: 1 !important; transform: none !important; }
+      .hero-content > * { opacity: 1 !important; transform: none !important; }
     }
 
     /* Chinese text flow */
@@ -1430,22 +1444,22 @@
       <div class="pillars-grid">
         <div class="pillar reveal reveal-d1">
           <span class="pillar-num">1</span>
-          <h3>Multi-Workspace</h3>
+          <h3 data-i18n="pillar.1.h">多工作空间</h3>
           <p data-i18n="pillar.1.body">每个项目一个标签页。一键切换，回到上次离开的地方——文件夹、滚动位置、上次打开的文件，都还在那里。</p>
         </div>
         <div class="pillar reveal reveal-d2">
           <span class="pillar-num">2</span>
-          <h3>All Formats, One App</h3>
+          <h3 data-i18n="pillar.2.h">全格式，一个 app</h3>
           <p data-i18n="pillar.2.body">一个 app 顶替十几个。文档、表格、演示稿、PDF、笔记、图片、音乐、视频——直接打开就能看。</p>
         </div>
         <div class="pillar reveal reveal-d3">
           <span class="pillar-num">3</span>
-          <h3>Full-Text Search</h3>
+          <h3 data-i18n="pillar.3.h">全文搜索</h3>
           <p data-i18n="pillar.3.body">搜的不只是文件名。笔记里的一句话、表格里的一个数字都能直接命中——跨所有打开的工作空间。</p>
         </div>
         <div class="pillar reveal reveal-d4">
           <span class="pillar-num">4</span>
-          <h3>Markdown Editor</h3>
+          <h3 data-i18n="pillar.4.h">Markdown 编辑器</h3>
           <p data-i18n="pillar.4.body">像阅读发表后的文章一样写作。无需分屏预览，所写即所见。</p>
         </div>
       </div>
@@ -1798,6 +1812,10 @@
         'hero.meta.devices': '全系列 Mac 适用',
         'hero.meta.free': 'Beta 免费使用',
 
+        'pillar.1.h': '多工作空间',
+        'pillar.2.h': '全格式，一个 app',
+        'pillar.3.h': '全文搜索',
+        'pillar.4.h': 'Markdown 编辑器',
         'pillar.1.body': '每个项目一个标签页。一键切换，回到上次离开的地方——文件夹、滚动位置、上次打开的文件，都还在那里。',
         'pillar.2.body': '一个 app 顶替十几个。文档、表格、演示稿、PDF、笔记、图片、音乐、视频——直接打开就能看。',
         'pillar.3.body': '搜的不只是文件名。笔记里的一句话、表格里的一个数字都能直接命中——跨所有打开的工作空间。',
@@ -1923,6 +1941,10 @@
         'hero.meta.devices': 'Made for every Mac',
         'hero.meta.free': 'Free during Beta',
 
+        'pillar.1.h': 'Multi-Workspace',
+        'pillar.2.h': 'All Formats, One App',
+        'pillar.3.h': 'Full-Text Search',
+        'pillar.4.h': 'Markdown Editor',
         'pillar.1.body': 'Every project gets its own tab. One click switches — your work is always where you left it: folder, scroll position, last opened file, all preserved.',
         'pillar.2.body': 'One app replaces a dozen. Documents, spreadsheets, slides, PDFs, notes, images, music, video — open and read instantly.',
         'pillar.3.body': 'Search reaches inside files, not just filenames. A single line in your notes or a number in a spreadsheet — found instantly, across every open workspace.',
