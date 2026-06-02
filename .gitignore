@@ -15,6 +15,7 @@
 *.log
 .cache/
 .tmp/
+.playwright-mcp/
 
 # Node (none today, but in case a tool sneaks in)
 node_modules/

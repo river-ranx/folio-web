@@ -12,10 +12,8 @@ The marketing website for **Folio**, a universal file viewer for Mac.
 
 ## Languages
 
-- 简体中文 (default for `zh-*` browsers)
-- English (default for everyone else)
-
-Toggle via the globe icon in the top-right.
+- English (default)
+- 简体中文 (via the globe toggle in the top-right; choice persists in `localStorage`)
 
 ## Local preview
 
