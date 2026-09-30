@@ -198,7 +198,7 @@
         <div class="pdf-view"><div class="pdf-find"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><span class="q"></span><span class="cnt"></span></div>
         <div class="pdf-page">
           <h4>Feedback in Fast Markets</h4>
-          <div class="au">A. Moreau · J. Tanaka · L. Berg</div>
+          <div class="pdf-au">A. Moreau · J. Tanaka · L. Berg</div>
           <p class="abs"><b>Abstract</b> We study how <mark>feedback</mark> between prices and beliefs shapes short-horizon returns. When a price move changes what participants expect, the expectation moves the price again — a loop that ordinary models treat as noise.</p>
           <p><b>1 Introduction</b> A sell-off begins as a price move and becomes a story. The story becomes a forecast, and the forecast changes positioning. Each step adds <mark>feedback</mark> to the last, until the market reacts less to information than to itself.</p>
           <p><b>2 Model</b> Traders hold heterogeneous beliefs and update on both fundamentals and price. The resulting <mark>feedback</mark> gain decides whether a shock fades or compounds, and how long the compounding lasts before liquidity pushes back.</p>

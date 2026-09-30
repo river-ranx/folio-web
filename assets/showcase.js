@@ -222,18 +222,18 @@
     const chapters = $$('.chapter', box);
     const layers = $$('.layer', $('#frame'));
     const pauseBtn = $('#showPause');
-    // layer index, video segment [start, end] (seconds)
+    // one layer per chapter; dur = how long the chapter stays up (ms)
     const MAP = [
-      { layer: 0, dur: 5500 },
-      { layer: 1, seg: [0, 14.5] },
-      { layer: 1, seg: [14.5, 25] },
-      { layer: 2, dur: 5500 },
-      { layer: 3, seg: [0, 14] }
+      { dur: 5500 },
+      { dur: 14500 },
+      { dur: 10500 },
+      { dur: 5500 },
+      { dur: 14000 }
     ];
     let cur = -1, stopped = reduced, visible = false;
     const reasons = new Set();
 
-    const load = v => { if (v && !v.getAttribute('src') && !reduced) { v.src = v.dataset.src; v.load(); } };
+    const load = v => { if (v && v.tagName === 'VIDEO' && !v.getAttribute('src') && !reduced) { v.src = v.dataset.src; v.load(); } };
     const sync = () => {
       const paused = reasons.size > 0;
       box.classList.toggle('paused', paused);
@@ -242,45 +242,33 @@
       const label = $('span', pauseBtn);
       label.dataset.i18n = stopped ? 'formats.resume' : 'formats.pause';
       label.textContent = t(label.dataset.i18n);
-      const v = layers[MAP[cur].layer];
-      if (v.tagName === 'VIDEO' && v.getAttribute('src')) { (paused || !visible) ? v.pause() : v.play().catch(() => {}); }
+      const v = layers[cur];
+      if (v.tagName === 'VIDEO' && v.getAttribute('src')) { v.loop = stopped; (paused || !visible) ? v.pause() : v.play().catch(() => {}); }
     };
     const restartBar = c => { const b = $('.bar', c); b.style.animation = 'none'; void b.offsetWidth; b.style.animation = ''; };
 
     function activate(i, user) {
       if (i === cur && !user) return;
       cur = i;
-      const m = MAP[i], vids = layers.filter(l => l.tagName === 'VIDEO');
       chapters.forEach((c, k) => {
         c.setAttribute('aria-selected', String(k === i));
         c.tabIndex = k === i ? 0 : -1;
         if (k === i) {
-          const ms = m.seg ? (m.seg[1] - m.seg[0]) * 1000 : m.dur;
-          c.style.setProperty('--dur', ms + 'ms');
+          c.style.setProperty('--dur', MAP[i].dur + 'ms');
           restartBar(c);
         }
       });
-      layers.forEach((l, k) => l.classList.toggle('on', k === m.layer));
-      vids.forEach(v => { if (v !== layers[m.layer]) v.pause(); });
-      const v = layers[m.layer];
+      layers.forEach((l, k) => l.classList.toggle('on', k === i));
+      layers.forEach((l, k) => { if (k !== i && l.tagName === 'VIDEO') l.pause(); });
+      const v = layers[i];
       if (v.tagName === 'VIDEO') {
-        load(v);
-        if (v.getAttribute('src')) {
-          const seek = () => { try { v.currentTime = m.seg[0]; } catch (e) {} };
-          v.readyState ? seek() : v.addEventListener('loadedmetadata', seek, { once: true });
-        }
+        if (v.getAttribute('src')) { try { v.currentTime = 0; } catch (e) {} } else load(v);
       }
-      // preload the export recording one chapter ahead
-      if (i === 3) load(layers[3]);
+      // preload the next recording one chapter ahead
+      load(layers[i + 1]);
       if (user) { stopped = true; }
       sync();
     }
-
-    // loop the current segment while autoplay is stopped
-    layers.filter(l => l.tagName === 'VIDEO').forEach(v => v.addEventListener('timeupdate', () => {
-      const m = MAP[cur];
-      if (layers[m.layer] === v && m.seg && v.currentTime >= m.seg[1] && stopped) v.currentTime = m.seg[0];
-    }));
 
     box.addEventListener('animationend', e => {
       if (!e.target.classList.contains('bar') || stopped) return;
@@ -458,20 +446,25 @@
     if (!full) return;
     if (reduced) { $('#fullChips').hidden = true; return; }
     const ensure = v => { if (!v.getAttribute('src')) { v.src = v.dataset.src; v.load(); } };
-    const drive = (v, loop) => whenVisible(v, () => { ensure(v); v.play().catch(() => {}); }, () => v.pause(), 0.35);
-    cli.loop = true;
-    full.loop = true;
-    drive(full); drive(cli);
-    const TS = chips.map(c => +c.dataset.t);
-    full.addEventListener('timeupdate', () => {
-      let k = 0;
-      TS.forEach((s, i) => { if (full.currentTime >= s) k = i; });
-      chips.forEach((c, i) => c.setAttribute('aria-selected', String(i === k)));
+    let visible = false, cur = 0, auto = true;
+    const play = v => v.play().catch(() => {});
+    // each chip is its own short clip: no seeking, so it also works on servers without Range support
+    const go = (i, user) => {
+      cur = i;
+      if (user) auto = false;
+      chips.forEach((c, k) => c.setAttribute('aria-selected', String(k === i)));
+      full.poster = `assets/video/full-${i + 1}-poster.webp`;
+      full.src = `assets/video/full-${i + 1}.mp4`;
+      full.load();
+      if (visible) play(full);
+    };
+    full.addEventListener('ended', () => {
+      if (auto) go((cur + 1) % chips.length);
+      else { full.currentTime = 0; play(full); }
     });
-    chips.forEach(c => c.addEventListener('click', () => {
-      ensure(full);
-      const go = () => { full.currentTime = +c.dataset.t; full.play().catch(() => {}); };
-      full.readyState ? go() : full.addEventListener('loadedmetadata', go, { once: true });
-    }));
+    chips.forEach((c, i) => c.addEventListener('click', () => { visible = true; go(i, true); }));
+    whenVisible(full, () => { visible = true; ensure(full); play(full); }, () => { visible = false; full.pause(); }, 0.35);
+    cli.loop = true;
+    whenVisible(cli, () => { ensure(cli); play(cli); }, () => cli.pause(), 0.35);
   })();
 })();
