@@ -6,8 +6,8 @@ The marketing website for **Folio**, a universal file viewer for Mac.
 
 ## Stack
 
-- Pure static site — single `index.html`, no build step, no framework
-- Inline CSS / vanilla JS for theme & i18n
+- Pure static site — `index.html` + `assets/css`, `assets/js`; no build step, no framework
+- Vanilla JS for theme, i18n and the scroll / demo choreography
 - Hosted on GitHub Pages (main branch, root)
 
 ## Languages
@@ -29,9 +29,12 @@ Pushing to `main` is the deploy. GitHub Pages serves the repo root.
 ## Structure
 
 ```
-index.html              # Single-file site (HTML + CSS + JS + i18n dictionary)
+index.html              # Markup + English copy (default)
 assets/
-  app-icon.png          # Folio app icon
-  landings/             # 7 hero landing images (one per feature section)
-  welcome/              # Welcome-window screenshot used below the hero
+  css/site.css          # Tokens, layout, all motion
+  js/i18n.js            # 中文 dictionary (+ <title> / meta)
+  js/site.js            # Theme, i18n, reveal, sticky stage, demos, video loader
+  stage/                # Sticky-stage window screenshots (webp)
+  video/                # Screen recordings (mp4 + webp poster)
+  app-icon.png, og.jpg
 ```
