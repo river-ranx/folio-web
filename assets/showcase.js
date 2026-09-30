@@ -174,7 +174,7 @@
     const list = $('#fdList'), key = $('#fdKey'), ql = $('#fdQl'), name = $('#fdQlName'), body = $('#fdQlBody');
     const row = (a, b, c, h) => `<div class="rw${h ? ' h' : ''}"><span>${a}</span><span>${b}</span><span>${c}</span></div>`;
     const F = [
-      { ext: 'MD', n: 'launch-notes.md', html: '<b>Launch notes</b><span class="m">Headings, lists and checkboxes — <i>rendered</i>, not raw markup.</span>☑ Write the release copy\n☐ Record the demo\n☐ Ship it' },
+      { ext: 'MD', n: 'notes.md', html: '<b>Launch notes</b><span class="m">Headings, lists and checkboxes — <i>rendered</i>, not raw markup.</span>☑ Write the copy\n☐ Record the demo\n☐ Ship it' },
       { ext: 'RS', n: 'main.rs', html: '<span class="t-kw">fn</span> <span class="t-fn">main</span>() {\n    <span class="t-kw">let</span> app = <span class="t-st">"Folio"</span>;\n    println!(<span class="t-st">"hello, {app}"</span>);\n}' },
       { ext: 'DB', n: 'app.sqlite', html: row('id', 'name', 'plan', 1) + row(1, 'Ada', 'free') + row(2, 'Grace', 'team') + row(3, 'Alan', 'free') },
       { ext: 'JS', n: 'config.json', html: '{\n  <span class="t-ty">"theme"</span>: <span class="t-st">"midnight"</span>,\n  <span class="t-ty">"tabs"</span>: <span class="t-kw">true</span>,\n  <span class="t-ty">"size"</span>: <span class="t-fn">14</span>\n}' }
