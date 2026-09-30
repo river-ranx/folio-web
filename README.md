@@ -29,9 +29,14 @@ Pushing to `main` is the deploy. GitHub Pages serves the repo root.
 ## Structure
 
 ```
-index.html              # Single-file site (HTML + CSS + JS + i18n dictionary)
+index.html              # Markup only
 assets/
+  site.css              # All styles (dark default, html.light overrides)
+  i18n.js               # en / zh dictionary + applyI18n
+  app.js                # Shell: theme, language, nav, reveal, FAQ, marquee
+  hero.js               # Live Folio window driven by file-type chips
+  showcase.js           # Bento micro-demos, chaptered recordings, full-edition palette
   app-icon.png          # Folio app icon
-  landings/             # 7 hero landing images (one per feature section)
-  welcome/              # Welcome-window screenshot used below the hero
+  img/                  # Screenshots (webp) + og.jpg
+  video/                # Screen recordings (mp4 + poster), lazy-loaded
 ```

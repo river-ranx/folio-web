@@ -16,7 +16,7 @@
   <meta property="og:title" content="Folio — One app. See every file.">
   <meta property="og:description" content="The universal viewer for Mac. One window for every file.">
   <meta property="og:type" content="website">
-  <meta property="og:image" content="assets/landings/01-hero.png">
+  <meta property="og:image" content="assets/img/og.jpg">
   <meta name="theme-color" content="#0A0908">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -257,11 +257,23 @@
             <div class="shotimg"><img src="assets/img/video.webp" alt="Folio playing a video" width="1400" height="930" loading="lazy" decoding="async"></div>
           </article>
 
+          <!-- Finder integration -->
+          <article class="card spot c-finder reveal">
+            <h3 data-i18n="card.finder.h">Space bar, straight from Finder</h3>
+            <p data-i18n="card.finder.p">Select a Markdown, code, data or 3D file in Finder and press Space — Folio's Quick Look extension renders it properly. A Finder quick action opens it in Folio.</p>
+            <div class="vis fd" id="fdVis">
+              <div class="fd-list" id="fdList" role="group" data-i18n-attr="aria-label:card.finder.files" aria-label="Files in Finder"></div>
+              <span class="fd-key" id="fdKey" aria-hidden="true">space</span>
+              <div class="fd-ql" id="fdQl" aria-hidden="true"><div class="fd-ql-bar"><i></i><span id="fdQlName"></span></div><div class="fd-ql-body" id="fdQlBody"></div></div>
+              <span class="fd-qa" data-i18n="card.finder.qa">Quick action · Open in Folio</span>
+            </div>
+          </article>
+
           <!-- Glass -->
           <article class="card spot c-glass reveal" id="glassCard">
-            <div style="flex:1;min-width:0">
+            <div>
               <h3 data-i18n="card.glass.h">Glass that feels like macOS</h3>
-              <p data-i18n="card.glass.p" style="max-width:48ch">A delicate, translucent interface in step with the system aesthetic — Liquid Glass, kept out of the way of your content.</p>
+              <p data-i18n="card.glass.p">A delicate, translucent interface in step with the system aesthetic — Liquid Glass, kept out of the way of your content.</p>
             </div>
             <div class="gl-vis" id="glVis" aria-hidden="true">
               <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>

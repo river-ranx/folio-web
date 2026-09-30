@@ -167,6 +167,52 @@
     });
   })();
 
+  // ----- Finder + Quick Look -----
+  (() => {
+    const vis = $('#fdVis');
+    if (!vis) return;
+    const list = $('#fdList'), key = $('#fdKey'), ql = $('#fdQl'), name = $('#fdQlName'), body = $('#fdQlBody');
+    const row = (a, b, c, h) => `<div class="rw${h ? ' h' : ''}"><span>${a}</span><span>${b}</span><span>${c}</span></div>`;
+    const F = [
+      { ext: 'MD', n: 'launch-notes.md', html: '<b>Launch notes</b><span class="m">Headings, lists and checkboxes — <i>rendered</i>, not raw markup.</span>☑ Write the release copy\n☐ Record the demo\n☐ Ship it' },
+      { ext: 'RS', n: 'main.rs', html: '<span class="t-kw">fn</span> <span class="t-fn">main</span>() {\n    <span class="t-kw">let</span> app = <span class="t-st">"Folio"</span>;\n    println!(<span class="t-st">"hello, {app}"</span>);\n}' },
+      { ext: 'DB', n: 'app.sqlite', html: row('id', 'name', 'plan', 1) + row(1, 'Ada', 'free') + row(2, 'Grace', 'team') + row(3, 'Alan', 'free') },
+      { ext: 'JS', n: 'config.json', html: '{\n  <span class="t-ty">"theme"</span>: <span class="t-st">"midnight"</span>,\n  <span class="t-ty">"tabs"</span>: <span class="t-kw">true</span>,\n  <span class="t-ty">"size"</span>: <span class="t-fn">14</span>\n}' }
+    ];
+    list.innerHTML = F.map((f, i) => `<button class="fd-row" type="button" data-i="${i}" tabindex="${i ? -1 : 0}"><span class="fx">${f.ext}</span>${f.n}</button>`).join('');
+    const rows = $$('.fd-row', list);
+    let T = null, cur = 0, auto = !reduced, visible = false;
+    const paint = i => {
+      cur = i;
+      rows.forEach((r, k) => { r.classList.toggle('on', k === i); r.tabIndex = k === i ? 0 : -1; });
+      name.textContent = F[i].n;
+      body.innerHTML = F[i].html;
+    };
+    const play = () => {
+      T && T.stop();
+      T = makeTimeline();
+      ql.classList.remove('on');
+      paint(cur);
+      T.at(450, () => key.classList.add('down'));
+      T.at(650, () => ql.classList.add('on'));
+      T.at(800, () => key.classList.remove('down'));
+      T.at(3300, () => ql.classList.remove('on'));
+      T.at(3800, () => { cur = (cur + 1) % F.length; play(); });
+      T.onStop(() => key.classList.remove('down'));
+    };
+    const manual = i => { auto = false; T && T.stop(); paint(i); ql.classList.add('on'); };
+    rows.forEach((r, i) => {
+      r.addEventListener('click', () => manual(i));
+      r.addEventListener('keydown', e => {
+        const d = e.key === 'ArrowDown' ? 1 : e.key === 'ArrowUp' ? -1 : 0;
+        if (d) { e.preventDefault(); const n = (cur + d + F.length) % F.length; manual(n); rows[n].focus(); }
+      });
+    });
+    if (reduced) { paint(0); ql.classList.add('on'); return; }
+    paint(0);
+    whenVisible(vis, () => { visible = true; if (auto) play(); }, () => { visible = false; T && T.stop(); }, 0.3);
+  })();
+
   // =====================================================================
   // Chaptered player: “Open it. Edit it. Send it out.”
   // =====================================================================
