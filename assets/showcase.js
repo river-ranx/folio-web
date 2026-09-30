@@ -3,6 +3,7 @@
   const { $, $$, makeTimeline } = window.folio;
   const reduced = window.folio.reduced();
   const t = k => i18n.t(k);
+  const still = () => window.folio.paused();
 
   // Run `on()` while `el` is on screen, `off()` otherwise.
   function whenVisible(el, on, off, threshold = 0.25) {
@@ -47,7 +48,7 @@
     });
     show(0, false);
     if (!reduced) {
-      const tick = () => { if (auto && visible) show((cur + 1) % WS.length, false); };
+      const tick = () => { if (auto && visible && !still()) show((cur + 1) % WS.length, false); };
       setInterval(tick, 3600);
       whenVisible(vis, () => { visible = true; }, () => { visible = false; });
     }
@@ -71,8 +72,9 @@
       list.innerHTML = Q[qi].r.map(([n, e, w, s]) => `<div class="sr-item"><div class="nm">${n}<em>${e}</em>${w ? `<span style="color:var(--mute)">${w}</span>` : ''}</div><div>${s}</div></div>`).join('');
     };
     if (reduced) { paint(0, 99); results(0); $$('.sr-item', list).forEach(el => el.classList.add('show')); return; }
-    let T = null, qi = 0, visible = false;
+    let T = null, qi = 0, visible = false, idle = false;
     const run = () => {
+      idle = false;
       T && T.stop();
       T = makeTimeline();
       const d = Q[qi];
@@ -81,9 +83,10 @@
       [...d.q].forEach((_, i) => T.at(500 + i * 85, () => paint(qi, i + 1)));
       const tEnd = 500 + d.q.length * 85 + 200;
       T.at(tEnd, () => { results(qi); $$('.sr-item', list).forEach((el, i) => setTimeout(() => el.classList.add('show'), i * 110)); });
-      T.at(tEnd + 3400, () => { qi = (qi + 1) % Q.length; run(); });
+      T.at(tEnd + 3400, () => { if (still()) { idle = true; return; } qi = (qi + 1) % Q.length; run(); });
     };
     whenVisible(vis, () => { if (!visible) { visible = true; run(); } }, () => { visible = false; T && T.stop(); });
+    document.addEventListener('motionchange', () => { if (!still() && idle && visible) { idle = false; qi = (qi + 1) % Q.length; run(); } });
   })();
 
   // ----- Language cloud -----
@@ -98,7 +101,7 @@
     let visible = false, last = 0;
     whenVisible(cloud, () => { visible = true; }, () => { visible = false; });
     setInterval(() => {
-      if (!visible) return;
+      if (!visible || still()) return;
       pills[last].classList.remove('lit');
       let n; do { n = Math.floor(Math.random() * pills.length); } while (n === last);
       last = n; pills[n].classList.add('lit');
@@ -122,7 +125,7 @@
     set(0);
     if (!reduced) {
       whenVisible(box, () => { visible = true; }, () => { visible = false; });
-      setInterval(() => { if (auto && visible) set((cur + 1) % C.length); }, 1300);
+      setInterval(() => { if (auto && visible && !still()) set((cur + 1) % C.length); }, 1300);
     }
   })();
 
@@ -181,7 +184,7 @@
     ];
     list.innerHTML = F.map((f, i) => `<button class="fd-row" type="button" data-i="${i}" tabindex="${i ? -1 : 0}"><span class="fx">${f.ext}</span>${f.n}</button>`).join('');
     const rows = $$('.fd-row', list);
-    let T = null, cur = 0, auto = !reduced, visible = false;
+    let T = null, cur = 0, auto = !reduced, visible = false, idle = false;
     const paint = i => {
       cur = i;
       rows.forEach((r, k) => { r.classList.toggle('on', k === i); r.tabIndex = k === i ? 0 : -1; });
@@ -189,6 +192,7 @@
       body.innerHTML = F[i].html;
     };
     const play = () => {
+      idle = false;
       T && T.stop();
       T = makeTimeline();
       ql.classList.remove('on');
@@ -197,7 +201,7 @@
       T.at(650, () => ql.classList.add('on'));
       T.at(800, () => key.classList.remove('down'));
       T.at(3300, () => ql.classList.remove('on'));
-      T.at(3800, () => { cur = (cur + 1) % F.length; play(); });
+      T.at(3800, () => { if (still()) { idle = true; ql.classList.add('on'); return; } cur = (cur + 1) % F.length; play(); });
       T.onStop(() => key.classList.remove('down'));
     };
     const manual = i => { auto = false; T && T.stop(); paint(i); ql.classList.add('on'); };
@@ -211,6 +215,7 @@
     if (reduced) { paint(0); ql.classList.add('on'); return; }
     paint(0);
     whenVisible(vis, () => { visible = true; if (auto) play(); }, () => { visible = false; T && T.stop(); }, 0.3);
+    document.addEventListener('motionchange', () => { if (!still() && idle && visible && auto) { cur = (cur + 1) % F.length; play(); } });
   })();
 
   // =====================================================================
@@ -270,6 +275,7 @@
       sync();
     }
 
+    document.addEventListener('motionchange', () => { still() ? reasons.add('still') : reasons.delete('still'); sync(); });
     box.addEventListener('animationend', e => {
       if (!e.target.classList.contains('bar') || stopped) return;
       activate((cur + 1) % MAP.length, false);
@@ -420,6 +426,7 @@
       if (user) stopped = true;
       sync();
     }
+    document.addEventListener('motionchange', () => { still() ? reasons.add('still') : reasons.delete('still'); sync(); });
     pal.addEventListener('animationend', e => { if (e.target.classList.contains('bar') && !stopped) select((cur + 1) % S.length); });
     rows.forEach((r, i) => {
       r.addEventListener('click', () => select(i, true));
@@ -446,8 +453,8 @@
     if (!full) return;
     if (reduced) { $('#fullChips').hidden = true; return; }
     const ensure = v => { if (!v.getAttribute('src')) { v.src = v.dataset.src; v.load(); } };
-    let visible = false, cur = 0, auto = true;
-    const play = v => v.play().catch(() => {});
+    let visible = false, cliVisible = false, cur = 0, auto = true;
+    const play = v => { if (!window.folio.paused()) v.play().catch(() => {}); };
     // each chip is its own short clip: no seeking, so it also works on servers without Range support
     const go = (i, user) => {
       cur = i;
@@ -464,7 +471,8 @@
     });
     chips.forEach((c, i) => c.addEventListener('click', () => { visible = true; go(i, true); }));
     whenVisible(full, () => { visible = true; ensure(full); play(full); }, () => { visible = false; full.pause(); }, 0.35);
+    document.addEventListener('motionchange', () => { if (window.folio.paused()) { full.pause(); cli.pause(); } else { if (visible) play(full); if (cliVisible) play(cli); } });
     cli.loop = true;
-    whenVisible(cli, () => { ensure(cli); play(cli); }, () => cli.pause(), 0.35);
+    whenVisible(cli, () => { cliVisible = true; ensure(cli); play(cli); }, () => { cliVisible = false; cli.pause(); }, 0.35);
   })();
 })();

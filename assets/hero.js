@@ -104,8 +104,7 @@
         });
         void tbl.offsetHeight;
         els.forEach(el => { el.style.transition = ''; el.style.transform = ''; });
-      },
-      dim(fn) { els.forEach((el, i) => el.classList.toggle('dim', !!fn && !fn(rows[i]))); }
+      }
     };
     if (sort) api.sortBy(sort.col, sort.dir);
     return api;
@@ -258,19 +257,18 @@
         <div class="dx-view"><div class="dx-page"><h4><span class="selbox"></span>Folio Introduction</h4><div class="sub">A focused universal file viewer for macOS</div>
         <h5>Executive summary</h5><p>Mac users juggle several single-purpose apps just to open the file types they meet every day. Folio collapses that into one predictable workspace.</p>
         <h5>Supported formats</h5>
-        <table><tr><th>Capability</th><th>Folio</th><th>Native preview</th></tr><tr><td>File formats</td><td>14 kinds</td><td>Fewer</td></tr><tr><td>Full-text search</td><td>Yes</td><td>No</td></tr></table></div></div></div>
-        <div class="dx-badge"></div>`;
+        <table><tr><th>Capability</th><th>In Folio</th></tr><tr><td>File formats</td><td>14 kinds</td></tr><tr><td>Editing</td><td>.docx in, .docx out</td></tr></table></div></div></div>
+        <div class="pill-note"></div>`;
     },
     enter(root, T, settled) {
-      const h = $('h4', root), b = $$('.dx-tools button', root)[0], sw = $$('.dx-tools .sw i', root), badge = $('.dx-badge', root);
+      const h = $('h4', root), b = $$('.dx-tools button', root)[0], sw = $$('.dx-tools .sw i', root);
       const bold = () => { h.classList.add('bold'); b.classList.add('on'); };
       const recolor = () => { h.classList.add('styled'); sw[2].classList.add('on'); };
-      if (settled) { bold(); recolor(); badge.classList.add('show'); return; }
+      if (settled) { bold(); recolor(); return; }
       T.at(600, () => h.classList.add('sel-on'));
       T.at(1500, bold);
       T.at(2300, recolor);
       T.at(3200, () => { h.classList.remove('sel-on'); b.classList.remove('on'); });
-      T.at(3900, () => badge.classList.add('show'));
     }
   });
 
@@ -317,18 +315,14 @@
   const POP = [['Brazil', 'South America', 214], ['China', 'Asia', 1412], ['India', 'Asia', 1408], ['Indonesia', 'Asia', 276], ['Nigeria', 'Africa', 218], ['Pakistan', 'Asia', 231], ['United States', 'North America', 333]];
   scene({
     id: 'csv', ext: 'CSV', chip: 'chip.sheet', chipI18n: true, dir: 'data', file: 'population.csv', kind: 'sc.kind.csv', note: 'sc.csv', dur: 7000,
-    build() { return '<div class="tbl-wrap"><div class="tbl-bar"><span>population.csv</span><span class="flt"></span></div><div class="tbl-host"></div></div><div class="pill-note"></div>'; },
+    build() { return '<div class="tbl-wrap"><div class="tbl-bar"><span>population.csv</span></div><div class="tbl-host"></div></div><div class="pill-note"></div>'; },
     enter(root, T, settled) {
-      const host = $('.tbl-host', root), flt = $('.flt', root);
-      flt.textContent = t('sc.filter');
+      const host = $('.tbl-host', root);
       const tb = mountTable(host, { cols: [{ label: 'Country' }, { label: 'Region' }, { label: 'Population (M)', num: true }], rows: POP, grid: '1.4fr 1.2fr 1fr' });
-      const isAsia = r => r[1] === 'Asia';
       let userTouched = false;
-      tb.onUser = () => { userTouched = true; tb.dim(null); flt.classList.remove('on'); };
+      tb.onUser = () => { userTouched = true; };
       if (settled) { tb.sortBy(2, -1); return; }
       T.at(1200, () => { if (!userTouched) tb.sortBy(2, -1); });
-      T.at(3400, () => { if (!userTouched) { flt.classList.add('on'); tb.dim(isAsia); } });
-      T.at(5600, () => { if (!userTouched) { flt.classList.remove('on'); tb.dim(null); } });
     }
   });
 
@@ -424,7 +418,7 @@
       if (settled || window.folio.reduced()) { draw(); return; }
       let last = performance.now();
       T.loop(now => {
-        if (!stageVisible) { last = now; return; }
+        if (!stageVisible || window.folio.paused()) { last = now; return; }
         const dt = Math.min(48, now - last); last = now;
         if (!dragging) {
           ry += vy + 0.0007 * dt; rx += vx;
@@ -474,7 +468,7 @@
       let last = performance.now();
       T.loop(now => {
         const dt = (now - last) / 1000; last = now;
-        if (playing && stageVisible) { tt += dt; if (tt >= DUR) tt = 0; paint(); }
+        if (playing && stageVisible && !window.folio.paused()) { tt += dt; if (tt >= DUR) tt = 0; paint(); }
       });
     }
   });
@@ -494,13 +488,14 @@
 
   // chips
   chipsEl.innerHTML = seq.map((s, i) =>
-    `<button class="chip" type="button" role="tab" id="chip-${s.id}" data-id="${s.id}" aria-selected="false" aria-controls="winMain" tabindex="${i ? -1 : 0}"><span class="fx">${s.ext}</span><span class="lbl" ${s.chipI18n ? `data-i18n="${s.chip}"` : ''}>${s.chipI18n ? t(s.chip) : s.chip}</span><i class="bar"></i></button>`).join('');
+    `<button class="chip" type="button" role="tab" id="chip-${s.id}" data-id="${s.id}" aria-selected="false" aria-controls="scene-${s.id}" tabindex="${i ? -1 : 0}"><span class="fx">${s.ext}</span><span class="lbl" ${s.chipI18n ? `data-i18n="${s.chip}"` : ''}>${s.chipI18n ? t(s.chip) : s.chip}</span><i class="bar"></i></button>`).join('');
 
   // scene hosts
   SCENES.forEach(s => {
     const el = document.createElement('div');
     el.className = 'scene';
     el.dataset.id = s.id;
+    el.id = 'scene-' + s.id;
     el.setAttribute('role', 'tabpanel');
     el.setAttribute('aria-labelledby', 'chip-' + s.id);
     main.insertBefore(el, $('#winStatus'));
@@ -608,8 +603,11 @@
     stage.addEventListener('mouseenter', () => { reasons.add('hover'); syncDock(); });
     stage.addEventListener('mouseleave', () => { reasons.delete('hover'); syncDock(); });
   }
-  dock.addEventListener('focusin', () => { reasons.add('focus'); syncDock(); });
-  dock.addEventListener('focusout', () => { reasons.delete('focus'); syncDock(); });
+  [dock, win].forEach(el => {
+    el.addEventListener('focusin', () => { reasons.add('focus'); syncDock(); });
+    el.addEventListener('focusout', () => { reasons.delete('focus'); syncDock(); });
+  });
+  document.addEventListener('motionchange', () => { window.folio.paused() ? reasons.add('still') : reasons.delete('still'); syncDock(); });
   new IntersectionObserver(([en]) => {
     stageVisible = en.isIntersecting;
     stageVisible ? reasons.delete('offscreen') : reasons.add('offscreen');

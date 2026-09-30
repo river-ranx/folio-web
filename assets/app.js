@@ -3,7 +3,8 @@
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const reducedMq = matchMedia('(prefers-reduced-motion: reduce)');
-  window.folio = { $, $$, reduced: () => reducedMq.matches };
+  let stilled = false;
+  window.folio = { $, $$, reduced: () => reducedMq.matches, paused: () => stilled };
 
   // ----- Language -----
   const langSwitch = $('#langSwitch');
@@ -41,6 +42,18 @@
     document.dispatchEvent(new CustomEvent('themechange'));
   });
 
+  // ----- Pause all motion (WCAG 2.2.2: one control for everything that moves on its own) -----
+  const motionBtn = $('#motionBtn');
+  const setStill = on => {
+    stilled = on;
+    document.documentElement.classList.toggle('still', on);
+    motionBtn.setAttribute('aria-pressed', String(on));
+    motionBtn.setAttribute('aria-label', i18n.t(on ? 'nav.motion.on' : 'nav.motion'));
+    document.dispatchEvent(new CustomEvent('motionchange'));
+  };
+  motionBtn.addEventListener('click', () => setStill(!stilled));
+  document.addEventListener('langchange', () => motionBtn.setAttribute('aria-label', i18n.t(stilled ? 'nav.motion.on' : 'nav.motion')));
+
   // ----- Navbar / mobile menu -----
   const navbar = $('.navbar');
   const onScroll = () => navbar.classList.toggle('scrolled', window.scrollY > 12);
@@ -56,6 +69,7 @@
   };
   mToggle.addEventListener('click', () => setMobile(!mMenu.classList.contains('open')));
   $$('a', mMenu).forEach(a => a.addEventListener('click', () => setMobile(false)));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && mMenu.classList.contains('open')) { setMobile(false); mToggle.focus(); } });
 
   // ----- Entrance -----
   window.addEventListener('load', () => {
