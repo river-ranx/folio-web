@@ -974,8 +974,7 @@ html.dark .converge .core {
   letter-spacing: -0.015em;
 }
 
-.chapter-head > p,
-.chapter-head-split > p {
+.chapter-head p {
   margin-top: 18px;
   font-size: 17px;
   color: var(--text-dim);
@@ -1605,7 +1604,7 @@ figcaption {
 .sl-doc {
   position: relative;
   width: 80%;
-  height: 82%;
+  height: 88%;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -1629,7 +1628,7 @@ figcaption {
 .sl-menu {
   position: absolute;
   left: 0;
-  top: 78px;
+  top: 62px;
   width: 72%;
   list-style: none;
   padding: 5px;
@@ -1645,7 +1644,7 @@ figcaption {
   display: flex;
   align-items: center;
   gap: 8px;
-  height: 28px;
+  height: 26px;
   padding: 0 8px;
   border-radius: 6px;
   font-size: 12.5px;
@@ -1663,7 +1662,7 @@ figcaption {
 .sl-table {
   position: absolute;
   left: 0;
-  top: 54px;
+  top: 46px;
   width: 78%;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1808,7 +1807,7 @@ figcaption {
   92%, 100% { background: #E7DDCC; height: 5px; }
 }
 
-.html-demo { padding: 14px; }
+.html-demo { padding: 8px; }
 .html-demo .window-frame { width: 100%; border-radius: 10px; box-shadow: var(--shadow-card); }
 
 /* spec list */
@@ -2571,6 +2570,7 @@ html.js .reveal.visible {
 }
 
 @media (max-width: 480px) {
+  .hero-meta .sep { display: none; }
   .hero h1 { font-size: 46px; }
   .hero-cta { flex-direction: column; width: 100%; }
   .hero-cta .btn { width: 100%; }
