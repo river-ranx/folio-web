@@ -96,7 +96,7 @@ function applyI18n(lang) {
   const label = $('#langLabel');
   if (label) label.textContent = dict['lang.label'];
   $$('#langMenu button[data-lang]').forEach(btn => {
-    btn.setAttribute('aria-current', btn.dataset.lang === lang ? 'true' : 'false');
+    btn.setAttribute('aria-checked', btn.dataset.lang === lang ? 'true' : 'false');
   });
 
   document.dispatchEvent(new CustomEvent('folio:lang', { detail: lang }));
@@ -114,6 +114,7 @@ function toggleLangMenu(e) {
   const el = $('#langSwitch');
   const isOpen = el.classList.toggle('open');
   $('.lang-trigger', el).setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  if (isOpen && e.detail === 0) $('#langMenu button[aria-checked="true"]').focus(); // 键盘打开：焦点进菜单
 }
 
 function closeLangMenu() {
@@ -128,7 +129,25 @@ document.addEventListener('click', (e) => {
   if (sw && !sw.contains(e.target)) closeLangMenu();
 });
 
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLangMenu(); });
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const sw = $('#langSwitch');
+    if (sw.classList.contains('open') && sw.contains(document.activeElement)) $('.lang-trigger', sw).focus();
+    closeLangMenu();
+    closeMobileMenu();
+  }
+  const menu = $('#langMenu');
+  if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && menu.contains(document.activeElement)) {
+    e.preventDefault();
+    const items = $$('button', menu);
+    items[(items.indexOf(document.activeElement) + (e.key === 'ArrowDown' ? 1 : items.length - 1)) % items.length].focus();
+  }
+});
+
+// 焦点离开语言开关就收起菜单
+$('#langSwitch').addEventListener('focusout', (e) => {
+  if (!e.currentTarget.contains(e.relatedTarget)) closeLangMenu();
+});
 
 // ===== Theme =====
 function updateThemeColor(isDark) {
@@ -167,12 +186,14 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 
 function toggleMobileMenu() {
-  $('.mobile-toggle').classList.toggle('open');
-  $('#mobileMenu').classList.toggle('open');
+  const open = $('#mobileMenu').classList.toggle('open');
+  $('.mobile-toggle').classList.toggle('open', open);
+  $('.mobile-toggle').setAttribute('aria-expanded', String(open));
 }
 
 function closeMobileMenu() {
   $('.mobile-toggle').classList.remove('open');
+  $('.mobile-toggle').setAttribute('aria-expanded', 'false');
   $('#mobileMenu').classList.remove('open');
 }
 
@@ -222,6 +243,7 @@ const animObserver = new IntersectionObserver(entries => {
   if (!root) return;
   const steps = $$('.step', root);
   const shots = $$('.shot', root);
+  root.style.setProperty('--steps', steps.length);
 
   function setStep(i) {
     root.dataset.step = i;
@@ -269,7 +291,8 @@ const animObserver = new IntersectionObserver(entries => {
     });
   });
 
-  // 没人动手时，缓慢轮播一遍，让人看到「每个标签各留各的位置」
+  // 没人动手时，缓慢轮播一遍，让人看到「每个标签各留各的位置」；指针或焦点一进来就停
+  ['pointerenter', 'focusin'].forEach(ev => root.addEventListener(ev, () => { touched = true; }));
   whenVisible(root, async signal => {
     let i = tabs.findIndex(b => b.getAttribute('aria-selected') === 'true');
     while (!touched) {
@@ -351,13 +374,22 @@ const animObserver = new IntersectionObserver(entries => {
       const v = e.target;
       if (e.isIntersecting) {
         if (!v.getAttribute('src')) v.src = v.dataset.src;
-        v.play().catch(() => {});
+        if (!v.dataset.held) v.play().catch(() => {});
       } else {
         v.pause();
       }
     });
   }, { threshold: 0.4 });
-  vids.forEach(v => io.observe(v));
+  vids.forEach(v => {
+    io.observe(v);
+    // 用户手动暂停后不再被滚动自动唤醒
+    const btn = $('.vid-toggle', v.parentElement);
+    btn.addEventListener('click', () => {
+      const hold = btn.getAttribute('aria-pressed') !== 'true';
+      btn.setAttribute('aria-pressed', String(hold));
+      if (hold) { v.dataset.held = '1'; v.pause(); } else { delete v.dataset.held; v.play().catch(() => {}); }
+    });
+  });
 
   const md = $('#vidMd');
   const tags = $$('.vtag');
@@ -397,6 +429,7 @@ const animObserver = new IntersectionObserver(entries => {
     root.style.setProperty('--tl', b.dataset.l);
     root.style.setProperty('--td', b.dataset.d);
     nameEl.textContent = label(b);
+    nameEl.parentElement.setAttribute('aria-live', touched ? 'polite' : 'off'); // 自动换色时不打扰读屏
     if (focus) b.focus();
   }
 
@@ -413,9 +446,13 @@ const animObserver = new IntersectionObserver(entries => {
   });
 
   pick(current);
-  document.addEventListener('folio:lang', () => { nameEl.textContent = label(current); });
+  document.addEventListener('folio:lang', () => {
+    nameEl.textContent = label(current);
+    swatches.forEach(b => b.setAttribute('aria-label', label(b)));
+  });
 
-  // 没人动手时，慢慢换色，让人看到整个界面跟着变
+  // 没人动手时，慢慢换色，让人看到整个界面跟着变；指针或焦点一进来就停
+  ['pointerenter', 'focusin'].forEach(ev => root.addEventListener(ev, () => { touched = true; }));
   whenVisible(root, async signal => {
     while (!touched) {
       await sleep(2800, signal);

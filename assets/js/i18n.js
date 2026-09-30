@@ -20,6 +20,7 @@ const I18N = {
     'nav.cta': '下载 Folio',
     'nav.theme': '切换主题',
     'nav.menu': '菜单',
+    'nav.skip': '跳到正文',
 
     'btn.download': '下载 macOS 版',
     'btn.explore': '探索功能',
@@ -136,6 +137,7 @@ const I18N = {
     'ws.resume': '恢复到',
     'ws.labels': '彩色标签',
     'ws.filter': '按标签筛选',
+    'lbl.red': '红色', 'lbl.orange': '橙色', 'lbl.yellow': '黄色', 'lbl.green': '绿色', 'lbl.blue': '蓝色', 'lbl.purple': '紫色',
 
     'search.q': '季度',
     'search.loc1': '第 12 页',
@@ -165,6 +167,7 @@ const I18N = {
     'write.vt3': '选中文字，工具栏就在手边',
     'write.vt4': '勾选任务，拖入图片',
     'write.vt5': '表格、代码块、脚注',
+    'write.vid.pause': '暂停录屏',
     'write.vid.cap': 'Folio 内实拍——Markdown 编辑器，2 倍速。',
     'slash.title': '会议记录',
     'slash.h1': '标题 1',

@@ -31,11 +31,12 @@
   <link rel="stylesheet" href="assets/css/site.css">
 </head>
 <body class="loading">
+  <a class="skip" href="#main" data-i18n="nav.skip">Skip to content</a>
   <!-- Navigation -->
-  <nav class="navbar" role="navigation">
+  <nav class="navbar" aria-label="Main">
     <div class="navbar-inner">
       <a href="#" class="brand">
-        <img src="assets/app-icon.png" alt="Folio" width="26" height="26">
+        <img src="assets/app-icon.png" alt="" width="26" height="26">
         Folio
       </a>
       <ul class="nav-links">
@@ -54,11 +55,11 @@
             <svg class="caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
           </button>
           <div class="lang-menu" role="menu" id="langMenu">
-            <button type="button" role="menuitemradio" data-lang="zh" onclick="setLang('zh')">
+            <button type="button" role="menuitemradio" aria-checked="false" lang="zh-CN" data-lang="zh" onclick="setLang('zh')">
               <svg class="check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
               中文
             </button>
-            <button type="button" role="menuitemradio" data-lang="en" onclick="setLang('en')">
+            <button type="button" role="menuitemradio" aria-checked="true" data-lang="en" onclick="setLang('en')">
               <svg class="check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
               English
             </button>
@@ -71,7 +72,7 @@
         </button>
         <a href="https://apps.apple.com/us/app/folio-universal-viewer/id6769624913?l=zh-Hans-CN&amp;mt=12"
            class="nav-cta" data-appstore target="_blank" rel="noopener" data-i18n="nav.cta">Get Folio</a>
-        <button class="mobile-toggle" onclick="toggleMobileMenu()" aria-label="Menu" data-i18n-attr="aria-label:nav.menu">
+        <button class="mobile-toggle" onclick="toggleMobileMenu()" aria-label="Menu" aria-expanded="false" aria-controls="mobileMenu" data-i18n-attr="aria-label:nav.menu">
           <span></span><span></span><span></span>
         </button>
       </div>
@@ -143,7 +144,7 @@
     </div>
   </section>
 
-  <main>
+  <main id="main">
     <!-- Contents -->
     <section class="index" id="features">
       <div class="container-wide">
@@ -299,7 +300,7 @@
               </div>
             </div>
             <div class="ws-panels">
-              <div class="ws-panel is-active" role="tabpanel" id="wsp0" aria-labelledby="wst0">
+              <div class="ws-panel is-active" role="tabpanel" tabindex="0" id="wsp0" aria-labelledby="wst0">
                 <ul class="mw-tree">
                   <li data-l="blue"><b>notes-week1.md</b></li>
                   <li data-l="blue"><b>notes-week2.md</b></li>
@@ -314,7 +315,7 @@
                   <span class="scroll-thumb" style="--top:52%"></span>
                 </div>
               </div>
-              <div class="ws-panel" role="tabpanel" id="wsp1" aria-labelledby="wst1" hidden>
+              <div class="ws-panel" role="tabpanel" tabindex="0" id="wsp1" aria-labelledby="wst1" hidden>
                 <ul class="mw-tree">
                   <li data-l="red"><b>Q3-roadmap.pptx</b></li>
                   <li class="sel" data-l="orange"><b>budget.xlsx</b></li>
@@ -329,7 +330,7 @@
                   <span class="scroll-thumb" style="--top:14%"></span>
                 </div>
               </div>
-              <div class="ws-panel" role="tabpanel" id="wsp2" aria-labelledby="wst2" hidden>
+              <div class="ws-panel" role="tabpanel" tabindex="0" id="wsp2" aria-labelledby="wst2" hidden>
                 <ul class="mw-tree">
                   <li data-l="green"><b>quiet-mind.pdf</b></li>
                   <li data-l="green"><b>type-and-space.pdf</b></li>
@@ -348,12 +349,12 @@
           </div>
           <div class="label-row" role="group" aria-label="Color labels" data-i18n-attr="aria-label:ws.labels">
             <span class="label-cap" data-i18n="ws.filter">Filter by label</span>
-            <button type="button" class="lbl" data-c="red" aria-pressed="false" aria-label="Red"></button>
-            <button type="button" class="lbl" data-c="orange" aria-pressed="false" aria-label="Orange"></button>
-            <button type="button" class="lbl" data-c="yellow" aria-pressed="false" aria-label="Yellow"></button>
-            <button type="button" class="lbl" data-c="green" aria-pressed="false" aria-label="Green"></button>
-            <button type="button" class="lbl" data-c="blue" aria-pressed="false" aria-label="Blue"></button>
-            <button type="button" class="lbl" data-c="purple" aria-pressed="false" aria-label="Purple"></button>
+            <button type="button" class="lbl" data-c="red" aria-pressed="false" aria-label="Red" data-i18n-attr="aria-label:lbl.red"></button>
+            <button type="button" class="lbl" data-c="orange" aria-pressed="false" aria-label="Orange" data-i18n-attr="aria-label:lbl.orange"></button>
+            <button type="button" class="lbl" data-c="yellow" aria-pressed="false" aria-label="Yellow" data-i18n-attr="aria-label:lbl.yellow"></button>
+            <button type="button" class="lbl" data-c="green" aria-pressed="false" aria-label="Green" data-i18n-attr="aria-label:lbl.green"></button>
+            <button type="button" class="lbl" data-c="blue" aria-pressed="false" aria-label="Blue" data-i18n-attr="aria-label:lbl.blue"></button>
+            <button type="button" class="lbl" data-c="purple" aria-pressed="false" aria-label="Purple" data-i18n-attr="aria-label:lbl.purple"></button>
           </div>
         </div>
       </div>
@@ -401,6 +402,7 @@
         <figure class="video-figure reveal">
           <div class="window-frame video-frame">
             <video id="vidMd" muted playsinline loop preload="none" poster="assets/video/write-markdown.webp" data-src="assets/video/write-markdown.mp4" width="1600" height="1002" aria-label="Screen recording of editing a Markdown note in Folio" data-i18n-attr="aria-label:write.vid.md.label"></video>
+            <button type="button" class="vid-toggle" aria-pressed="false" aria-label="Pause recording" data-i18n-attr="aria-label:write.vid.pause"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="ic-pause" d="M9 6v12M15 6v12"/><path class="ic-play" d="M8 5.5v13l11-6.5z"/></svg></button>
             <div class="vid-tags" aria-hidden="true">
               <span class="vtag is-active" data-t="0" data-i18n="write.vt1">Press / to add anything</span>
               <span class="vtag" data-t="3" data-i18n="write.vt2">Just write — no syntax to remember</span>
@@ -452,6 +454,7 @@
             <div class="fig-stage html-demo">
               <div class="window-frame video-frame">
                 <video id="vidHtml" muted playsinline loop preload="none" poster="assets/video/write-html.webp" data-src="assets/video/write-html.mp4" width="1440" height="898" aria-label="Screen recording of editing text inside an HTML page in Folio" data-i18n-attr="aria-label:write.vid.html.label"></video>
+                <button type="button" class="vid-toggle" aria-pressed="false" aria-label="Pause recording" data-i18n-attr="aria-label:write.vid.pause"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="ic-pause" d="M9 6v12M15 6v12"/><path class="ic-play" d="M8 5.5v13l11-6.5z"/></svg></button>
               </div>
             </div>
             <figcaption><b data-i18n="html.cap.h">HTML pages, too.</b> <span data-i18n="html.cap.p">Press Edit Text and type straight into the rendered page.</span></figcaption>
@@ -524,7 +527,7 @@
             <button type="button" role="radio" aria-checked="false" data-name="Amber" data-l="#D97706" data-d="#FBBF24" aria-label="Amber"></button>
             <button type="button" role="radio" aria-checked="false" data-name="Red" data-l="#DC2626" data-d="#F87171" aria-label="Red"></button>
           </div>
-          <p class="swatch-name" aria-live="polite"><span id="swatchName">Amber</span></p>
+          <p class="swatch-name" aria-live="off"><span id="swatchName">Amber</span></p>
         </div>
       </div>
     </section>
@@ -748,7 +751,7 @@
     <section class="cta-section" id="download">
       <div class="container">
         <span class="eyebrow reveal" style="margin-bottom:20px;" data-i18n="cta.eyebrow">ready?</span>
-        <h2 class="reveal">One app.<span class="serif">See every file.</span></h2>
+        <h2 class="reveal">One app. <span class="serif">See every file.</span></h2>
         <p class="reveal" data-i18n="cta.body">Make your Mac quiet. One window for every file.</p>
         <div class="cta-buttons reveal">
           <a href="https://apps.apple.com/us/app/folio-universal-viewer/id6769624913?l=zh-Hans-CN&amp;mt=12"
@@ -766,7 +769,7 @@
     <div class="container-wide">
       <div class="footer-inner">
         <div class="brand">
-          <img src="assets/app-icon.png" alt="Folio" width="22" height="22">
+          <img src="assets/app-icon.png" alt="" width="22" height="22">
           Folio
         </div>
         <span class="footer-copy" data-i18n="footer.copy">© 2026 Folio · Made for macOS</span>
