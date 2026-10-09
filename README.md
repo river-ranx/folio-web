@@ -2,7 +2,7 @@
 
 The marketing website for **Folio**, a universal file viewer for Mac.
 
-🌐 **Live**: https://river-ranx.github.io/folio-web/
+🌐 **Live**: [https://river-ranx.github.io/folio-web/](https://river-ranx.github.io/folio-web/)
 
 ## Stack
 
@@ -35,3 +35,7 @@ assets/
   landings/             # 7 hero landing images (one per feature section)
   welcome/              # Welcome-window screenshot used below the hero
 ```
+
+
+
+
