@@ -687,8 +687,7 @@
     .hero-content.loaded .hero-badge { transition: opacity 0.4s ease 0.15s, transform 0.4s ease 0.15s; }
     .hero-content.loaded h1 { transition: opacity 0.5s ease 0.25s, transform 0.5s ease 0.25s; }
     .hero-content.loaded .hero-subtitle { transition: opacity 0.5s ease 0.38s, transform 0.5s ease 0.38s; }
-    .hero-content.loaded .hero-cta { transition: opacity 0.5s ease 0.48s, transform 0.5s ease 0.48s; }
-    .hero-content.loaded .hero-alt { transition: opacity 0.4s ease 0.54s, transform 0.4s ease 0.54s; }
+    .hero-content.loaded .hero-editions { transition: opacity 0.5s ease 0.48s, transform 0.5s ease 0.48s; }
     .hero-content.loaded .hero-meta { transition: opacity 0.4s ease 0.58s, transform 0.4s ease 0.58s; }
 
     .hero-icon {
@@ -748,96 +747,122 @@
       margin-bottom: 36px;
     }
 
-    /* 首屏 CTA：Folio Pro 是主按钮；App Store 版是更轻的次级入口（文字链接 + 一行取舍说明） */
-    .hero-cta {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    /* 首屏版本选择：两张等宽卡片放在同一个 grid 里，等高由 stretch 保证，按钮用 margin-top:auto 沉底对齐 */
+    .hero-editions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 14px;
+      width: 100%;
+      max-width: 640px;
+      margin-bottom: 36px;
+      text-align: left;
     }
 
-    .hero-cta .btn {
-      height: 58px;
-      padding: 0 34px;
-      gap: 10px;
-      border-radius: 15px;
-      font-size: 18px;
-      font-weight: 650;
-      letter-spacing: -0.01em;
-    }
-
-    .hero-cta .btn svg { width: 16px; height: 16px; }
-
-    .hero-cta-note {
-      font-size: 13.5px;
-      color: var(--text-dim);
-      text-align: center;
-    }
-
-    .hero-alt {
+    .hero-ed {
+      position: relative;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      margin: 40px 0 44px;
-      text-align: center;
+      gap: 18px;
+      padding: 22px 22px 22px;
+      border: 1px solid var(--border-strong);
+      border-radius: 18px;
+      background: var(--bg-elevated);
+      box-shadow: var(--shadow-card);
     }
 
-    .hero-alt::before {
-      content: '';
-      width: 28px;
-      height: 1px;
-      margin-bottom: 26px;
-      background: var(--border-strong);
+    .hero-ed-pro {
+      border-color: var(--accent);
+      background:
+        radial-gradient(ellipse 90% 70% at 100% 0%, var(--accent-glow) 0%, transparent 62%),
+        var(--bg-elevated);
+      box-shadow: var(--shadow-window);
     }
 
-    .hero-alt-lead {
-      font-size: 15px;
-      line-height: 1.6;
+    .hero-ed-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 2px 10px;
+    }
+
+    .hero-ed-name {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .hero-ed-channel {
+      font-size: 12.5px;
       color: var(--text-dim);
     }
 
-    .hero-alt-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 3px 0;
-      font-size: 15px;
-      font-weight: 600;
+    /* 角标压在卡片上边框，不占标题行，避免窄屏或英文下换行 */
+    .hero-ed-flag {
+      position: absolute;
+      top: 0;
+      right: 20px;
+      transform: translateY(-50%);
+      padding: 2px 10px;
+      border: 1px solid var(--accent);
+      border-radius: 999px;
+      background: var(--bg-elevated);
+      color: var(--link);
+      font-size: 11.5px;
+      font-weight: 650;
+      line-height: 1.5;
+      white-space: nowrap;
+    }
+
+    .hero-ed-list {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      list-style: none;
+      font-size: 14px;
+      line-height: 1.45;
       color: var(--text);
-      transition: color 0.15s ease;
     }
 
-    .hero-alt-link .ul {
-      text-decoration: underline;
-      text-decoration-color: var(--border-strong);
-      text-decoration-thickness: 1.5px;
-      text-underline-offset: 5px;
-      transition: text-decoration-color 0.15s ease;
+    .hero-ed-list li {
+      position: relative;
+      padding-left: 22px;
     }
 
-    .hero-alt-link svg {
-      width: 14px;
-      height: 14px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      transition: transform 0.18s ease;
+    .hero-ed-list li::before {
+      content: '';
+      position: absolute;
+      left: 1px;
+      top: 0.32em;
+      width: 10px;
+      height: 6px;
+      border-left: 2px solid var(--accent);
+      border-bottom: 2px solid var(--accent);
+      transform: rotate(-45deg);
     }
 
-    .hero-alt-link:hover { color: var(--link); }
-    .hero-alt-link:hover .ul { text-decoration-color: var(--accent); }
-    .hero-alt-link:hover svg { transform: translateX(3px); }
+    .hero-ed-list li.is-off { color: var(--text-dim); }
 
-    .hero-alt-why {
-      max-width: 400px;
-      margin-top: 8px;
-      font-size: 13px;
-      line-height: 1.55;
-      color: var(--text-dim);
-      text-wrap: balance;
+    .hero-ed-list li.is-off::before {
+      top: 0.62em;
+      left: 0;
+      width: 10px;
+      height: 0;
+      border-left: 0;
+      border-bottom: 2px solid var(--text-mute);
+      transform: none;
     }
+
+    .hero-ed-btn {
+      margin-top: auto;
+      width: 100%;
+      height: 48px;
+      border-radius: 12px;
+      font-size: 15.5px;
+      font-weight: 650;
+    }
+
+    .hero-ed-pro .hero-ed-btn { box-shadow: 0 8px 24px -8px rgba(238, 127, 31, 0.55), 0 2px 4px rgba(238, 127, 31, 0.12); }
 
     .hero-meta-free {
       display: inline-flex;
@@ -2028,6 +2053,7 @@
       .hero-window { margin-top: 40px; }
       .nav-links { display: none; }
       .nav-cta { display: none; }
+      .hero-editions { grid-template-columns: 1fr; max-width: 420px; }
       .hero-meta { flex-wrap: wrap; justify-content: center; gap: 8px 14px; }
       .hero-meta span, .hero-meta a { white-space: nowrap; }
       .hero-meta { gap: 8px 18px; }
@@ -2175,22 +2201,40 @@
         </div>
         <h1>One&nbsp;app.<br><span class="serif">See every file.</span></h1>
         <p class="hero-subtitle" data-i18n="hero.subtitle">让你的 Mac 安静下来。把所有你常用的文件——文档、表格、演示稿、PDF、笔记、图片、音乐与视频——全部装进一个窗口。</p>
-        <div class="hero-cta">
-          <a href="https://github.com/river-ranx/folio-web/releases/latest"
-             class="btn btn-accent" data-pro target="_blank" rel="noopener" aria-describedby="heroProNote">
-            <span data-i18n="btn.pro">下载 Folio Pro</span>
-            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-          </a>
-          <p class="hero-cta-note" id="heroProNote" data-i18n="hero.pro.note">官网直接下载 · 终端、Git 与本地 AI</p>
-        </div>
-        <div class="hero-alt">
-          <p class="hero-alt-lead" data-i18n="hero.alt.lead">更想用 App Store 版？</p>
-          <a href="https://apps.apple.com/us/app/folio-universal-viewer/id6769624913?l=zh-Hans-CN&amp;mt=12"
-             class="hero-alt-link" data-appstore target="_blank" rel="noopener" aria-describedby="heroAltWhy">
-            <span class="ul" data-i18n="btn.store.short">下载 Folio</span>
-            <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-          </a>
-          <p class="hero-alt-why" id="heroAltWhy" data-i18n="hero.alt.why">阅读、编辑、搜索所有文件，沙盒运行、自动更新，但没有终端与 Git。</p>
+        <div class="hero-editions" role="group" data-i18n-aria="hero.ed.aria" aria-label="选择版本">
+          <article class="hero-ed hero-ed-pro">
+            <header class="hero-ed-head">
+              <h2 class="hero-ed-name">Folio Pro</h2>
+              <span class="hero-ed-channel" data-i18n="channel.direct">直接下载</span>
+              <span class="hero-ed-flag" data-i18n="hero.ed.rec">推荐</span>
+            </header>
+            <ul class="hero-ed-list">
+              <li data-i18n="hero.pro.f1">包含 Folio 的全部功能</li>
+              <li data-i18n="hero.pro.f2">终端与 AI 智能体</li>
+              <li data-i18n="hero.pro.f3">完整 Git 与本地 AI</li>
+            </ul>
+            <a href="https://github.com/river-ranx/folio-web/releases/latest"
+               class="btn btn-accent hero-ed-btn" data-pro target="_blank" rel="noopener">
+              <span data-i18n="btn.pro">下载 Folio Pro</span>
+              <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+            </a>
+          </article>
+          <article class="hero-ed">
+            <header class="hero-ed-head">
+              <h2 class="hero-ed-name">Folio</h2>
+              <span class="hero-ed-channel" data-i18n="btn.store.sub">来自 Mac App Store</span>
+            </header>
+            <ul class="hero-ed-list">
+              <li data-i18n="hero.store.f1">阅读、编辑、搜索所有文件</li>
+              <li data-i18n="hero.store.f2">沙盒运行，自动更新</li>
+              <li class="is-off" data-i18n="hero.store.f3">没有终端与 Git</li>
+            </ul>
+            <a href="https://apps.apple.com/us/app/folio-universal-viewer/id6769624913?l=zh-Hans-CN&amp;mt=12"
+               class="btn btn-ghost hero-ed-btn" data-appstore target="_blank" rel="noopener">
+              <span data-i18n="btn.store.short">下载 Folio</span>
+              <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+          </article>
         </div>
         <div class="hero-meta">
           <span class="hero-meta-free" data-i18n="hero.meta.free">两个版本目前都免费</span>
@@ -2828,9 +2872,14 @@
 
         'btn.pro.sub': '终端、Git 与本地 AI',
         'btn.store.sub': '来自 Mac App Store',
-        'hero.pro.note': '官网直接下载 · 终端、Git 与本地 AI',
-        'hero.alt.lead': '更想用 App Store 版？',
-        'hero.alt.why': '阅读、编辑、搜索所有文件，沙盒运行、自动更新，但没有终端与 Git。',
+        'hero.ed.aria': '选择版本',
+        'hero.ed.rec': '推荐',
+        'hero.store.f1': '阅读、编辑、搜索所有文件',
+        'hero.store.f2': '沙盒运行，自动更新',
+        'hero.store.f3': '没有终端与 Git',
+        'hero.pro.f1': '包含 Folio 的全部功能',
+        'hero.pro.f2': '终端与 AI 智能体',
+        'hero.pro.f3': '完整 Git 与本地 AI',
         'nav.compare': '对比版本',
         'hero.compare': '对比两个版本',
         'hero.meta.free': '两个版本目前都免费',
@@ -3044,9 +3093,14 @@
 
         'btn.pro.sub': 'Terminal, Git & on-device AI',
         'btn.store.sub': 'On the Mac App Store',
-        'hero.pro.note': 'Direct download · Terminal, Git & on-device AI',
-        'hero.alt.lead': 'Prefer the App Store?',
-        'hero.alt.why': 'Read, edit & search every file — sandboxed and auto-updated, but no terminal or Git.',
+        'hero.ed.aria': 'Choose an edition',
+        'hero.ed.rec': 'Recommended',
+        'hero.store.f1': 'Read, edit & search every file',
+        'hero.store.f2': 'Sandboxed, auto-updated',
+        'hero.store.f3': 'No terminal or Git',
+        'hero.pro.f1': 'Everything in Folio',
+        'hero.pro.f2': 'Terminal & AI agents',
+        'hero.pro.f3': 'Full Git & on-device AI',
         'nav.compare': 'Compare',
         'hero.compare': 'Compare editions',
         'hero.meta.free': 'Both editions free for now',
@@ -3279,8 +3333,8 @@
         if (typeof val === 'string') el.setAttribute('aria-label', val);
       });
 
-      // Folio Pro 直装包发布在 GitHub Release；换成直链时只改这一处
-      const PRO_URL = 'https://github.com/river-ranx/folio-web/releases/latest';
+      // Folio Pro 直装包：GitHub Release 最新版的固定文件名资产，发新版时保持资产名 Folio-Pro.zip 即可，无需改此处
+      const PRO_URL = 'https://github.com/river-ranx/folio-web/releases/latest/download/Folio-Pro.zip';
       document.querySelectorAll('a[data-pro]').forEach(a => { a.href = PRO_URL; });
 
       // App Store 落地页语言跟随站点语言
@@ -3357,9 +3411,8 @@
 
     (function bootstrap() {
       // Theme
-      const savedTheme = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+      // 默认深色；仅当用户手动切到浅色并记在 localStorage 时才用浅色（不再跟随系统）
+      const isDark = localStorage.getItem('theme') !== 'light';
       if (isDark) document.documentElement.classList.add('dark');
       updateThemeColor(isDark);
 

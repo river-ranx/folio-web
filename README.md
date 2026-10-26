@@ -7,7 +7,7 @@ Two editions, both free for now:
 | Edition | Channel | Download button points to |
 | --- | --- | --- |
 | **Folio** | Mac App Store (sandboxed) | the App Store listing |
-| **Folio Pro** | Direct download (Developer ID, Apple Silicon) | this repo's GitHub Releases (`releases/latest`) |
+| **Folio Pro** | Direct download (Developer ID, Apple Silicon) | `releases/latest/download/Folio-Pro.zip` (latest GitHub Release asset) |
 
 The Folio Pro URL lives in one place: the `PRO_URL` constant in `index.html`'s `applyI18n`.
 
