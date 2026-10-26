@@ -42,6 +42,8 @@
       --accent-strong: #D26A0D;
       --accent-soft: rgba(238, 127, 31, 0.10);
       --accent-glow: rgba(238, 127, 31, 0.20);
+      /* 琥珀「文字色」：浅底上 5.8:1（品牌琥珀作文字仅 ~2.7:1），用于链接 hover */
+      --link: #9A4A06;
       /* 主 CTA 按钮（白字）— 浅色用更深的琥珀，白字达 WCAG AA 大字 3.62:1（品牌琥珀 #EE7F1F 仅 2.73:1） */
       --btn-accent-bg: var(--accent-strong);
       --btn-accent-bg-hover: #B85C09;
@@ -54,12 +56,16 @@
       --shadow-card: 0 1px 2px rgba(60, 40, 20, 0.04), 0 0 0 1px var(--border);
       --shadow-window: 0 24px 60px rgba(60, 40, 20, 0.14), 0 8px 24px rgba(60, 40, 20, 0.07);
       --shadow-pop: 0 14px 36px -10px rgba(60, 40, 20, 0.22), 0 0 0 1px var(--border);
+      --pro-col: rgba(238, 127, 31, 0.05);
       --theme-icon-sun: none;
       --theme-icon-moon: block;
     }
 
-    /* ===== Dark mode overrides ===== */
-    html.dark {
+    /* ===== Dark mode overrides =====
+       .pro-zone 复用同一套暗色 token：Folio Pro 的区块在浅色页面里也是深色「工作间」，
+       颜色只在这里定义一次，不另写一份。 */
+    html.dark,
+    .pro-zone {
       --bg: #0B0907;
       --bg-elevated: #131110;
       --bg-subtle: rgba(255, 230, 200, 0.04);
@@ -75,6 +81,7 @@
       --accent-strong: #FFAD68;
       --accent-soft: rgba(255, 154, 74, 0.14);
       --accent-glow: rgba(255, 154, 74, 0.30);
+      --link: #FFAD68;
       /* 暗色：亮琥珀做底（白字仅 2.11:1），改用深字 → ≈9:1。hover 再提亮一档更跳。 */
       --btn-accent-bg: var(--accent);
       --btn-accent-bg-hover: var(--accent-strong);
@@ -87,8 +94,15 @@
       --shadow-card: 0 1px 0 rgba(255,255,255,0.04) inset, 0 0 0 1px var(--border);
       --shadow-window: 0 24px 60px rgba(0, 0, 0, 0.45), 0 8px 24px rgba(0, 0, 0, 0.25);
       --shadow-pop: 0 14px 36px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--border);
+      --pro-col: rgba(255, 154, 74, 0.06);
       --theme-icon-sun: block;
       --theme-icon-moon: none;
+    }
+
+    /* 自定义属性会继承，但 color/background 是父级算好的值，需要在区块上重新取一次 */
+    .pro-zone {
+      color: var(--text);
+      background: var(--bg);
     }
 
     html {
@@ -513,6 +527,48 @@
       border-color: var(--text-mute);
     }
 
+    .cta-buttons.cta-choices {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* 两行式按钮：标题 + 一句话说明，箭头靠右 */
+    .btn-stack {
+      height: auto;
+      min-height: 64px;
+      padding: 12px 20px;
+      justify-content: space-between;
+      gap: 14px;
+      text-align: left;
+      border-radius: 12px;
+    }
+
+    .btn-stack-text {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .btn-title {
+      font-size: 15.5px;
+      font-weight: 650;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+
+    .btn-sub {
+      font-size: 12.5px;
+      font-weight: 500;
+      line-height: 1.3;
+      opacity: 0.82;
+    }
+
     .btn svg {
       width: 15px;
       height: 15px;
@@ -631,7 +687,7 @@
     .hero-content.loaded .hero-badge { transition: opacity 0.4s ease 0.15s, transform 0.4s ease 0.15s; }
     .hero-content.loaded h1 { transition: opacity 0.5s ease 0.25s, transform 0.5s ease 0.25s; }
     .hero-content.loaded .hero-subtitle { transition: opacity 0.5s ease 0.38s, transform 0.5s ease 0.38s; }
-    .hero-content.loaded .hero-cta { transition: opacity 0.5s ease 0.48s, transform 0.5s ease 0.48s; }
+    .hero-content.loaded .hero-editions { transition: opacity 0.5s ease 0.48s, transform 0.5s ease 0.48s; }
     .hero-content.loaded .hero-meta { transition: opacity 0.4s ease 0.58s, transform 0.4s ease 0.58s; }
 
     .hero-icon {
@@ -691,12 +747,137 @@
       margin-bottom: 36px;
     }
 
-    .hero-cta {
+    /* 首屏版本选择：两张等宽卡片放在同一个 grid 里，等高由 stretch 保证，按钮用 margin-top:auto 沉底对齐 */
+    .hero-editions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      width: 100%;
+      max-width: 640px;
+      margin-bottom: 36px;
+      text-align: left;
+    }
+
+    .hero-ed {
+      position: relative;
       display: flex;
-      gap: 12px;
+      flex-direction: column;
+      gap: 18px;
+      padding: 22px 22px 22px;
+      border: 1px solid var(--border-strong);
+      border-radius: 18px;
+      background: var(--bg-elevated);
+      box-shadow: var(--shadow-card);
+    }
+
+    .hero-ed-pro {
+      border-color: var(--accent);
+      background:
+        radial-gradient(ellipse 90% 70% at 100% 0%, var(--accent-glow) 0%, transparent 62%),
+        var(--bg-elevated);
+      box-shadow: var(--shadow-window);
+    }
+
+    .hero-ed-head {
+      display: flex;
       flex-wrap: wrap;
-      justify-content: center;
-      margin-bottom: 28px;
+      align-items: baseline;
+      gap: 2px 10px;
+    }
+
+    .hero-ed-name {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .hero-ed-channel {
+      font-size: 12.5px;
+      color: var(--text-dim);
+    }
+
+    /* 角标压在卡片上边框，不占标题行，避免窄屏或英文下换行 */
+    .hero-ed-flag {
+      position: absolute;
+      top: 0;
+      right: 20px;
+      transform: translateY(-50%);
+      padding: 2px 10px;
+      border: 1px solid var(--accent);
+      border-radius: 999px;
+      background: var(--bg-elevated);
+      color: var(--link);
+      font-size: 11.5px;
+      font-weight: 650;
+      line-height: 1.5;
+      white-space: nowrap;
+    }
+
+    .hero-ed-list {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      list-style: none;
+      font-size: 14px;
+      line-height: 1.45;
+      color: var(--text);
+    }
+
+    .hero-ed-list li {
+      position: relative;
+      padding-left: 22px;
+    }
+
+    .hero-ed-list li::before {
+      content: '';
+      position: absolute;
+      left: 1px;
+      top: 0.32em;
+      width: 10px;
+      height: 6px;
+      border-left: 2px solid var(--accent);
+      border-bottom: 2px solid var(--accent);
+      transform: rotate(-45deg);
+    }
+
+    .hero-ed-list li.is-off { color: var(--text-dim); }
+
+    .hero-ed-list li.is-off::before {
+      top: 0.62em;
+      left: 0;
+      width: 10px;
+      height: 0;
+      border-left: 0;
+      border-bottom: 2px solid var(--text-mute);
+      transform: none;
+    }
+
+    .hero-ed-btn {
+      margin-top: auto;
+      width: 100%;
+      height: 48px;
+      border-radius: 12px;
+      font-size: 15.5px;
+      font-weight: 650;
+    }
+
+    .hero-ed-pro .hero-ed-btn { box-shadow: 0 8px 24px -8px rgba(238, 127, 31, 0.55), 0 2px 4px rgba(238, 127, 31, 0.12); }
+
+    .hero-meta-free {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .hero-meta-free::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
     }
 
     .hero-meta {
@@ -705,7 +886,7 @@
       gap: 18px;
       font-family: 'JetBrains Mono', ui-monospace, monospace;
       font-size: 12px;
-      color: var(--text-mute);
+      color: var(--text-dim);   /* 原 --text-mute 对比度不到 AA */
     }
 
     .hero-meta .sep {
@@ -715,6 +896,16 @@
       background: var(--text-mute);
       opacity: 0.6;
     }
+
+    .hero-meta-link {
+      text-decoration: underline;
+      text-decoration-color: var(--border-strong);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 4px;
+      transition: color 0.15s ease, text-decoration-color 0.15s ease;
+    }
+
+    .hero-meta-link:hover { color: var(--text); text-decoration-color: var(--accent); }
 
     /* ===== Hero Window ===== */
     .hero-window {
@@ -1118,6 +1309,617 @@
       line-height: 1.7;
     }
 
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* ===== Lineup：两个版本，同一个内核 ===== */
+    .lineup { padding: 120px 0 40px; }
+
+    .lineup-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      max-width: 1040px;
+      margin: 0 auto;
+    }
+
+    .lineup-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 34px 32px 30px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: var(--bg-elevated);
+      overflow: hidden;
+    }
+
+    .lineup-card.pro-zone {
+      border-color: var(--border-strong);
+      background:
+        radial-gradient(ellipse 90% 70% at 100% 0%, var(--accent-glow) 0%, transparent 62%),
+        var(--bg-elevated);
+      box-shadow: var(--shadow-window);
+    }
+
+    .lineup-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 12px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .lineup-free {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .lineup-free::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .lineup-card h3 {
+      font-size: 34px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-top: 6px;
+    }
+
+    .lineup-tag {
+      font-size: 26px;
+      line-height: 1.1;
+      color: var(--accent);
+      margin-top: -8px;
+    }
+
+    .lineup-desc {
+      font-size: 15px;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+
+    .lineup-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      list-style: none;
+      flex: 1;
+      align-content: flex-start;
+    }
+
+    .lineup-chips li {
+      display: inline-flex;
+      align-items: center;
+      height: 30px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--bg-subtle);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .lineup-chips li.chip-base {
+      border-style: dashed;
+      border-color: var(--border-strong);
+      background: transparent;
+      color: var(--text-dim);
+    }
+
+    .lineup-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-top: 18px;
+      margin-top: 6px;
+      border-top: 1px solid var(--border);
+    }
+
+    .lineup-for {
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    .lineup-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .lineup-link svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: transform 0.2s ease;
+    }
+
+    .lineup-link:hover svg { transform: translateY(2px); }
+
+    /* 「两个版本都有」标签：核心功能区的统一标注 */
+    .core-label {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+
+    .core-label .eyebrow::before { display: none; }
+
+    .both-dots {
+      display: inline-flex;
+      gap: 3px;
+    }
+
+    .both-dots i {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .both-dots i + i {
+      background: var(--text);
+    }
+
+    /* ===== Folio Pro ===== */
+    .pro {
+      padding: 128px 0 120px;
+      overflow: hidden;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background:
+        radial-gradient(ellipse 80% 50% at 50% 0%, var(--bg-cream) 0%, transparent 70%),
+        var(--bg);
+    }
+
+    .pro::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 820px;
+      height: 360px;
+      background: radial-gradient(ellipse at center top, var(--accent-glow) 0%, transparent 70%);
+      filter: blur(50px);
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .pro > .container { position: relative; z-index: 1; }
+
+    .pro-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 28px;
+      padding: 0 12px 0 6px;
+      margin-bottom: 20px;
+      border-radius: 999px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-elevated);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .pro-badge b {
+      display: inline-flex;
+      align-items: center;
+      height: 18px;
+      padding: 0 7px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: var(--btn-accent-fg);
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+    }
+
+    .lineup .section-head h2 .serif,
+    .pro .section-head h2 .serif {
+      display: block;
+      color: var(--accent);
+      margin-top: 4px;
+    }
+
+    /* 仿 Folio Pro 窗口：纯装饰，文件树 + Diff + 终端 */
+    .pro-window {
+      max-width: 1040px;
+      margin: 0 auto;
+      border-radius: 14px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-elevated);
+      box-shadow: var(--shadow-window), 0 40px 120px -40px var(--accent-glow);
+      overflow: hidden;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 12.5px;
+      line-height: 1.7;
+      color: var(--text);
+      text-align: left;
+    }
+
+    .pw-bar {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      height: 42px;
+      padding: 0 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-subtle);
+    }
+
+    .pw-lights { display: flex; gap: 7px; flex-shrink: 0; }
+    .pw-lights i { width: 11px; height: 11px; border-radius: 50%; background: #FF5F57; }
+    .pw-lights i:nth-child(2) { background: #FEBC2E; }
+    .pw-lights i:nth-child(3) { background: #28C840; }
+
+    .pw-tabs { display: flex; gap: 4px; min-width: 0; overflow: hidden; }
+
+    .pw-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      height: 28px;
+      padding: 0 12px;
+      border-radius: 7px;
+      font-size: 12px;
+      color: var(--text-mute);
+      white-space: nowrap;
+    }
+
+    .pw-tab.active {
+      background: var(--bg-hover);
+      color: var(--text);
+    }
+
+    .pw-tab .pw-live {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .pw-body {
+      display: grid;
+      grid-template-columns: 210px 1fr;
+    }
+
+    .pw-side {
+      padding: 14px 10px;
+      border-right: 1px solid var(--border);
+      color: var(--text-dim);
+    }
+
+    .pw-repo {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px 10px;
+      margin-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .pw-branch { color: var(--text-mute); font-size: 11.5px; }
+
+    .pw-file {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    .pw-file.indent { padding-left: 22px; }
+    .pw-file.sel { background: var(--bg-hover); color: var(--text); }
+
+    .pw-git { font-size: 11px; font-weight: 500; }
+    .pw-git.m { color: #E8C170; }
+    .pw-git.a { color: #8BD9A4; }
+
+    .pw-main { min-width: 0; display: flex; flex-direction: column; }
+
+    .pw-diff {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .pw-hunk {
+      padding: 0 18px 6px;
+      color: var(--text-mute);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .pw-line {
+      display: grid;
+      grid-template-columns: 44px 18px 1fr;
+      padding-right: 18px;
+      white-space: pre;
+      overflow: hidden;
+    }
+
+    .pw-line .n { color: var(--text-mute); text-align: right; padding-right: 12px; opacity: 0.7; }
+    .pw-line .s { color: var(--text-mute); }
+    .pw-line.add { background: rgba(80, 200, 120, 0.09); }
+    .pw-line.add .s, .pw-line.add .c { color: #8BD9A4; }
+    .pw-line.del { background: rgba(255, 95, 87, 0.09); }
+    .pw-line.del .s, .pw-line.del .c { color: #F2A39E; }
+    .pw-line .c { overflow: hidden; text-overflow: ellipsis; }
+
+    .pw-term {
+      flex: 1;
+      padding: 14px 18px 16px;
+      background: var(--bg);
+      color: var(--text-dim);
+    }
+
+    .pw-term p { white-space: pre; overflow: hidden; text-overflow: ellipsis; }
+    .pw-term .t-acc { color: var(--accent); }
+    .pw-term .t-txt { color: var(--text); }
+    .pw-term .t-ok { color: #8BD9A4; }
+
+    .pw-cursor {
+      display: inline-block;
+      width: 7px;
+      height: 14px;
+      margin-left: 2px;
+      vertical-align: -2px;
+      background: var(--accent);
+      animation: pwBlink 1.1s steps(1) infinite;
+    }
+
+    @keyframes pwBlink { 50% { opacity: 0; } }
+
+    .pw-status {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      height: 28px;
+      padding: 0 14px;
+      border-top: 1px solid var(--border);
+      background: var(--bg-subtle);
+      font-size: 11px;
+      color: var(--text-mute);
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .pw-status .ok { color: #8BD9A4; }
+
+    .pro-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      max-width: 1040px;
+      margin: 56px auto 0;
+    }
+
+    .pro-card {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 22px 20px 24px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--bg-elevated);
+      transition: border-color 0.2s ease, transform 0.25s ease;
+    }
+
+    .pro-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+    }
+
+    .pro-card .feature-icon { margin-bottom: 6px; }
+
+    .pro-card h3 {
+      font-size: 15.5px;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+    }
+
+    .pro-card p {
+      font-size: 13.5px;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+
+    .pro-cta {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      margin-top: 56px;
+    }
+
+    .pro-req {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    /* ===== Compare ===== */
+    .compare { padding: 120px 0 112px; }
+
+    .compare-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--bg-elevated);
+      overflow: hidden;
+    }
+
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14.5px;
+    }
+
+    .compare-table col.ed { width: 190px; }
+    .compare-table col.ed-pro { background: var(--pro-col); }
+
+    .compare-table th,
+    .compare-table td {
+      padding: 13px 22px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: middle;
+      line-height: 1.45;
+    }
+
+    .compare-table tbody tr:last-child td,
+    .compare-table tbody tr:last-child th { border-bottom: none; }
+
+    .compare-table thead th {
+      padding: 26px 22px 20px;
+      vertical-align: bottom;
+      font-weight: 400;
+    }
+
+    .cmp-name {
+      display: block;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: var(--text);
+    }
+
+    .cmp-channel {
+      display: block;
+      margin-top: 4px;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 11.5px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .compare-table tbody th {
+      font-weight: 400;
+      color: var(--text);
+    }
+
+    .compare-table .cmp-group th {
+      padding: 10px 22px;
+      background: var(--bg-subtle);
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 11.5px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .compare-table td { color: var(--text-dim); font-size: 13.5px; word-break: keep-all; }
+
+    .cmp-yes,
+    .cmp-no {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+    }
+
+    .cmp-yes {
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+    }
+
+    .cmp-yes svg {
+      width: 13px;
+      height: 13px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .cmp-no::before {
+      content: '';
+      width: 10px;
+      height: 1.5px;
+      border-radius: 1px;
+      background: var(--text-mute);
+    }
+
+    .compare-cta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      max-width: 900px;
+      margin: 20px auto 0;
+    }
+
+    .compare-notes {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px 24px;
+      max-width: 900px;
+      margin: 28px auto 0;
+      font-size: 13.5px;
+      color: var(--text-dim);
+      text-align: center;
+    }
+
+    .compare-notes span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .compare-notes svg { width: 14px; height: 14px; flex-shrink: 0; }
+    .compare-notes strong { color: var(--text); font-weight: 600; }
+
     /* ===== CTA ===== */
     .cta-section {
       padding: 120px 0;
@@ -1180,6 +1982,14 @@
       flex-wrap: wrap;
     }
 
+    .cta-section > .container > .cta-note {
+      max-width: none;
+      margin: 22px 0 0;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
     /* ===== Footer ===== */
     footer {
       padding: 56px 0 48px;
@@ -1233,6 +2043,8 @@
       .split.reverse .split-text { order: 0; }
       .pillars-grid { grid-template-columns: repeat(2, 1fr); }
       .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .lineup-grid { grid-template-columns: 1fr; max-width: 560px; }
+      .pro-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
     @media (max-width: 768px) {
@@ -1241,6 +2053,27 @@
       .hero-window { margin-top: 40px; }
       .nav-links { display: none; }
       .nav-cta { display: none; }
+      .hero-editions { grid-template-columns: 1fr; max-width: 420px; }
+      .hero-meta { flex-wrap: wrap; justify-content: center; gap: 8px 14px; }
+      .hero-meta span, .hero-meta a { white-space: nowrap; }
+      .hero-meta { gap: 8px 18px; }
+      .hero-meta .sep { display: none; }   /* 换行时分隔点会孤悬在行尾，窄屏改用间距分隔 */
+      .cta-buttons.cta-choices,
+      .compare-cta { grid-template-columns: 1fr; max-width: 420px; }
+      .compare-cta { margin-left: auto; margin-right: auto; }
+      .lineup { padding-top: 88px; }
+      .pro { padding: 88px 0; }
+      .pw-body { grid-template-columns: 1fr; }
+      .pw-side { display: none; }
+      .pro-window { font-size: 11.5px; }
+      .pw-tab:not(.active) { display: none; }
+      .compare-table col.ed { width: 86px; }
+      .compare-table th,
+      .compare-table td { padding: 12px 12px; }
+      .compare-table thead th { padding: 20px 12px 16px; }
+      .cmp-name { font-size: 16px; }
+      .cmp-channel { display: none; }
+      .compare-table tbody th { font-size: 13.5px; }
       .lang-trigger { padding: 0 8px; }
       .mobile-toggle { display: flex; }
       .pillars-grid { grid-template-columns: 1fr; padding: 0 20px; }
@@ -1256,8 +2089,18 @@
     @media (max-width: 480px) {
       .hero h1 { font-size: 44px; }
       .features-grid { grid-template-columns: 1fr; }
-      .hero-cta { flex-direction: column; width: 100%; }
-      .hero-cta .btn { width: 100%; }
+      .lineup-card { padding: 26px 22px 24px; }
+      .lineup-foot { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .pro-grid { grid-template-columns: 1fr; gap: 10px; }
+      .pro-card {
+        display: grid;
+        grid-template-columns: 32px 1fr;
+        column-gap: 14px;
+        row-gap: 2px;
+        padding: 16px 16px 18px;
+      }
+      .pro-card .feature-icon { grid-row: span 2; margin-bottom: 0; }
+      .compare-table td { font-size: 12.5px; }
       .split-text h2 { font-size: 30px; }
     }
 
@@ -1269,6 +2112,7 @@
       }
       .halo { animation: none !important; }
       .formats-track { animation: none !important; }
+      .pw-cursor { animation: none !important; }
       .reveal { opacity: 1 !important; transform: none !important; }
       .hero-content > * { opacity: 1 !important; transform: none !important; }
     }
@@ -1293,9 +2137,10 @@
         Folio
       </a>
       <ul class="nav-links">
-        <li><a href="#showcase" data-i18n="nav.formats">所有格式</a></li>
         <li><a href="#features" data-i18n="nav.features">功能</a></li>
-        <li><a href="#themes" data-i18n="nav.themes">主题</a></li>
+        <li><a href="#showcase" data-i18n="nav.formats">所有格式</a></li>
+        <li><a href="#pro">Folio Pro</a></li>
+        <li><a href="#editions" data-i18n="nav.compare">对比版本</a></li>
         <li><a href="#faq" data-i18n="nav.faq">常见问题</a></li>
       </ul>
       <div class="nav-right">
@@ -1322,8 +2167,7 @@
           <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21.752 15.002A9.718 9.718 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"/></svg>
           <svg class="icon-sun" viewBox="0 0 24 24"><path d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM7.5 12a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0Zm11.394-5.834a.75.75 0 0 0-1.06-1.06l-1.591 1.59a.75.75 0 1 0 1.06 1.061l1.591-1.59Zm-1.06 11.668a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 1 0-1.061 1.06l1.59 1.591ZM12 18a.75.75 0 0 1 .75.75V21a.75.75 0 0 1-1.5 0v-2.25A.75.75 0 0 1 12 18Zm-7.834-5.16a.75.75 0 0 0 0-1.5H2.25a.75.75 0 0 0 0 1.5h1.916ZM6.343 17.834a.75.75 0 0 0-1.06-1.06l-1.591 1.59a.75.75 0 1 0 1.06 1.061l1.591-1.59ZM3.692 4.63a.75.75 0 0 0 0 1.06l1.59 1.591a.75.75 0 0 0 1.061-1.06L4.752 4.63a.75.75 0 0 0-1.06 0ZM18 12a.75.75 0 0 1 .75-.75h2.25a.75.75 0 0 1 0 1.5h-2.25A.75.75 0 0 1 18 12Z"/></svg>
         </button>
-        <a href="https://apps.apple.com/us/app/folio-universal-viewer/id6769624913?l=zh-Hans-CN&amp;mt=12"
-           class="nav-cta" data-appstore target="_blank" rel="noopener" data-i18n="nav.cta">下载 Folio</a>
+        <a href="#editions" class="nav-cta" data-i18n="nav.cta">下载 Folio</a>
         <button class="mobile-toggle" onclick="toggleMobileMenu()" aria-label="Menu">
           <span></span><span></span><span></span>
         </button>
@@ -1333,12 +2177,12 @@
 
   <!-- Mobile menu -->
   <div class="mobile-menu" id="mobileMenu">
-    <a href="#showcase" onclick="closeMobileMenu()" data-i18n="nav.formats">所有格式</a>
     <a href="#features" onclick="closeMobileMenu()" data-i18n="nav.features">功能</a>
-    <a href="#themes" onclick="closeMobileMenu()" data-i18n="nav.themes">主题</a>
+    <a href="#showcase" onclick="closeMobileMenu()" data-i18n="nav.formats">所有格式</a>
+    <a href="#pro" onclick="closeMobileMenu()">Folio Pro</a>
+    <a href="#editions" onclick="closeMobileMenu()" data-i18n="nav.compare">对比版本</a>
     <a href="#faq" onclick="closeMobileMenu()" data-i18n="nav.faq">常见问题</a>
-    <a href="https://apps.apple.com/us/app/folio-universal-viewer/id6769624913?l=zh-Hans-CN&amp;mt=12"
-       data-appstore target="_blank" rel="noopener" onclick="closeMobileMenu()" data-i18n="nav.cta">下载 Folio</a>
+    <a href="#editions" onclick="closeMobileMenu()" data-i18n="nav.cta">下载 Folio</a>
   </div>
 
   <!-- Hero -->
@@ -1357,22 +2201,49 @@
         </div>
         <h1>One&nbsp;app.<br><span class="serif">See every file.</span></h1>
         <p class="hero-subtitle" data-i18n="hero.subtitle">让你的 Mac 安静下来。把所有你常用的文件——文档、表格、演示稿、PDF、笔记、图片、音乐与视频——全部装进一个窗口。</p>
-        <div class="hero-cta">
-          <a href="https://apps.apple.com/us/app/folio-universal-viewer/id6769624913?l=zh-Hans-CN&amp;mt=12"
-             class="btn btn-accent" data-appstore target="_blank" rel="noopener">
-            <span data-i18n="btn.download">下载 macOS 版</span>
-            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-          </a>
-          <a href="#showcase" class="btn btn-ghost" data-i18n="btn.explore">
-            探索功能
-          </a>
+        <div class="hero-editions" role="group" data-i18n-aria="hero.ed.aria" aria-label="选择版本">
+          <article class="hero-ed hero-ed-pro">
+            <header class="hero-ed-head">
+              <h2 class="hero-ed-name">Folio Pro</h2>
+              <span class="hero-ed-channel" data-i18n="channel.direct">直接下载</span>
+              <span class="hero-ed-flag" data-i18n="hero.ed.rec">推荐</span>
+            </header>
+            <ul class="hero-ed-list">
+              <li data-i18n="hero.pro.f1">包含 Folio 的全部功能</li>
+              <li data-i18n="hero.pro.f2">终端与 AI 智能体</li>
+              <li data-i18n="hero.pro.f3">完整 Git 与本地 AI</li>
+            </ul>
+            <a href="https://github.com/river-ranx/folio-web/releases/latest"
+               class="btn btn-accent hero-ed-btn" data-pro target="_blank" rel="noopener">
+              <span data-i18n="btn.pro">下载 Folio Pro</span>
+              <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+            </a>
+          </article>
+          <article class="hero-ed">
+            <header class="hero-ed-head">
+              <h2 class="hero-ed-name">Folio</h2>
+              <span class="hero-ed-channel" data-i18n="btn.store.sub">来自 Mac App Store</span>
+            </header>
+            <ul class="hero-ed-list">
+              <li data-i18n="hero.store.f1">阅读、编辑、搜索所有文件</li>
+              <li data-i18n="hero.store.f2">沙盒运行，自动更新</li>
+              <li class="is-off" data-i18n="hero.store.f3">没有终端与 Git</li>
+            </ul>
+            <a href="https://apps.apple.com/us/app/folio-universal-viewer/id6769624913?l=zh-Hans-CN&amp;mt=12"
+               class="btn btn-ghost hero-ed-btn" data-appstore target="_blank" rel="noopener">
+              <span data-i18n="btn.store.short">下载 Folio</span>
+              <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+          </article>
         </div>
         <div class="hero-meta">
+          <span class="hero-meta-free" data-i18n="hero.meta.free">两个版本目前都免费</span>
+          <span class="sep"></span>
           <span>macOS 15+</span>
           <span class="sep"></span>
-          <span data-i18n="hero.meta.devices">全系列 Mac 适用</span>
+          <a href="#editions" class="hero-meta-link" data-i18n="hero.compare">对比两个版本</a>
           <span class="sep"></span>
-          <span data-i18n="hero.meta.ios">iOS / iPadOS 即将到来</span>
+          <span data-i18n="hero.meta.soon">Windows、iPadOS、iOS 即将到来</span>
         </div>
       </div>
     </div>
@@ -1385,8 +2256,73 @@
   </section>
 
   <main>
+    <!-- Lineup: two editions, one core -->
+    <section class="lineup" id="lineup">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow" data-i18n="line.eyebrow">两个版本，同一个内核</span>
+          <h2><span data-i18n="line.h2.line1">同一个 Folio，</span><span class="serif accent" data-i18n="line.h2.serif">走多远由你定。</span></h2>
+          <p data-i18n="line.sub">两个版本用同一套方式阅读、编辑和搜索每个文件。Folio Pro 再加上那些必须走出 App Store 沙盒才能做到的工具。</p>
+        </div>
+
+        <div class="lineup-grid">
+          <article class="lineup-card reveal reveal-d1">
+            <div class="lineup-top">
+              <span>Mac App Store</span>
+              <span class="lineup-free" data-i18n="free">目前免费</span>
+            </div>
+            <h3>Folio</h3>
+            <p class="lineup-tag serif" data-i18n="line.store.tag">看见每个文件。</p>
+            <p class="lineup-desc" data-i18n="line.store.desc">所有格式一个窗口打开，Markdown、代码与笔记可编辑，全文搜索，15 套主题。沙盒运行，由 App Store 自动更新。</p>
+            <ul class="lineup-chips">
+              <li data-i18n="line.store.c1">全格式阅读</li>
+              <li data-i18n="line.store.c2">编辑</li>
+              <li data-i18n="line.store.c3">全文搜索</li>
+              <li data-i18n="line.store.c4">15 套主题</li>
+            </ul>
+            <div class="lineup-foot">
+              <span class="lineup-for" data-i18n="line.store.for">适合阅读、写作与日常文件</span>
+              <a href="#features" class="lineup-link">
+                <span data-i18n="line.store.link">看看核心功能</span>
+                <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+              </a>
+            </div>
+          </article>
+
+          <article class="lineup-card pro-zone reveal reveal-d2">
+            <div class="lineup-top">
+              <span data-i18n="channel.direct">直接下载</span>
+              <span class="lineup-free" data-i18n="free">目前免费</span>
+            </div>
+            <h3>Folio Pro</h3>
+            <p class="lineup-tag serif" data-i18n="line.pro.tag">看见之后，直接动手。</p>
+            <p class="lineup-desc" data-i18n="line.pro.desc">包含 Folio 的全部能力，外加能跑 AI 智能体的终端、完整 Git、本地模型与语言服务。</p>
+            <ul class="lineup-chips">
+              <li class="chip-base" data-i18n="line.pro.c0">Folio 的全部 +</li>
+              <li data-i18n="line.pro.c1">终端与 AI</li>
+              <li>Git</li>
+              <li data-i18n="line.pro.c2">本地模型</li>
+              <li>LSP</li>
+              <li data-i18n="line.pro.c3">任务</li>
+              <li data-i18n="line.pro.c4">iCloud 同步</li>
+            </ul>
+            <div class="lineup-foot">
+              <span class="lineup-for" data-i18n="line.pro.for">适合开发者、研究者与重度用户</span>
+              <a href="#pro" class="lineup-link">
+                <span data-i18n="line.pro.link">看看 Folio Pro</span>
+                <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+              </a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
     <!-- Pillars -->
     <section class="pillars" id="features">
+      <div class="core-label reveal">
+        <span class="eyebrow"><span class="both-dots" aria-hidden="true"><i></i><i></i></span><span data-i18n="core.label">两个版本都有</span></span>
+      </div>
       <div class="pillars-grid">
         <div class="pillar reveal reveal-d1">
           <span class="pillar-num">1</span>
@@ -1608,6 +2544,194 @@
       </div>
     </section>
 
+    <!-- Folio Pro -->
+    <section class="pro pro-zone" id="pro">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="pro-badge"><b>PRO</b><span data-i18n="pro.badge">Folio 的全部，再多一点</span></span>
+          <h2><span data-i18n="pro.h2.line1">看见每个文件，</span><span class="serif" data-i18n="pro.h2.serif">然后直接动手。</span></h2>
+          <p data-i18n="pro.sub">Folio Pro 包含 Folio 的全部，再加上只有走出 App Store 沙盒才能做到的事：能跑 AI 智能体的终端、真正的 Git，以及在你 Mac 上运行的本地模型。</p>
+        </div>
+
+        <div class="pro-window reveal" role="img" data-i18n-aria="pro.window.aria" aria-label="Folio Pro 窗口：左侧是带 Git 状态的文件树，右上是代码 Diff，右下是运行 Claude Code 的终端">
+          <div class="pw-bar" aria-hidden="true">
+            <div class="pw-lights"><i></i><i></i><i></i></div>
+            <div class="pw-tabs">
+              <span class="pw-tab">README.md</span>
+              <span class="pw-tab">parser.go</span>
+              <span class="pw-tab active"><span class="pw-live"></span>Terminal — claude</span>
+            </div>
+          </div>
+          <div class="pw-body" aria-hidden="true">
+            <div class="pw-side">
+              <div class="pw-repo"><span>folio-core</span><span class="pw-branch">⎇ main</span></div>
+              <div class="pw-file">▾ src</div>
+              <div class="pw-file indent sel"><span>parser.go</span><span class="pw-git m">M</span></div>
+              <div class="pw-file indent"><span>render.go</span><span class="pw-git m">M</span></div>
+              <div class="pw-file indent"><span>cache.go</span><span class="pw-git a">A</span></div>
+              <div class="pw-file indent"><span>blocks.go</span></div>
+              <div class="pw-file">▸ docs</div>
+              <div class="pw-file"><span>README.md</span></div>
+              <div class="pw-file"><span>go.mod</span></div>
+            </div>
+            <div class="pw-main">
+              <div class="pw-diff">
+                <div class="pw-hunk">@@ -42,7 +42,9 @@ func Parse(r io.Reader) (*Doc, error)</div>
+                <div class="pw-line"><span class="n">42</span><span class="s"> </span><span class="c">    buf := bufio.NewReader(r)</span></div>
+                <div class="pw-line del"><span class="n">43</span><span class="s">-</span><span class="c">    doc := &amp;Doc{}</span></div>
+                <div class="pw-line add"><span class="n">43</span><span class="s">+</span><span class="c">    doc := &amp;Doc{Blocks: make([]Block, 0, 64)}</span></div>
+                <div class="pw-line add"><span class="n">44</span><span class="s">+</span><span class="c">    // reuse the block cache between parses</span></div>
+                <div class="pw-line add"><span class="n">45</span><span class="s">+</span><span class="c">    doc.cache = cache.Get()</span></div>
+                <div class="pw-line"><span class="n">46</span><span class="s"> </span><span class="c">    for {</span></div>
+              </div>
+              <div class="pw-term">
+                <p><span class="t-acc">~/code/folio-core</span> <span>main</span></p>
+                <p><span class="t-acc">❯</span> <span class="t-txt">claude</span></p>
+                <p><span class="t-acc">✻</span> <span class="t-txt">Claude Code</span></p>
+                <p><span class="t-txt">&gt; make the parser reuse the block cache</span></p>
+                <p><span class="t-acc">⏺</span> Update(src/parser.go)  <span class="t-ok">+3</span> −1</p>
+                <p><span class="t-acc">⏺</span> Create(src/cache.go)</p>
+                <p><span class="t-ok">✓</span> go test ./...  <span class="t-ok">ok</span>  0.84s</p>
+                <p><span class="t-acc">❯</span> <span class="pw-cursor"></span></p>
+              </div>
+            </div>
+          </div>
+          <div class="pw-status" aria-hidden="true">
+            <span>⎇ main ↑1</span>
+            <span>2 modified · 1 added</span>
+            <span><span class="ok">●</span> gopls</span>
+          </div>
+        </div>
+
+        <div class="pro-grid">
+          <div class="pro-card reveal">
+            <div class="feature-icon"><svg viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div>
+            <h3 data-i18n="pro.term.h">终端与 AI 标签页</h3>
+            <p data-i18n="pro.term.p">在要修改的文件旁边，直接运行 Claude Code、Codex 等命令行工具。</p>
+          </div>
+          <div class="pro-card reveal">
+            <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="9" r="2.5"/><path d="M6 8.5v7M18 11.5c0 3-3 3.5-9.5 5"/></svg></div>
+            <h3 data-i18n="pro.git.h">完整 Git</h3>
+            <p data-i18n="pro.git.p">打开的每个仓库都能看提交历史、Diff 与 Blame。</p>
+          </div>
+          <div class="pro-card reveal">
+            <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/></svg></div>
+            <h3 data-i18n="pro.ask.h">提问与总结</h3>
+            <p data-i18n="pro.ask.p">在侧栏里提问，任何文档都能一键总结。</p>
+          </div>
+          <div class="pro-card reveal">
+            <div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg></div>
+            <h3 data-i18n="pro.local.h">本地模型</h3>
+            <p data-i18n="pro.local.p">语义搜索、离线翻译与 OCR，在你的 Mac 上运行。</p>
+          </div>
+          <div class="pro-card reveal">
+            <div class="feature-icon"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+            <h3 data-i18n="pro.lsp.h">语言服务</h3>
+            <p data-i18n="pro.lsp.p">通过 LSP 为 Go、Rust、Python、TS/JS、Java 提供代码智能。</p>
+          </div>
+          <div class="pro-card reveal">
+            <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+            <h3 data-i18n="pro.tasks.h">任务与日历</h3>
+            <p data-i18n="pro.tasks.p">任务放在工作旁边，与菜单栏日历联动。</p>
+          </div>
+          <div class="pro-card reveal">
+            <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/></svg></div>
+            <h3 data-i18n="pro.pdf.h">PDF 进阶</h3>
+            <p data-i18n="pro.pdf.p">PDF 转成 Markdown，或保留排版直接翻译。</p>
+          </div>
+          <div class="pro-card reveal">
+            <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M17.5 19a4.5 4.5 0 1 0-1.4-8.8A6 6 0 0 0 4.5 12 3.5 3.5 0 0 0 6 19z"/></svg></div>
+            <h3 data-i18n="pro.sync.h">iCloud 同步</h3>
+            <p data-i18n="pro.sync.p">支持 iCloud 同步，以及更多翻译引擎。</p>
+          </div>
+        </div>
+
+        <div class="pro-cta reveal">
+          <a href="https://github.com/river-ranx/folio-web/releases/latest"
+             class="btn btn-accent" data-pro target="_blank" rel="noopener">
+            <span data-i18n="btn.pro">下载 Folio Pro</span>
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          </a>
+          <span class="pro-req" data-i18n="pro.req">macOS 15+ · 仅 Apple 芯片（M 系列）· 目前免费</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Compare editions（保留 #editions 锚点，兼容旧链接） -->
+    <section class="compare" id="editions">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow" data-i18n="cmp.eyebrow">对比版本</span>
+          <h2><span data-i18n="cmp.h2.line1">选一个</span> <span class="serif accent">Folio.</span></h2>
+          <p data-i18n="cmp.sub">要终端、Git 与本地 AI，选 Folio Pro；只想日常查看和编辑，选 App Store 版 Folio。两个版本目前都免费。</p>
+        </div>
+
+        <div class="compare-wrap reveal">
+          <table class="compare-table">
+            <caption class="sr-only" data-i18n="cmp.caption">Folio 与 Folio Pro 功能对比</caption>
+            <colgroup><col><col class="ed"><col class="ed ed-pro"></colgroup>
+            <thead>
+              <tr>
+                <td></td>
+                <th scope="col"><span class="cmp-name">Folio</span><span class="cmp-channel">Mac App Store</span></th>
+                <th scope="col"><span class="cmp-name">Folio Pro</span><span class="cmp-channel" data-i18n="channel.direct">直接下载</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="cmp-group"><th colspan="3" scope="colgroup" data-i18n="cmp.g.core">核心能力</th></tr>
+              <tr><th scope="row" data-i18n="cmp.r1">打开所有格式：文档、表格、演示稿、PDF、图片、音乐与视频</th><td><span class="cmp-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span class="sr-only" data-i18n="cmp.yes">包含</span></span></td><td><span class="cmp-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span class="sr-only" data-i18n="cmp.yes">包含</span></span></td></tr>
+              <tr><th scope="row" data-i18n="cmp.r2">Markdown、代码与笔记编辑</th><td><span class="cmp-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span class="sr-only" data-i18n="cmp.yes">包含</span></span></td><td><span class="cmp-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span class="sr-only" data-i18n="cmp.yes">包含</span></span></td></tr>
+              <tr><th scope="row" data-i18n="cmp.r3">PDF 工具箱</th><td><span class="cmp-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span class="sr-only" data-i18n="cmp.yes">包含</span></span></td><td><span class="cmp-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span class="sr-only" data-i18n="cmp.yes">包含</span></span></td></tr>
+              <tr><th scope="row" data-i18n="cmp.r4">跨工作空间全文搜索</th><td><span class="cmp-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span class="sr-only" data-i18n="cmp.yes">包含</span></span></td><td><span class="cmp-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span class="sr-only" data-i18n="cmp.yes">包含</span></span></td></tr>
+              <tr><th scope="row" data-i18n="cmp.r5">自动备份与历史版本</th><td><span class="cmp-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span class="sr-only" data-i18n="cmp.yes">包含</span></span></td><td><span class="cmp-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span class="sr-only" data-i18n="cmp.yes">包含</span></span></td></tr>
+              <tr><th scope="row" data-i18n="cmp.r6">15 套主题，深浅自动</th><td><span class="cmp-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span class="sr-only" data-i18n="cmp.yes">包含</span></span></td><td><span class="cmp-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span class="sr-only" data-i18n="cmp.yes">包含</span></span></td></tr>
+              <tr><th scope="row" data-i18n="cmp.r7">翻译</th><td><span data-i18n="cmp.r7.a">Apple 系统翻译</span></td><td><span data-i18n="cmp.r7.b">+ 本地模型与更多引擎</span></td></tr>
+              <tr class="cmp-group"><th colspan="3" scope="colgroup" data-i18n="cmp.g.pro">Pro 工具</th></tr>
+              <tr><th scope="row" data-i18n="cmp.r8">终端与 AI 标签页（Claude Code、Codex…）</th><td><span class="cmp-no"><span class="sr-only" data-i18n="cmp.no">不包含</span></span></td><td><span class="cmp-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span class="sr-only" data-i18n="cmp.yes">包含</span></span></td></tr>
+              <tr><th scope="row" data-i18n="cmp.r9">Git：提交历史、Diff、Blame</th><td><span class="cmp-no"><span class="sr-only" data-i18n="cmp.no">不包含</span></span></td><td><span class="cmp-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span class="sr-only" data-i18n="cmp.yes">包含</span></span></td></tr>
+              <tr><th scope="row" data-i18n="cmp.r10">侧栏提问与文档总结</th><td><span class="cmp-no"><span class="sr-only" data-i18n="cmp.no">不包含</span></span></td><td><span class="cmp-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span class="sr-only" data-i18n="cmp.yes">包含</span></span></td></tr>
+              <tr><th scope="row" data-i18n="cmp.r11">本地模型：语义搜索、OCR</th><td><span class="cmp-no"><span class="sr-only" data-i18n="cmp.no">不包含</span></span></td><td><span class="cmp-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span class="sr-only" data-i18n="cmp.yes">包含</span></span></td></tr>
+              <tr><th scope="row" data-i18n="cmp.r12">语言服务（LSP）</th><td><span class="cmp-no"><span class="sr-only" data-i18n="cmp.no">不包含</span></span></td><td><span class="cmp-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span class="sr-only" data-i18n="cmp.yes">包含</span></span></td></tr>
+              <tr><th scope="row" data-i18n="cmp.r13">任务，与菜单栏日历联动</th><td><span class="cmp-no"><span class="sr-only" data-i18n="cmp.no">不包含</span></span></td><td><span class="cmp-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span class="sr-only" data-i18n="cmp.yes">包含</span></span></td></tr>
+              <tr><th scope="row" data-i18n="cmp.r14">PDF 转 Markdown、保留排版的 PDF 翻译</th><td><span class="cmp-no"><span class="sr-only" data-i18n="cmp.no">不包含</span></span></td><td><span class="cmp-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span class="sr-only" data-i18n="cmp.yes">包含</span></span></td></tr>
+              <tr><th scope="row" data-i18n="cmp.r15">iCloud 同步</th><td><span class="cmp-no"><span class="sr-only" data-i18n="cmp.no">不包含</span></span></td><td><span class="cmp-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><span class="sr-only" data-i18n="cmp.yes">包含</span></span></td></tr>
+              <tr class="cmp-group"><th colspan="3" scope="colgroup" data-i18n="cmp.g.get">获取方式</th></tr>
+              <tr><th scope="row" data-i18n="cmp.r16">分发</th><td><span data-i18n="cmp.r16.a">App Store · 沙盒</span></td><td><span data-i18n="cmp.r16.b">直接下载</span></td></tr>
+              <tr><th scope="row" data-i18n="cmp.r17">系统要求</th><td>macOS 15+</td><td><span data-i18n="cmp.r17.b">macOS&nbsp;15+ · Apple&nbsp;芯片</span></td></tr>
+              <tr><th scope="row" data-i18n="cmp.r18">价格</th><td><span data-i18n="free">目前免费</span></td><td><span data-i18n="free">目前免费</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="compare-cta reveal">
+          <a href="https://apps.apple.com/us/app/folio-universal-viewer/id6769624913?l=zh-Hans-CN&amp;mt=12"
+             class="btn btn-ghost btn-stack" data-appstore target="_blank" rel="noopener">
+            <span class="btn-stack-text">
+              <span class="btn-title" data-i18n="btn.store.short">下载 Folio</span>
+              <span class="btn-sub" data-i18n="btn.store.sub">来自 Mac App Store</span>
+            </span>
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          </a>
+          <a href="https://github.com/river-ranx/folio-web/releases/latest"
+             class="btn btn-accent btn-stack" data-pro target="_blank" rel="noopener">
+            <span class="btn-stack-text">
+              <span class="btn-title" data-i18n="btn.pro">下载 Folio Pro</span>
+              <span class="btn-sub" data-i18n="btn.pro.sub">终端、Git 与本地 AI</span>
+            </span>
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          </a>
+        </div>
+
+        <div class="compare-notes reveal">
+          <span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 5.5l7.5-1v7H3zM11.5 4.35L21 3v8.5h-9.5zM3 12.5h7.5v7L3 18.5zM11.5 12.5H21V21l-9.5-1.35z"/></svg>
+            <span><strong>Windows</strong> <span data-i18n="soon">即将到来</span></span>
+          </span>
+          <span data-i18n="cmp.one">同一台 Mac 上请只安装其中一个——两者注册相同的 Quick Look 与 Safari 扩展。</span>
+        </div>
+      </div>
+    </section>
+
     <!-- FAQ -->
     <section class="faq" id="faq">
       <div class="container">
@@ -1649,7 +2773,7 @@
               <span class="faq-icon"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
             </button>
             <div class="faq-a" role="region">
-              <p data-i18n="faq.a4">Folio 支持 macOS 15 及以上版本，全系列 Mac 都能流畅运行。</p>
+              <p data-i18n="faq.a4">Folio 支持 macOS 15 及以上版本。Folio Pro 内置本地模型，需要 Apple 芯片（M 系列）的 Mac。</p>
             </div>
           </div>
           <div class="faq-item reveal">
@@ -1676,7 +2800,16 @@
               <span class="faq-icon"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
             </button>
             <div class="faq-a" role="region">
-              <p data-i18n="faq.a7">Folio 当前是 Beta 版，完全免费下载使用。正式版定价将在公开发布前公布；Beta 用户会获得忠诚度优惠。</p>
+              <p data-i18n="faq.a7">Folio 与 Folio Pro 目前都完全免费。将来如果调整定价，会提前公布，早期用户会获得忠诚度优惠。</p>
+            </div>
+          </div>
+          <div class="faq-item reveal">
+            <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+              <span data-i18n="faq.q8">Folio 和 Folio Pro 有什么区别？</span>
+              <span class="faq-icon"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+            </button>
+            <div class="faq-a" role="region">
+              <p data-i18n="faq.a8">Folio 来自 Mac App Store，运行在沙盒里，专注日常的文件查看与编辑。Folio Pro 是直接下载的版本，不受沙盒限制，因此多了内置终端与 AI 标签页、完整 Git、本地模型、语言服务、任务和 iCloud 同步。两者共用同一套文件阅读体验；它们会注册相同的 Quick Look 与 Safari 扩展，同一台 Mac 上请只安装其中一个。</p>
             </div>
           </div>
         </div>
@@ -1689,13 +2822,25 @@
         <span class="eyebrow reveal" style="margin-bottom:20px;" data-i18n="cta.eyebrow">准备好了吗？</span>
         <h2 class="reveal">One app.<span class="serif">See every file.</span></h2>
         <p class="reveal" data-i18n="cta.body">让你的 Mac 安静下来。一个窗口，看完所有文件。</p>
-        <div class="cta-buttons reveal">
+        <div class="cta-buttons reveal cta-choices">
+          <a href="https://github.com/river-ranx/folio-web/releases/latest"
+             class="btn btn-accent btn-stack" data-pro target="_blank" rel="noopener">
+            <span class="btn-stack-text">
+              <span class="btn-title" data-i18n="btn.pro">下载 Folio Pro</span>
+              <span class="btn-sub" data-i18n="btn.pro.sub">终端、Git 与本地 AI</span>
+            </span>
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          </a>
           <a href="https://apps.apple.com/us/app/folio-universal-viewer/id6769624913?l=zh-Hans-CN&amp;mt=12"
-             class="btn btn-accent" data-appstore target="_blank" rel="noopener">
-            <span data-i18n="btn.download">下载 macOS 版</span>
+             class="btn btn-ghost btn-stack" data-appstore target="_blank" rel="noopener">
+            <span class="btn-stack-text">
+              <span class="btn-title" data-i18n="btn.store.short">下载 Folio</span>
+              <span class="btn-sub" data-i18n="btn.store.sub">来自 Mac App Store</span>
+            </span>
             <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
           </a>
         </div>
+        <p class="cta-note reveal" data-i18n="cta.note">两个版本目前都免费 · Windows 即将到来</p>
       </div>
     </section>
   </main>
@@ -1722,16 +2867,111 @@
 
         'nav.formats': '所有格式',
         'nav.features': '功能',
-        'nav.themes': '主题',
         'nav.faq': '常见问题',
         'nav.cta': '下载 Folio',
 
-        'btn.download': '下载 macOS 版',
-        'btn.explore': '探索功能',
+        'btn.pro.sub': '终端、Git 与本地 AI',
+        'btn.store.sub': '来自 Mac App Store',
+        'hero.ed.aria': '选择版本',
+        'hero.ed.rec': '推荐',
+        'hero.store.f1': '阅读、编辑、搜索所有文件',
+        'hero.store.f2': '沙盒运行，自动更新',
+        'hero.store.f3': '没有终端与 Git',
+        'hero.pro.f1': '包含 Folio 的全部功能',
+        'hero.pro.f2': '终端与 AI 智能体',
+        'hero.pro.f3': '完整 Git 与本地 AI',
+        'nav.compare': '对比版本',
+        'hero.compare': '对比两个版本',
+        'hero.meta.free': '两个版本目前都免费',
+        'hero.meta.soon': 'Windows、iPadOS、iOS 即将到来',
+        'free': '目前免费',
+        'soon': '即将到来',
+        'channel.direct': '直接下载',
+        'cta.note': '两个版本目前都免费 · Windows 即将到来',
+
+        'line.eyebrow': '两个版本，同一个内核',
+        'line.h2.line1': '同一个 Folio，',
+        'line.h2.serif': '走多远由你定。',
+        'line.sub': '两个版本用同一套方式阅读、编辑和搜索每个文件。Folio Pro 再加上那些必须走出 App Store 沙盒才能做到的工具。',
+        'line.store.tag': '看见每个文件。',
+        'line.store.desc': '所有格式一个窗口打开，Markdown、代码与笔记可编辑，全文搜索，15 套主题。沙盒运行，由 App Store 自动更新。',
+        'line.store.c1': '全格式阅读',
+        'line.store.c2': '编辑',
+        'line.store.c3': '全文搜索',
+        'line.store.c4': '15 套主题',
+        'line.store.for': '适合阅读、写作与日常文件',
+        'line.store.link': '看看核心功能',
+        'line.pro.tag': '看见之后，直接动手。',
+        'line.pro.desc': '包含 Folio 的全部能力，外加能跑 AI 智能体的终端、完整 Git、本地模型与语言服务。',
+        'line.pro.c0': 'Folio 的全部 +',
+        'line.pro.c1': '终端与 AI',
+        'line.pro.c2': '本地模型',
+        'line.pro.c3': '任务',
+        'line.pro.c4': 'iCloud 同步',
+        'line.pro.for': '适合开发者、研究者与重度用户',
+        'line.pro.link': '看看 Folio Pro',
+        'core.label': '两个版本都有',
+
+        'pro.badge': 'Folio 的全部，再多一点',
+        'pro.h2.line1': '看见每个文件，',
+        'pro.h2.serif': '然后直接动手。',
+        'pro.sub': 'Folio Pro 包含 Folio 的全部，再加上只有走出 App Store 沙盒才能做到的事：能跑 AI 智能体的终端、真正的 Git，以及在你 Mac 上运行的本地模型。',
+        'pro.window.aria': 'Folio Pro 窗口：左侧是带 Git 状态的文件树，右上是代码 Diff，右下是运行 Claude Code 的终端',
+        'pro.term.h': '终端与 AI 标签页',
+        'pro.term.p': '在要修改的文件旁边，直接运行 Claude Code、Codex 等命令行工具。',
+        'pro.git.h': '完整 Git',
+        'pro.git.p': '打开的每个仓库都能看提交历史、Diff 与 Blame。',
+        'pro.ask.h': '提问与总结',
+        'pro.ask.p': '在侧栏里提问，任何文档都能一键总结。',
+        'pro.local.h': '本地模型',
+        'pro.local.p': '语义搜索、离线翻译与 OCR，在你的 Mac 上运行。',
+        'pro.lsp.h': '语言服务',
+        'pro.lsp.p': '通过 LSP 为 Go、Rust、Python、TS/JS、Java 提供代码智能。',
+        'pro.tasks.h': '任务与日历',
+        'pro.tasks.p': '任务放在工作旁边，与菜单栏日历联动。',
+        'pro.pdf.h': 'PDF 进阶',
+        'pro.pdf.p': 'PDF 转成 Markdown，或保留排版直接翻译。',
+        'pro.sync.h': 'iCloud 同步',
+        'pro.sync.p': '支持 iCloud 同步，以及更多翻译引擎。',
+        'pro.req': 'macOS 15+ · 仅 Apple 芯片（M 系列）· 目前免费',
+
+        'cmp.eyebrow': '对比版本',
+        'cmp.h2.line1': '选一个',
+        'cmp.sub': '要终端、Git 与本地 AI，选 Folio Pro；只想日常查看和编辑，选 App Store 版 Folio。两个版本目前都免费。',
+        'cmp.caption': 'Folio 与 Folio Pro 功能对比',
+        'cmp.yes': '包含',
+        'cmp.no': '不包含',
+        'cmp.g.core': '核心能力',
+        'cmp.g.pro': 'Pro 工具',
+        'cmp.g.get': '获取方式',
+        'cmp.r1': '打开所有格式：文档、表格、演示稿、PDF、图片、音乐与视频',
+        'cmp.r2': 'Markdown、代码与笔记编辑',
+        'cmp.r3': 'PDF 工具箱',
+        'cmp.r4': '跨工作空间全文搜索',
+        'cmp.r5': '自动备份与历史版本',
+        'cmp.r6': '15 套主题，深浅自动',
+        'cmp.r7': '翻译',
+        'cmp.r7.a': 'Apple 系统翻译',
+        'cmp.r7.b': '+ 本地模型与更多引擎',
+        'cmp.r8': '终端与 AI 标签页（Claude Code、Codex…）',
+        'cmp.r9': 'Git：提交历史、Diff、Blame',
+        'cmp.r10': '侧栏提问与文档总结',
+        'cmp.r11': '本地模型：语义搜索、OCR',
+        'cmp.r12': '语言服务（LSP）',
+        'cmp.r13': '任务，与菜单栏日历联动',
+        'cmp.r14': 'PDF 转 Markdown、保留排版的 PDF 翻译',
+        'cmp.r15': 'iCloud 同步',
+        'cmp.r16': '分发',
+        'cmp.r16.a': 'App Store · 沙盒',
+        'cmp.r16.b': '直接下载',
+        'cmp.r17': '系统要求',
+        'cmp.r17.b': 'macOS\u00a015+ · Apple\u00a0芯片',
+        'cmp.r18': '价格',
+        'cmp.one': '同一台 Mac 上请只安装其中一个——两者注册相同的 Quick Look 与 Safari 扩展。',
+        'btn.pro': '下载 Folio Pro',
+        'btn.store.short': '下载 Folio',
 
         'hero.subtitle': '让你的 Mac 安静下来。把所有你常用的文件——文档、表格、演示稿、PDF、笔记、图片、音乐与视频——全部装进一个窗口。',
-        'hero.meta.devices': '全系列 Mac 适用',
-        'hero.meta.ios': 'iOS / iPadOS 即将到来',
 
         'pillar.1.h': '多工作空间',
         'pillar.2.h': '全格式，一个 app',
@@ -1823,13 +3063,15 @@
         'faq.q3': '我可以用它编辑文件吗？',
         'faq.a3': '可以。笔记和代码完全可编辑。Office 文档与 PDF 目前是高保真预览，下一版本会开放标注与表单填写。',
         'faq.q4': '支持哪些 macOS 版本？',
-        'faq.a4': 'Folio 支持 macOS 15 及以上版本，全系列 Mac 都能流畅运行。',
+        'faq.a4': 'Folio 支持 macOS 15 及以上版本。Folio Pro 内置本地模型，需要 Apple 芯片（M 系列）的 Mac。',
         'faq.q5': '搜索一万个文件的文件夹会不会很慢？',
         'faq.a5': 'Folio 在你打开文件夹时就悄悄准备好，之后只在文件变化时跟进。一万个文件的大文件夹，输入即可命中——你不会感觉到它在工作。',
         'faq.q6': '我的数据安全吗？',
         'faq.a6': '所有处理都在你的电脑上完成。Folio 不会把你的文件内容上传到任何地方——这是默认行为，没有「关闭云同步」的开关。',
         'faq.q7': '是否免费？',
-        'faq.a7': 'Folio 当前是 Beta 版，完全免费下载使用。正式版定价将在公开发布前公布；Beta 用户会获得忠诚度优惠。',
+        'faq.a7': 'Folio 与 Folio Pro 目前都完全免费。将来如果调整定价，会提前公布，早期用户会获得忠诚度优惠。',
+        'faq.q8': 'Folio 和 Folio Pro 有什么区别？',
+        'faq.a8': 'Folio 来自 Mac App Store，运行在沙盒里，专注日常的文件查看与编辑。Folio Pro 是直接下载的版本，不受沙盒限制，因此多了内置终端与 AI 标签页、完整 Git、本地模型、语言服务、任务和 iCloud 同步。两者共用同一套文件阅读体验；它们会注册相同的 Quick Look 与 Safari 扩展，同一台 Mac 上请只安装其中一个。',
 
         'cta.eyebrow': '准备好了吗？',
         'cta.body': '让你的 Mac 安静下来。一个窗口，看完所有文件。',
@@ -1846,16 +3088,111 @@
 
         'nav.formats': 'Formats',
         'nav.features': 'Features',
-        'nav.themes': 'Themes',
         'nav.faq': 'FAQ',
         'nav.cta': 'Get Folio',
 
-        'btn.download': 'Download for Mac',
-        'btn.explore': 'Explore features',
+        'btn.pro.sub': 'Terminal, Git & on-device AI',
+        'btn.store.sub': 'On the Mac App Store',
+        'hero.ed.aria': 'Choose an edition',
+        'hero.ed.rec': 'Recommended',
+        'hero.store.f1': 'Read, edit & search every file',
+        'hero.store.f2': 'Sandboxed, auto-updated',
+        'hero.store.f3': 'No terminal or Git',
+        'hero.pro.f1': 'Everything in Folio',
+        'hero.pro.f2': 'Terminal & AI agents',
+        'hero.pro.f3': 'Full Git & on-device AI',
+        'nav.compare': 'Compare',
+        'hero.compare': 'Compare editions',
+        'hero.meta.free': 'Both editions free for now',
+        'hero.meta.soon': 'Windows, iPadOS & iOS coming soon',
+        'free': 'Free for now',
+        'soon': 'coming soon',
+        'channel.direct': 'Direct download',
+        'cta.note': 'Both editions are free for now · Windows coming soon',
+
+        'line.eyebrow': 'two editions, one core',
+        'line.h2.line1': 'Same Folio.',
+        'line.h2.serif': 'Go as far as you need.',
+        'line.sub': 'Both editions read, edit and search every file the same way. Folio Pro adds the tools that need to live outside the App Store sandbox.',
+        'line.store.tag': 'See every file.',
+        'line.store.desc': 'Every format in one window, with Markdown, code and note editing, full-text search and 15 themes. Sandboxed, and kept up to date by the App Store.',
+        'line.store.c1': 'Every format',
+        'line.store.c2': 'Editing',
+        'line.store.c3': 'Full-text search',
+        'line.store.c4': '15 themes',
+        'line.store.for': 'For reading, writing and everyday files',
+        'line.store.link': 'Explore the core',
+        'line.pro.tag': 'Then get to work.',
+        'line.pro.desc': 'Everything in Folio, plus a terminal for your AI agents, a full Git client, on-device models and language servers.',
+        'line.pro.c0': 'Everything in Folio +',
+        'line.pro.c1': 'Terminal & AI',
+        'line.pro.c2': 'On-device models',
+        'line.pro.c3': 'Tasks',
+        'line.pro.c4': 'iCloud sync',
+        'line.pro.for': 'For developers, researchers and power users',
+        'line.pro.link': 'Explore Folio Pro',
+        'core.label': 'in both editions',
+
+        'pro.badge': 'Everything in Folio, and then some',
+        'pro.h2.line1': 'See every file.',
+        'pro.h2.serif': 'Then get to work.',
+        'pro.sub': 'Folio Pro is everything in Folio, plus what only works outside the App Store sandbox — a terminal for your AI agents, real Git, and models that run on your Mac.',
+        'pro.window.aria': 'Folio Pro window: a file tree with Git status on the left, a code diff at the top right, and a terminal running Claude Code below it',
+        'pro.term.h': 'Terminal & AI tab',
+        'pro.term.p': 'Run Claude Code, Codex and other CLIs right next to the files they change.',
+        'pro.git.h': 'Full Git client',
+        'pro.git.p': 'History, diff and blame for every repository you open.',
+        'pro.ask.h': 'Ask & summarize',
+        'pro.ask.p': 'Ask questions in the side panel and summarize any document.',
+        'pro.local.h': 'On-device models',
+        'pro.local.p': 'Semantic search, offline translation and OCR, running on your Mac.',
+        'pro.lsp.h': 'Language servers',
+        'pro.lsp.p': 'Code intelligence for Go, Rust, Python, TS/JS and Java via LSP.',
+        'pro.tasks.h': 'Tasks & calendar',
+        'pro.tasks.p': 'Keep tasks next to your work, linked to the menu-bar calendar.',
+        'pro.pdf.h': 'PDF, further',
+        'pro.pdf.p': 'Turn PDFs into Markdown, or translate them with the layout intact.',
+        'pro.sync.h': 'iCloud sync',
+        'pro.sync.p': 'Sync with iCloud, plus more translation engines to choose from.',
+        'pro.req': 'macOS 15+ · Apple Silicon (M-series) · Free for now',
+
+        'cmp.eyebrow': 'compare',
+        'cmp.h2.line1': 'Pick your',
+        'cmp.sub': 'Pick Folio Pro for terminal, Git and on-device AI. Pick Folio from the App Store for everyday viewing and editing. Both are free for now.',
+        'cmp.caption': 'Folio and Folio Pro feature comparison',
+        'cmp.yes': 'Included',
+        'cmp.no': 'Not included',
+        'cmp.g.core': 'The core',
+        'cmp.g.pro': 'Pro tools',
+        'cmp.g.get': 'Getting it',
+        'cmp.r1': 'Open every format — documents, sheets, slides, PDF, images, audio, video',
+        'cmp.r2': 'Markdown, code and note editing',
+        'cmp.r3': 'PDF toolkit',
+        'cmp.r4': 'Full-text search across workspaces',
+        'cmp.r5': 'Automatic backups and version history',
+        'cmp.r6': '15 themes, light and dark',
+        'cmp.r7': 'Translation',
+        'cmp.r7.a': 'Apple system translation',
+        'cmp.r7.b': '+ on-device models & more engines',
+        'cmp.r8': 'Terminal & AI tab (Claude Code, Codex…)',
+        'cmp.r9': 'Git: history, diff, blame',
+        'cmp.r10': 'Side-panel Ask and summaries',
+        'cmp.r11': 'On-device semantic search and OCR',
+        'cmp.r12': 'Language servers (LSP)',
+        'cmp.r13': 'Tasks, linked to the menu-bar calendar',
+        'cmp.r14': 'PDF to Markdown, layout-preserving PDF translation',
+        'cmp.r15': 'iCloud sync',
+        'cmp.r16': 'Distribution',
+        'cmp.r16.a': 'App Store · sandboxed',
+        'cmp.r16.b': 'Direct download',
+        'cmp.r17': 'Requires',
+        'cmp.r17.b': 'macOS\u00a015+ · Apple\u00a0Silicon',
+        'cmp.r18': 'Price',
+        'cmp.one': 'Install only one on a given Mac — both register the same Quick Look and Safari extensions.',
+        'btn.pro': 'Get Folio Pro',
+        'btn.store.short': 'Get Folio',
 
         'hero.subtitle': 'Turn your Mac into one quiet, focused workspace. Documents, spreadsheets, slides, PDFs, notes, images, music and video — all in a single window.',
-        'hero.meta.devices': 'Made for every Mac',
-        'hero.meta.ios': 'iPadOS & iOS coming soon',
 
         'pillar.1.h': 'Multi-Workspace',
         'pillar.2.h': 'All Formats, One App',
@@ -1947,13 +3284,15 @@
         'faq.q3': 'Can I edit files in it?',
         'faq.a3': 'Yes. Notes and code are fully editable. Office files and PDFs are high-fidelity preview today; annotation and form filling are coming next.',
         'faq.q4': 'Which macOS versions are supported?',
-        'faq.a4': 'Folio supports macOS 15 and above, and runs smoothly on every Mac.',
+        'faq.a4': 'Folio supports macOS 15 and above. Folio Pro bundles on-device models, so it needs an Apple Silicon (M-series) Mac.',
         'faq.q5': 'Will searching a folder of 10,000 files be slow?',
         'faq.a5': "Folio quietly prepares when you open a folder, then only catches up on changes. Even folders with 10,000 files respond as you type — you won't notice it working.",
         'faq.q6': 'Is my data safe?',
         'faq.a6': 'Everything happens on your Mac. Folio never uploads your files anywhere — it is the default, with no cloud toggle to switch off.',
         'faq.q7': 'Is it free?',
-        'faq.a7': 'Folio is free during Beta. Pricing will be announced before public release; Beta users receive a loyalty discount.',
+        'faq.a7': 'Both Folio and Folio Pro are free for now. If pricing changes, it will be announced in advance, and early users get a loyalty discount.',
+        'faq.q8': 'What is the difference between Folio and Folio Pro?',
+        'faq.a8': 'Folio comes from the Mac App Store and runs in the sandbox, focused on everyday viewing and editing. Folio Pro is the direct-download edition, free of the sandbox, so it adds a built-in terminal and AI tab, full Git, on-device models, language servers, tasks and iCloud sync. Both share the same file-reading experience; they register the same Quick Look and Safari extensions, so install only one on a given Mac.',
 
         'cta.eyebrow': 'ready?',
         'cta.body': 'Make your Mac quiet. One window for every file.',
@@ -1989,6 +3328,14 @@
         const val = dict[key];
         if (typeof val === 'string') el.textContent = val;
       });
+      document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+        const val = dict[el.getAttribute('data-i18n-aria')];
+        if (typeof val === 'string') el.setAttribute('aria-label', val);
+      });
+
+      // Folio Pro 直装包：GitHub Release 最新版的固定文件名资产，发新版时保持资产名 Folio-Pro.zip 即可，无需改此处
+      const PRO_URL = 'https://github.com/river-ranx/folio-web/releases/latest/download/Folio-Pro.zip';
+      document.querySelectorAll('a[data-pro]').forEach(a => { a.href = PRO_URL; });
 
       // App Store 落地页语言跟随站点语言
       const storeUrl = 'https://apps.apple.com/us/app/folio-universal-viewer/id6769624913?mt=12';
@@ -2064,9 +3411,8 @@
 
     (function bootstrap() {
       // Theme
-      const savedTheme = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+      // 默认深色；仅当用户手动切到浅色并记在 localStorage 时才用浅色（不再跟随系统）
+      const isDark = localStorage.getItem('theme') !== 'light';
       if (isDark) document.documentElement.classList.add('dark');
       updateThemeColor(isDark);
 

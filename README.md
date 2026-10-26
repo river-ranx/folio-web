@@ -2,6 +2,15 @@
 
 The marketing website for **Folio**, a universal file viewer for Mac.
 
+Two editions, both free for now:
+
+| Edition | Channel | Download button points to |
+| --- | --- | --- |
+| **Folio** | Mac App Store (sandboxed) | the App Store listing |
+| **Folio Pro** | Direct download (Developer ID, Apple Silicon) | `releases/latest/download/Folio-Pro.zip` (latest GitHub Release asset) |
+
+The Folio Pro URL lives in one place: the `PRO_URL` constant in `index.html`'s `applyI18n`.
+
 🌐 **Live**: [https://river-ranx.github.io/folio-web/](https://river-ranx.github.io/folio-web/)
 
 ## Stack
