@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Folio · 风格探索</title>
+<style>
+  *{box-sizing:border-box;margin:0}
+  body{font:16px/1.5 -apple-system,"PingFang SC",system-ui,sans-serif;background:#111;color:#eee;padding:40px 24px 80px}
+  h1{font-size:28px;letter-spacing:-.02em}
+  p.s{color:#999;margin:8px 0 32px}
+  .g{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;max-width:1240px}
+  a{display:block;color:inherit;text-decoration:none;border:1px solid #2a2a2a;border-radius:14px;overflow:hidden;background:#181818;transition:transform .2s,border-color .2s}
+  a:hover,a:focus-visible{transform:translateY(-3px);border-color:#888;outline:none}
+  .f{height:190px;overflow:hidden;position:relative;background:#222}
+  iframe{width:1440px;height:760px;border:0;transform:scale(.21);transform-origin:0 0;pointer-events:none;position:absolute;inset:0}
+  .t{padding:14px 16px}
+  b{display:block;font-size:17px}
+  small{color:#999}
+</style>
+</head>
+<body>
+<h1>Folio · 风格探索</h1>
+<p class="s">四个互不参考的整页方案，内容一致、风格不同。每页右上角可切 EN / 中文，角落有示意图标注开关。</p>
+<div class="g">
+  <a href="a-swiss.html"><div class="f"><iframe src="a-swiss.html" loading="lazy" tabindex="-1" title=""></iframe></div><div class="t"><b>A · Swiss 规格书</b><small>白纸 + 电蓝，网格线，编号目录，技术线稿</small></div></a>
+  <a href="b-command.html"><div class="f"><iframe src="b-command.html" loading="lazy" tabindex="-1" title=""></iframe></div><div class="t"><b>B · Command 暗色</b><small>⌘K 命令面板，冷色渐变光，开发者气质</small></div></a>
+  <a href="c-glass.html"><div class="f"><iframe src="c-glass.html" loading="lazy" tabindex="-1" title=""></iframe></div><div class="t"><b>C · Liquid Glass</b><small>极光壁纸 + 玻璃窗口，Mac 桌面场景</small></div></a>
+  <a href="d-sticker.html"><div class="f"><iframe src="d-sticker.html" loading="lazy" tabindex="-1" title=""></iframe></div><div class="t"><b>D · Sticker 贴纸</b><small>饱和彩色 + 粗描边硬阴影，可拖动文件贴纸</small></div></a>
+</div>
+</body>
+</html>

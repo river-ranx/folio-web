@@ -1,0 +1,1586 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Folio — One app. See every file. | The universal viewer for Mac</title>
+<meta name="description" content="Folio opens 14 kinds of files natively on Mac and edits Markdown, Word and code in place. Folio Pro adds a local workbench: terminal, Git, AI CLI and file snapshots. Free, macOS 15+.">
+<meta name="theme-color" content="#F4F4F0">
+<link rel="icon" href="../assets/app-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F4F4F0; --card:#FFFFFF; --ink:#0B0B0B; --mute:#55554F; --line:rgba(11,11,11,.13); --outer:#0B0B0B;
+  --sig:#1D3CFF; --sig-soft:rgba(29,60,255,.12); --ph:#FF2D9B;
+  --sans:'Inter Tight','Helvetica Neue',Helvetica,Arial,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,Consolas,'PingFang SC','Hiragino Sans GB',monospace;
+  --pad:32px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.5 var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+img,svg{display:block;max-width:100%}
+a{color:inherit}
+button{font:inherit;color:inherit}
+p{margin:0}
+::selection{background:var(--sig);color:#fff}
+:focus-visible{outline:3px solid var(--sig);outline-offset:3px}
+.dark :focus-visible{outline-color:var(--ink)}
+.cta :focus-visible{outline-color:#fff}
+.skip{position:absolute;left:-999px;top:0;z-index:100;background:var(--ink);color:var(--paper);padding:12px 16px}
+.skip:focus{left:12px;top:12px}
+.mono{font:500 12px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.mute{color:var(--mute)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+b,strong{font-weight:700}
+[hidden]{display:none !important}
+
+/* ---------- 12-column grid ---------- */
+.wrap{max-width:1440px;margin:0 auto;padding:0 var(--pad);position:relative}
+.g{display:grid;grid-template-columns:repeat(12,minmax(0,1fr))}
+.col{grid-column:var(--col,1/-1);min-width:0}
+.in{padding-left:12px;padding-right:12px}
+.cols{position:fixed;inset:0;z-index:0;pointer-events:none}
+.cols .wrap,.cols .g{height:100%}
+.cols i{border-left:1px solid var(--line)}
+.cols i:last-child{border-right:1px solid var(--line)}
+.cols.local{position:absolute;inset:0 var(--pad)}
+.cols.local .wrap{padding:0;max-width:none}
+.wrap>*:not(.cols){position:relative;z-index:1}
+body.no-grid .cols{display:none}
+
+/* ---------- header ---------- */
+.top{position:sticky;top:0;z-index:50;background:var(--paper);border-bottom:1px solid var(--ink)}
+.bar{display:flex;align-items:center;justify-content:space-between;height:56px;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;min-height:40px}
+.brand img{width:30px;height:30px}
+.brand b{font-size:21px;letter-spacing:-.04em;font-weight:800}
+.nav{display:flex;gap:0}
+.nav a{display:flex;align-items:center;min-height:40px;padding:0 14px;text-decoration:none}
+.nav a:hover{background:var(--ink);color:var(--paper)}
+.ctl{display:flex;align-items:center;gap:8px}
+.sw{display:flex}
+.th-b{width:40px;height:40px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer;padding:0}
+.th-b i{width:18px;height:18px;background:var(--c);display:block;border:2px solid transparent;outline:2px solid transparent;outline-offset:2px}
+.th-b[aria-pressed=true] i{outline-color:var(--ink)}
+.th-b.sys i{background:repeating-linear-gradient(45deg,var(--c) 0 3px,var(--paper) 3px 6px)}
+.lang{display:flex;border:1.5px solid var(--ink)}
+.lang button{min-width:44px;height:40px;padding:0 8px;border:0;background:transparent;cursor:pointer;font:500 12px var(--mono);letter-spacing:.05em}
+.lang button+button{border-left:1.5px solid var(--ink)}
+.lang button[aria-pressed=true]{background:var(--ink);color:var(--paper)}
+
+/* ---------- buttons ---------- */
+.btn{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:52px;padding:0 20px;border:2px solid var(--ink);background:var(--paper);color:var(--ink);font:600 16px/1.1 var(--sans);letter-spacing:-.01em;text-decoration:none;cursor:pointer;transition:background .12s,color .12s,border-color .12s}
+.btn:hover{background:var(--ink);color:var(--paper)}
+.btn.pri{background:var(--sig);border-color:var(--sig);color:#fff}
+.btn.pri:hover{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn .ar{font:500 18px var(--mono)}
+.btn.sm{min-height:40px;padding:0 14px;font-size:14px;display:inline-flex}
+.dark .btn{background:transparent;border-color:var(--ink);color:var(--ink)}
+.dark .btn:hover{background:var(--ink);color:var(--paper)}
+.dark .btn.pri{background:var(--sig);color:#fff;border-color:var(--ink)}
+.dark .btn.pri:hover{background:var(--ink);color:var(--paper)}
+
+/* ---------- headings ---------- */
+h1,h2,h3,h4{margin:0;font-weight:700;letter-spacing:-.045em;line-height:.95;word-spacing:.1em}
+h1{font-size:clamp(54px,11.6vw,196px);font-weight:800;letter-spacing:-.068em;line-height:.84;padding:28px 12px 0 8px}
+h1 .sig{color:var(--sig);display:block}
+h1 span.l{display:block}
+html[lang=zh] h1{font-size:clamp(44px,9.6vw,164px);letter-spacing:-.04em;line-height:.98}
+h2{font-size:clamp(40px,6.2vw,100px);font-weight:800;letter-spacing:-.058em;line-height:.9}
+html[lang=zh] h2{letter-spacing:-.03em;line-height:1.02;font-size:clamp(36px,5.4vw,88px)}
+h3{font-size:24px;letter-spacing:-.03em;line-height:1.05}
+.lede{font-size:clamp(18px,1.6vw,22px);line-height:1.38;font-weight:500;letter-spacing:-.012em;max-width:34em}
+
+/* ---------- hero ---------- */
+.hero{position:relative;z-index:1;padding-bottom:0}
+.hero-meta{border-bottom:1px solid var(--ink);padding:14px 0}
+.hero-meta>div{padding:0 12px}
+.hero-row{padding-top:44px;align-items:start}
+.hero-l{display:flex;flex-direction:column;gap:28px;padding:0 12px}
+.dl{display:flex;flex-direction:column;border-top:2px solid var(--ink)}
+.dlc{display:grid;grid-template-columns:44px 1fr auto;gap:4px 14px;padding:16px 0 18px;border-bottom:1px solid var(--ink);align-items:baseline}
+.dlc .id{font:700 14px var(--mono);color:var(--sig)}
+.dlc h3{font-size:30px;letter-spacing:-.04em}
+.dlc .spec{grid-column:2/3;color:var(--mute)}
+.dlc .price{grid-column:3/4;grid-row:1;font:700 13px var(--mono);letter-spacing:.06em}
+.dlc .btn{grid-column:1/-1;margin-top:12px}
+.hero-fig{padding:0}
+.hero-fig svg{width:100%;height:auto}
+.stats{list-style:none;margin:56px 0 0;padding:0;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));border-top:4px solid var(--ink)}
+.stats li{grid-column:span 3;padding:14px 12px 28px;display:flex;flex-direction:column;gap:6px}
+.stats b{font-size:clamp(64px,9.4vw,150px);font-weight:800;letter-spacing:-.07em;line-height:.85}
+.stats b sup{font-size:.34em;letter-spacing:0;vertical-align:top;position:relative;top:.2em;margin-left:.08em}
+
+/* ---------- sections ---------- */
+.sec{position:relative;z-index:1;border-top:4px solid var(--ink)}
+.sec>.wrap{padding-bottom:104px}
+.sec-head{padding:18px 0 56px;align-items:start;row-gap:28px}
+.sec-no{font:700 13px var(--mono);letter-spacing:.06em;padding:8px 12px 0}
+.sec-no span{display:block;font-weight:500;color:var(--mute);margin-top:4px}
+.sec-head .lede{color:var(--ink)}
+.fn{border-top:1px solid var(--ink);padding:14px 12px 0;margin:0;list-style:none}
+
+.dark{--paper:#0B0B0B;--ink:#F4F4F0;--mute:#ACACA5;--line:rgba(244,244,240,.2);--card:#161614;--outer:#F4F4F0;background:var(--paper);color:var(--ink);border-top-color:var(--sig)}
+.dark .win,.dark .lt{--paper:#F4F4F0;--ink:#0B0B0B;--mute:#55554F;--line:rgba(11,11,11,.13);--card:#fff;--outer:#0B0B0B;background:#fff;color:var(--ink)}
+.dark .win{border-color:#F4F4F0}
+.cta{background:var(--sig);color:#fff;--ink:#fff;--paper:var(--sig);--line:rgba(255,255,255,.3);--mute:rgba(255,255,255,.82);border-top-color:var(--ink)}
+
+/* ---------- figures ---------- */
+.fig{position:relative;margin:0}
+.fig figcaption{font:500 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:10px 0 0;display:flex;gap:12px;color:var(--mute)}
+.fig figcaption b{color:var(--ink);white-space:nowrap;flex:none}
+.ph-tag{position:absolute;top:0;left:0;transform:translateY(-100%);z-index:6;background:var(--ph);color:#000;font:700 11px/1 var(--mono);letter-spacing:.04em;padding:6px 8px;pointer-events:none}
+.ph-note{font:400 11px/1.4 var(--mono);color:var(--mute);padding:6px 0 0 9px;border-left:4px solid var(--ph);margin-top:8px;word-break:break-all}
+.ph-note b{color:var(--ink);font-weight:500}
+body.no-ph .ph-tag,body.no-ph .ph-note{display:none}
+.win{background:#fff;border:2px solid var(--ink);color:var(--ink)}
+.win-bar{display:flex;align-items:stretch;border-bottom:2px solid var(--ink);height:40px;background:var(--paper);overflow:hidden}
+.win-dots{display:flex;gap:7px;align-items:center;padding:0 12px}
+.win-dots i{width:10px;height:10px;border:1.5px solid var(--ink);border-radius:50%}
+.win-title{flex:1;display:flex;align-items:center;padding:0 12px;font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;overflow:hidden}
+.seg{display:flex}
+.seg button{border:0;border-left:1.5px solid var(--ink);background:transparent;min-width:72px;padding:0 12px;cursor:pointer;font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;height:40px}
+.seg button[aria-pressed=true],.seg button[aria-selected=true]{background:var(--ink);color:var(--paper)}
+svg .o{fill:var(--card);stroke:var(--ink);stroke-width:1.5}
+svg .n{fill:none;stroke:var(--ink);stroke-width:1.5;stroke-linecap:square}
+svg .t{fill:none;stroke:var(--ink);stroke-width:1}
+svg .k{fill:var(--ink);stroke:none}
+svg .g{fill:var(--ink);fill-opacity:.2;stroke:none}
+svg .sf{fill:var(--sig);stroke:none}
+svg .sl{fill:var(--sig);fill-opacity:.2;stroke:none}
+svg .ss{fill:none;stroke:var(--sig);stroke-width:2.5}
+svg .d{stroke-dasharray:4 3}
+svg .h{fill:url(#hatch);stroke:var(--ink);stroke-width:1.5}
+svg .wf{fill:#fff;stroke:none}
+svg .wv{stroke:var(--ink);stroke-width:2.5;fill:none}
+svg .m{font:500 10px var(--mono);fill:var(--ink);letter-spacing:.04em}
+svg .mm{fill:var(--mute)}
+svg .mw{fill:#fff}
+svg .ms{fill:var(--sig)}
+svg .mb{font-weight:700}
+
+/* ---------- 01 index ---------- */
+.idx{list-style:none;margin:0;padding:0;border-top:2px solid var(--ink)}
+.idx li{border-bottom:1px solid var(--ink)}
+.idx button{display:grid;grid-template-columns:48px minmax(104px,1fr) minmax(112px,1.05fr) minmax(0,2fr) 40px;gap:0 14px;align-items:baseline;width:100%;padding:13px 12px;min-height:56px;border:0;background:transparent;text-align:left;cursor:pointer;color:var(--ink)}
+.idx button:hover,.idx li.on button{background:var(--sig);color:#fff}
+.idx button:focus-visible{outline:3px solid var(--ink);outline-offset:-3px}
+.idx .no{font:500 12px var(--mono);letter-spacing:.06em}
+.idx .nm{font-size:23px;font-weight:700;letter-spacing:-.035em;line-height:1.1}
+.idx .ex{font:500 12px var(--mono);letter-spacing:.03em}
+.idx .nt{font-size:15px;line-height:1.3;color:var(--mute)}
+.idx .rw{font:700 11px var(--mono);letter-spacing:.06em;text-align:right}
+.idx button:hover .nt,.idx li.on .nt{color:#fff}
+.idx-head{display:grid;grid-template-columns:48px minmax(104px,1fr) minmax(112px,1.05fr) minmax(0,2fr) 40px;gap:0 14px;padding:0 12px 10px}
+.idx-fig{position:sticky;top:76px;align-self:start;padding-left:20px}
+.idx-box{background:var(--card);border:2px solid var(--ink)}
+.idx-cap{display:flex;justify-content:space-between;padding:10px 12px;border-bottom:1.5px solid var(--ink);background:var(--paper)}
+.idx-cap b{color:var(--sig)}
+.idx-box svg{width:100%;height:auto}
+.legend{display:flex;gap:18px;padding:12px 12px 0;color:var(--mute)}
+.legend b{color:var(--ink)}
+
+/* ---------- 02 tabs ---------- */
+.specs{list-style:none;margin:0;padding:0;counter-reset:s}
+.specs li{border-top:1px solid var(--ink);padding:16px 12px 22px;display:grid;grid-template-columns:44px 1fr;gap:4px 8px}
+.specs li::before{counter-increment:s;content:counter(s,decimal-leading-zero);font:700 13px var(--mono);color:var(--sig);padding-top:5px}
+.dark .specs li::before{color:var(--ink)}
+.specs h4{font-size:24px;letter-spacing:-.035em;line-height:1.05}
+.specs p{grid-column:2;color:var(--mute);font-size:16px;line-height:1.45;max-width:30em}
+.specs li:last-child{border-bottom:1px solid var(--ink)}
+.tw .tabs{display:flex;flex:1;min-width:0;overflow:hidden}
+.tw .tabs button{border:0;border-left:1.5px solid var(--ink);background:transparent;padding:0 16px;min-height:40px;cursor:pointer;font:500 12px var(--mono);letter-spacing:.04em;white-space:nowrap}
+.tw .tabs button[aria-selected=true]{background:var(--ink);color:var(--paper)}
+.tw .tabs button:hover:not([aria-selected=true]){background:var(--sig);color:#fff}
+.tw .wb{display:grid;grid-template-columns:216px minmax(0,1fr);grid-template-rows:minmax(0,1fr);height:432px}
+.tw .side{border-right:2px solid var(--ink);display:flex;flex-direction:column;overflow:hidden;background:var(--paper)}
+.tw .side h5{margin:0;padding:12px 12px 8px;font:500 10px var(--mono);letter-spacing:.08em;color:var(--mute)}
+.tw .side button{display:flex;align-items:center;gap:10px;width:100%;min-height:40px;padding:0 12px;border:0;background:transparent;cursor:pointer;text-align:left;font:500 12px var(--mono);letter-spacing:.02em;border-top:1px solid var(--line)}
+.tw .side button.root{font-weight:700;border-top:1px solid var(--ink)}
+.tw .side button.root[aria-current=true]{background:var(--ink);color:var(--paper)}
+.tw .side button.file{padding-left:26px;font-weight:400}
+.tw .side button.file.cur{background:var(--sig);color:#fff}
+.tw .side button.file.dim{opacity:.28}
+.tw .side button:hover:not(.cur):not([aria-current=true]){background:var(--sig-soft)}
+.tw .side button span.t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb{width:10px;height:10px;flex:none;display:block;background:var(--c);border:1px solid rgba(0,0,0,.35)}
+.tw .main{display:flex;flex-direction:column;min-width:0;min-height:0}
+.tw .tool{display:flex;align-items:center;gap:2px;padding:0 6px 0 12px;height:44px;border-bottom:1.5px solid var(--ink);font:500 10px var(--mono);letter-spacing:.08em;color:var(--mute)}
+.tw .tool .chips{display:flex;margin-left:auto}
+.chip{width:40px;height:40px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer}
+.chip i{width:16px;height:16px;background:var(--c);border:1.5px solid rgba(0,0,0,.4);display:block}
+.chip[aria-pressed=true] i{outline:2px solid var(--ink);outline-offset:2px}
+.scroller{flex:1;overflow:auto;padding:22px 26px;background:var(--card);scrollbar-width:thin}
+.scroller h6{margin:0 0 14px;font:700 18px var(--mono);letter-spacing:-.02em}
+.scroller .b{display:grid;gap:7px;margin-bottom:26px}
+.scroller .b i{display:block;height:6px;background:var(--ink);opacity:.2}
+.scroller .b i.h{height:12px;opacity:1;width:42%}
+.scroller .pgm{font:500 10px var(--mono);color:var(--mute);letter-spacing:.08em;border-top:1px dashed var(--ink);padding-top:6px;margin:-8px 0 20px;display:block}
+.readout{display:flex;flex-wrap:wrap;gap:6px 22px;padding-top:12px}
+.readout b{color:var(--ink)}
+
+/* ---------- 03 search ---------- */
+.sbox{display:flex;align-items:center;gap:14px;padding:0 16px;height:68px;border-bottom:2px solid var(--ink);background:var(--card)}
+.sbox svg{width:26px;height:26px;flex:none}
+.sbox input{flex:1;min-width:0;border:0;background:transparent;font:600 28px var(--sans);letter-spacing:-.03em;color:var(--ink);height:100%}
+.sbox input:focus{outline:none}
+.sbox:focus-within{outline:3px solid var(--sig);outline-offset:-3px}
+.tryq{display:flex;flex-wrap:wrap;align-items:center;border-bottom:1.5px solid var(--ink);background:var(--paper)}
+.tryq span{padding:0 14px;color:var(--mute)}
+.tryq button{min-height:40px;padding:0 14px;border:0;border-left:1px solid var(--ink);background:transparent;cursor:pointer;font:500 12px var(--mono)}
+.tryq button:hover{background:var(--ink);color:var(--paper)}
+.res{list-style:none;margin:0;padding:0;max-height:476px;overflow:auto;background:var(--card)}
+.res li{display:grid;grid-template-columns:76px minmax(0,230px) minmax(0,1fr);gap:4px 16px;padding:12px 16px;border-bottom:1px solid var(--line);align-items:baseline}
+.res li:hover{background:var(--sig-soft)}
+.res .ty{font:700 11px var(--mono);letter-spacing:.06em;border:1.5px solid var(--ink);padding:3px 0;text-align:center}
+.res .fl{font:700 14px var(--sans);letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.res .fl small{display:block;font:500 10px var(--mono);color:var(--mute);letter-spacing:.06em}
+.res .sn{font-size:15px;color:var(--mute);line-height:1.4}
+mark{background:var(--sig);color:#fff;padding:0 2px}
+.empty{padding:36px 16px;color:var(--mute)}
+.sfoot{display:flex;justify-content:space-between;padding:10px 16px;border-top:2px solid var(--ink);background:var(--paper)}
+
+/* ---------- 04 editors ---------- */
+.etabs{display:flex;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink)}
+.etabs button{flex:1;display:grid;grid-template-columns:auto 1fr;gap:2px 12px;align-items:baseline;text-align:left;padding:14px 14px 16px;border:0;border-left:1px solid var(--ink);background:transparent;cursor:pointer;min-height:76px}
+.etabs button:first-child{border-left:0}
+.etabs button b{font-size:26px;letter-spacing:-.04em;line-height:1.05}
+.etabs button .mono{padding-top:6px}
+.etabs button small{grid-column:2;color:var(--mute);font-size:14px}
+.etabs button[aria-selected=true]{background:var(--ink);color:var(--paper)}
+.etabs button[aria-selected=true] small{color:var(--paper);opacity:.8}
+.etabs button:hover:not([aria-selected=true]){background:var(--sig-soft)}
+.epanel{padding-top:36px}
+.pro-tag{display:inline-block;background:var(--sig);color:#fff;font:700 10px/1 var(--mono);letter-spacing:.08em;padding:4px 6px;margin-right:6px;vertical-align:2px}
+.proadds{display:grid;grid-template-columns:repeat(3,1fr);margin-top:48px;border-top:2px solid var(--ink);border-bottom:1px solid var(--ink)}
+.proadds>div{padding:16px 14px 20px;border-left:1px solid var(--ink)}
+.proadds>div:first-child{border-left:0}
+.proadds h4{font-size:20px;margin:10px 0 4px;letter-spacing:-.03em}
+.proadds p{font-size:15px;color:var(--mute);line-height:1.4}
+.proadds .mono.lab{display:flex;justify-content:space-between}
+.tbar{display:flex;border-bottom:1.5px solid var(--ink);overflow:hidden;background:var(--paper)}
+.tbar span{min-width:38px;height:36px;display:grid;place-items:center;border-right:1px solid var(--line);font:700 12px var(--mono)}
+.tbar span.on{background:var(--sig);color:#fff}
+.edwrap{display:grid;grid-template-columns:minmax(0,1fr) 150px;grid-template-rows:minmax(0,1fr);height:430px}
+.ed{padding:24px 28px;overflow:hidden;background:var(--card)}
+.ed h6{margin:0 0 10px;font:800 32px var(--sans);letter-spacing:-.05em;line-height:1}
+.ed p{font-size:15px;line-height:1.5}
+.ed table{border-collapse:collapse;width:100%;margin:14px 0;font-size:14px}
+.ed th,.ed td{border:1.5px solid var(--ink);padding:5px 10px;text-align:left}
+.ed th{background:var(--paper);font:700 11px var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.ed .math{font:italic 500 20px Georgia,'Times New Roman',serif;text-align:center;padding:8px 0;letter-spacing:.01em}
+.flow{display:flex;align-items:center;gap:0;margin:10px 0}
+.flow span{border:1.5px solid var(--ink);padding:5px 12px;font:500 11px var(--mono)}
+.flow span:last-child{background:var(--sig);color:#fff;border-color:var(--sig)}
+.flow i{width:22px;height:1.5px;background:var(--ink);position:relative}
+.flow i::after{content:"";position:absolute;right:0;top:-3.5px;border-left:7px solid var(--ink);border-top:4px solid transparent;border-bottom:4px solid transparent}
+.imgph{margin-top:10px;height:50px;border:1.5px solid var(--ink);background-image:repeating-linear-gradient(45deg,var(--ink) 0 1px,transparent 1px 7px);position:relative}
+.imgph span{position:absolute;left:8px;bottom:-1.5px;transform:translateY(100%);font:500 10px var(--mono);color:var(--mute)}
+.outl{border-left:1.5px solid var(--ink);padding:14px 12px;background:var(--paper);font:500 10px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;display:flex;flex-direction:column;gap:12px}
+.outl b{color:var(--mute);font-weight:500}
+.outl span{padding-left:0}
+.outl span.i{padding-left:10px}
+.outl span.on{color:var(--sig);font-weight:700}
+pre.src,pre.code,.tui,.dl2,.term{font-variant-ligatures:none}
+pre.src,pre.code{margin:0;font:400 12.5px/1.7 var(--mono);padding:20px 24px;overflow:hidden;background:var(--card);white-space:pre}
+pre.src .a{color:var(--sig);font-weight:700}
+pre.src .c{color:var(--mute)}
+.statusbar{display:flex;justify-content:space-between;padding:8px 12px;border-top:1.5px solid var(--ink);background:var(--paper);color:var(--mute);font-size:10px}
+.word{display:grid;grid-template-columns:minmax(0,1fr) 190px;grid-template-rows:minmax(0,1fr);height:470px}
+.pg-wrap{background:#D9D9D3;padding:22px;overflow:hidden;display:flex;justify-content:center}
+.wpage{width:100%;max-width:400px;background:#fff;border:1.5px solid var(--ink);padding:26px 30px;position:relative;overflow:hidden;font-family:Georgia,'Times New Roman',serif;font-size:var(--fs,13px);line-height:1.55;text-align:var(--ta,left);color:#000}
+.wpage h6{margin:0 0 10px;font:700 22px var(--sans);letter-spacing:-.03em}
+.wpage table{border-collapse:collapse;width:100%;margin:10px 0;font-size:.92em}
+.wpage td,.wpage th{border:1px solid #000;padding:3px 7px;text-align:left}
+.wpage .wm{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%) rotate(-28deg);font:800 74px var(--sans);letter-spacing:-.04em;color:rgba(11,11,11,.07);pointer-events:none}
+.fmt{border-left:2px solid var(--ink);background:var(--paper);display:flex;flex-direction:column}
+.fmt h5{margin:0;padding:10px 12px;border-bottom:1.5px solid var(--ink);font:700 11px var(--mono);letter-spacing:.08em}
+.fmt .row{padding:10px 12px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.fmt .row>span{font:500 10px var(--mono);letter-spacing:.08em;color:var(--mute)}
+.fmt .fake{border:1.5px solid var(--ink);padding:0 8px;min-height:32px;display:flex;align-items:center;justify-content:space-between;font:500 12px var(--mono);background:#fff}
+.step{display:flex}
+.step button,.alg button{width:40px;height:40px;border:1.5px solid var(--ink);background:#fff;cursor:pointer;font:700 15px var(--mono);margin-right:-1.5px}
+.step output{min-width:46px;height:40px;border:1.5px solid var(--ink);display:grid;place-items:center;font:700 13px var(--mono);margin-right:-1.5px;background:#fff}
+.step button:hover,.alg button:hover{background:var(--sig);color:#fff}
+.alg{display:flex}
+.alg button[aria-pressed=true]{background:var(--ink);color:var(--paper)}
+.cswatch{display:flex;gap:6px}
+.cswatch i{width:20px;height:20px;border:1.5px solid var(--ink);display:block}
+pre.code{height:430px;display:block;background:var(--card);font-size:13px}
+pre.code .ln{display:inline-block;width:34px;color:var(--mute);user-select:none}
+pre.code .kw{color:var(--sig);font-weight:700}
+pre.code .cm{color:var(--mute)}
+pre.code .br{background:var(--sig);color:#fff;outline:1px solid var(--sig)}
+.findbox{position:absolute;right:14px;top:52px;background:var(--paper);border:1.5px solid var(--ink);display:flex;align-items:center;gap:10px;padding:0 12px;height:40px;font:500 12px var(--mono);z-index:2}
+.findbox b{color:var(--sig)}
+.codewrap{position:relative}
+
+/* ---------- 05 craft ---------- */
+.cells{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));border-top:2px solid var(--ink)}
+.cell{border-bottom:1px solid var(--ink);padding:16px 12px 28px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.cell .mono.hd{display:flex;justify-content:space-between;color:var(--mute)}
+.cell .mono.hd b{color:var(--ink)}
+.cell h3{font-size:30px;letter-spacing:-.045em}
+.cell p{color:var(--mute);font-size:16px;line-height:1.45;max-width:26em}
+.themes{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;border:1.5px solid var(--ink);border-right:0;border-bottom:0;max-width:420px}
+.themes button{aspect-ratio:1/.8;min-height:56px;border:0;border-right:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink);background:var(--c);color:#fff;cursor:pointer;font:700 10px var(--mono);letter-spacing:.06em;display:flex;align-items:flex-end;justify-content:space-between;padding:6px;position:relative}
+.themes button.sys{background:repeating-linear-gradient(45deg,var(--c) 0 6px,#fff 6px 12px)}
+.themes button.sys span{background:#fff;color:#000;padding:1px 3px}
+.themes button[aria-pressed=true]::after{content:"✓";position:absolute;right:6px;top:4px;font:700 13px var(--mono)}
+.themes button:focus-visible{outline:3px solid var(--ink);outline-offset:-5px}
+.langs{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--ink)}
+.langs li{border-bottom:1px solid var(--line);padding:9px 0;display:flex;gap:10px;align-items:baseline;font-size:17px;font-weight:600;letter-spacing:-.02em}
+.langs li span{font:500 10px var(--mono);color:var(--mute)}
+.big3{display:flex;flex-direction:column;gap:2px}
+.big3 b{font-size:clamp(30px,3.4vw,48px);font-weight:800;letter-spacing:-.055em;line-height:1}
+.big3 b:nth-child(2){color:var(--sig)}
+.cell svg{width:100%;height:auto}
+.cell .fig{margin-top:30px}
+
+/* ---------- 06 pro ---------- */
+.proarea{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));align-items:start}
+.plist{list-style:none;margin:0;padding:0;border-top:2px solid var(--ink)}
+.plist li{border-bottom:1px solid var(--ink)}
+.plist button{display:grid;grid-template-columns:48px 1fr;gap:2px 8px;width:100%;text-align:left;padding:14px 12px 16px;border:2px solid transparent;background:transparent;cursor:pointer;min-height:76px}
+.plist button .pn{font:700 12px var(--mono);letter-spacing:.06em;padding-top:5px}
+.plist button b{font-size:23px;letter-spacing:-.035em;line-height:1.1}
+.plist button small{grid-column:2;font-size:14px;color:var(--mute);line-height:1.35}
+.plist button:hover{background:rgba(244,244,240,.1)}
+.plist button[aria-selected=true]{background:var(--sig);color:#fff;border-color:var(--ink)}
+.plist button[aria-selected=true] small{color:#fff;opacity:.9}
+.pdetail{padding-left:28px}
+.pbul{list-style:none;margin:28px 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:0 24px;border-top:2px solid var(--ink)}
+.pbul li{border-bottom:1px solid var(--line);padding:11px 0 12px;font-size:15.5px;line-height:1.4;display:grid;grid-template-columns:22px 1fr}
+.pbul li::before{content:"";width:8px;height:8px;background:var(--sig);margin-top:8px;outline:1px solid var(--ink)}
+.notice{margin-top:22px;display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1.5px solid var(--ink);font-size:14.5px;line-height:1.4}
+.p1{display:grid;grid-template-columns:200px minmax(0,1fr);grid-template-rows:minmax(0,1fr);height:380px}
+.p1 aside{border-right:2px solid var(--ink);background:var(--paper);overflow:hidden}
+.p1 aside h5,.p1 aside .gr{margin:0;padding:10px 12px 6px;font:500 10px var(--mono);letter-spacing:.08em;color:var(--mute)}
+.p1 aside .gr{color:var(--ink);font-weight:700;border-top:1px solid var(--ink);padding-top:10px}
+.p1 aside .s{display:flex;justify-content:space-between;gap:8px;padding:8px 12px;font-size:13.5px;line-height:1.25;border-top:1px solid var(--line)}
+.p1 aside .s small{font:500 10px var(--mono);color:var(--mute);white-space:nowrap}
+.p1 aside .s.on{background:var(--sig);color:#fff}
+.p1 aside .s.on small{color:#fff}
+.p1 aside .nw{display:block;margin:10px 12px;font:700 11px var(--mono);letter-spacing:.06em;border:1.5px dashed var(--ink);padding:8px;text-align:center}
+.tui{background:#fff;font:400 12.5px/1.65 var(--mono);padding:18px 20px;overflow:hidden;position:relative}
+.tui .u{color:var(--sig);font-weight:700}
+.tui .m{color:var(--mute)}
+.tui .rule{border-top:1px solid var(--ink);margin:12px 0 8px;padding-top:8px}
+.caret{display:inline-block;width:8px;height:15px;background:var(--ink);vertical-align:-3px;animation:blink 1.1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.term{height:380px;background:#fff;padding:0;overflow:hidden;font:400 12.5px/1.6 var(--mono)}
+.term .tt{display:flex;border-bottom:1.5px solid var(--ink);background:var(--paper)}
+.term .tt span{padding:0 16px;height:36px;display:flex;align-items:center;border-right:1px solid var(--ink);font:500 11px var(--mono)}
+.term .tt span.on{background:var(--ink);color:var(--paper)}
+.blk{margin:14px 16px 0;border-left:4px solid var(--ink);padding:0 0 4px 12px}
+.blk.cur2{border-left-color:var(--sig)}
+.blk .ph{font:500 11px var(--mono);letter-spacing:.04em;color:var(--mute);display:flex;gap:14px;margin-bottom:2px}
+.blk .ph b{color:var(--sig)}
+.blk .cm{font-weight:700}
+.blk .cm::before{content:"$ ";color:var(--sig)}
+.blk .o{color:var(--mute);white-space:pre}
+.gitw{display:grid;grid-template-columns:170px minmax(0,1fr);grid-template-rows:minmax(0,1fr);height:380px}
+.gitw aside{border-right:2px solid var(--ink);background:var(--paper)}
+.gitw aside h5{margin:0;padding:10px 12px;border-bottom:1px solid var(--ink);font:500 10px var(--mono);letter-spacing:.08em;color:var(--mute)}
+.gitw aside div{padding:9px 12px;font:500 12px var(--mono);border-bottom:1px solid var(--line);display:flex;gap:8px}
+.gitw aside div b{color:var(--sig)}
+.gitw aside div.on{background:var(--ink);color:var(--paper)}
+.gitw aside div.on b{color:var(--paper)}
+.gdiff{overflow:hidden;background:#fff;display:flex;flex-direction:column}
+.hh{display:flex;align-items:center;gap:0;border-bottom:1px solid var(--ink);background:var(--paper)}
+.hh button{display:flex;align-items:center;gap:10px;min-height:40px;padding:0 12px;border:0;border-right:1px solid var(--ink);background:transparent;cursor:pointer;font:700 11px var(--mono);letter-spacing:.04em;white-space:nowrap}
+.hh button i{width:16px;height:16px;border:1.5px solid var(--ink);background:#fff;display:block;position:relative}
+.hh button[aria-pressed=true] i{background:var(--sig);border-color:var(--sig)}
+.hh button[aria-pressed=true] i::after{content:"✓";position:absolute;inset:0;color:#fff;font:700 11px/13px var(--mono);text-align:center}
+.hh span{padding:0 12px;font:400 11px var(--mono);color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dl2{font:400 12.5px/1.65 var(--mono);white-space:pre;padding:0 14px}
+.dl2 .p{background:var(--sig-soft);display:block;margin:0 -14px;padding:0 14px}
+.dl2 .p::before{content:"+ ";color:var(--sig);font-weight:700}
+.dl2 .r{display:block;margin:0 -14px;padding:0 14px;color:var(--mute);text-decoration:line-through;background:rgba(11,11,11,.06)}
+.dl2 .r::before{content:"- ";text-decoration:none;display:inline-block}
+.dl2 .x{display:block}
+.dl2 .x::before{content:"  "}
+.gfoot{margin-top:auto;border-top:2px solid var(--ink);background:var(--paper);padding:10px 14px;display:flex;flex-wrap:wrap;gap:6px 16px;font:500 11px var(--mono);align-items:center}
+.gfoot .warn{background:var(--sig);color:#fff;padding:3px 7px;font-weight:700}
+.gfoot .ch{border:1.5px solid var(--ink);padding:3px 7px}
+.tlsvg{background:#fff;border:2px solid var(--ink)}
+.tlsvg svg{width:100%;height:auto}
+.trans{display:grid;grid-template-columns:230px minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;height:380px}
+.trans aside{grid-row:1}
+.trans aside{border-right:2px solid var(--ink);background:var(--paper)}
+.trans aside h5{margin:0;padding:10px 12px;border-bottom:1px solid var(--ink);font:500 10px var(--mono);letter-spacing:.08em;color:var(--mute)}
+.trans aside button{display:grid;grid-template-columns:20px 1fr;gap:0 8px;align-items:center;width:100%;min-height:54px;padding:6px 12px;border:0;border-bottom:1px solid var(--line);background:transparent;text-align:left;cursor:pointer}
+.trans aside button i{width:14px;height:14px;border:1.5px solid var(--ink);border-radius:50%;display:block;background:#fff}
+.trans aside button[aria-checked=true]{background:var(--ink);color:var(--paper)}
+.trans aside button[aria-checked=true] i{background:var(--sig);border-color:var(--paper)}
+.trans aside button b{font-size:14px;letter-spacing:-.01em}
+.trans aside button small{grid-column:2;font:500 10px var(--mono);letter-spacing:.06em;color:var(--mute)}
+.trans aside button[aria-checked=true] small{color:var(--paper);opacity:.8}
+.sbs{display:grid;grid-template-columns:1fr 1fr;background:#fff;align-content:start;overflow:hidden}
+.sbs h5{margin:0;padding:10px 14px;border-bottom:1px solid var(--ink);border-left:1px solid var(--ink);font:500 10px var(--mono);letter-spacing:.08em;color:var(--mute);background:var(--paper)}
+.sbs h5:first-child{border-left:0}
+.sbs p{padding:14px;font-size:14.5px;line-height:1.5;border-left:1px solid var(--ink);border-bottom:1px solid var(--line)}
+.sbs p:nth-child(odd){border-left:0}
+.tfoot{grid-column:1/-1;border-top:2px solid var(--ink);padding:10px 14px;font:500 11px var(--mono);letter-spacing:.04em;display:flex;gap:14px;flex-wrap:wrap;align-items:center;background:var(--paper)}
+.tasks{display:grid;grid-template-columns:190px minmax(0,1fr);grid-template-rows:minmax(0,1fr);height:380px}
+.tasks aside{border-right:2px solid var(--ink);background:var(--paper)}
+.tasks aside div{display:flex;justify-content:space-between;padding:0 12px;min-height:40px;align-items:center;border-bottom:1px solid var(--line);font-size:14px;font-weight:600}
+.tasks aside div small{font:500 11px var(--mono);color:var(--mute)}
+.tasks aside div.on{background:var(--ink);color:var(--paper)}
+.tasks aside div.on small{color:var(--paper)}
+.tlist{padding:16px 20px;background:#fff;overflow:hidden}
+.tlist h6{margin:0 0 6px;font:800 34px var(--sans);letter-spacing:-.05em;display:flex;justify-content:space-between;align-items:baseline}
+.tlist h6 .mono{font-size:10px;background:var(--paper);border:1.5px solid var(--ink);padding:4px 7px;letter-spacing:.06em}
+.tk{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:0;border:0;border-bottom:1px solid var(--line);background:transparent;text-align:left;cursor:pointer;font-size:16px;font-weight:500;letter-spacing:-.01em}
+.tk i{width:20px;height:20px;border:1.5px solid var(--ink);flex:none;position:relative;background:#fff}
+.tk[aria-pressed=true] i{background:var(--sig);border-color:var(--sig)}
+.tk[aria-pressed=true] i::after{content:"✓";position:absolute;inset:0;color:#fff;font:700 13px/17px var(--mono);text-align:center}
+.tk[aria-pressed=true] span{text-decoration:line-through;color:var(--mute)}
+.tk em{margin-left:auto;font:500 10px var(--mono);font-style:normal;letter-spacing:.06em;color:var(--mute);white-space:nowrap}
+.tk .ai{background:var(--ink);color:var(--paper);padding:3px 6px;font:700 10px var(--mono);letter-spacing:.06em;margin-left:auto}
+.tk .ai+em{margin-left:0}
+
+/* ---------- 07 compare ---------- */
+.cmp{width:100%;border-collapse:collapse;table-layout:fixed}
+.cmp th,.cmp td{padding:13px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--ink)}
+.cmp thead th{border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);padding:16px 12px 18px;vertical-align:bottom}
+.cmp thead th b{display:block;font-size:clamp(26px,3.2vw,48px);letter-spacing:-.055em;line-height:.95;font-weight:800}
+.cmp thead th small{display:block;margin-top:10px;font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+.cmp thead th.pro{background:var(--sig);color:#fff}
+.cmp thead th.pro small{color:#fff;opacity:.9}
+.cmp tbody th{font-weight:600;font-size:16px;letter-spacing:-.01em;line-height:1.3;width:40%}
+.cmp tbody th small{display:block;font:500 11px var(--mono);color:var(--mute);letter-spacing:.06em;margin-bottom:2px}
+.cmp td{font-size:15px;line-height:1.35}
+.cmp td.pro{background:var(--sig-soft)}
+.cmp tr.grp th{background:var(--ink);color:var(--paper);font:700 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:9px 12px;border-bottom:0;width:auto}
+.cmp tbody tr:not(.grp):hover th,.cmp tbody tr:not(.grp):hover td{background:var(--sig);color:#fff}
+.cmp tbody tr:not(.grp):hover th small{color:#fff}
+.cmp .y{display:block;width:16px;height:16px;background:var(--sig);outline:1.5px solid var(--ink);outline-offset:0}
+.cmp tbody tr:hover .y{background:#fff;outline-color:#fff}
+.cmp .no{display:block;font:500 16px var(--mono);color:var(--mute)}
+.cmp tbody tr:hover .no{color:#fff}
+.cmp-foot{display:flex;gap:16px;padding:14px 12px 0;color:var(--mute);align-items:center;flex-wrap:wrap}
+
+/* ---------- 08 faq ---------- */
+.faq{border-top:2px solid var(--ink)}
+.q{border-bottom:1px solid var(--ink)}
+.q summary{list-style:none;display:grid;grid-template-columns:56px 1fr 40px;gap:0 12px;align-items:baseline;padding:18px 12px;min-height:64px;cursor:pointer}
+.q summary::-webkit-details-marker{display:none}
+.q summary .qt{font-size:clamp(20px,2.1vw,28px);font-weight:700;letter-spacing:-.035em;line-height:1.15}
+.q summary .pm{font:500 24px/1 var(--mono);text-align:right}
+.q summary .pm::before{content:"+"}
+.q[open] summary .pm::before{content:"−"}
+.q summary:hover{background:var(--sig);color:#fff}
+.q summary:focus-visible{outline-offset:-3px}
+.qa{padding:0 12px 26px 80px;max-width:50em;color:var(--mute);font-size:17px;line-height:1.5}
+.qa b{color:var(--ink)}
+
+/* ---------- 09 cta ---------- */
+.cta-h{font-size:clamp(68px,17vw,280px);font-weight:800;letter-spacing:-.075em;line-height:.8;padding:16px 8px 56px}
+html[lang=zh] .cta-h{font-size:clamp(56px,13vw,220px);letter-spacing:-.04em;line-height:.95}
+.cta-card{background:var(--paper-w,#fff);color:#0B0B0B;border:2px solid #0B0B0B;padding:22px 22px 24px;display:flex;flex-direction:column;gap:14px;margin:0 12px 0 0}
+.cta-card h3{font-size:48px;letter-spacing:-.06em;line-height:.95}
+.cta-card .mono{color:#55554F}
+.cta-card p{font-size:17px;line-height:1.4;color:#0B0B0B}
+.cta-card .btn{background:#0B0B0B;border-color:#0B0B0B;color:#fff}
+.cta-card .btn:hover{background:var(--sig);border-color:var(--sig)}
+.cta-card.b .btn{background:var(--sig);border-color:var(--sig)}
+.cta-card.b .btn:hover{background:#0B0B0B;border-color:#0B0B0B}
+.cta-card .top2{display:flex;justify-content:space-between}
+.cta-card .top2 b{color:var(--sig)}
+.cta-row{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));row-gap:16px}
+.cta-row>div{display:flex}
+.cta-card{flex:1}
+.cta-card .btn{margin-top:auto}
+foot,footer{display:block}
+.foot{position:relative;z-index:1;border-top:4px solid var(--ink)}
+.foot>.wrap{padding-bottom:56px}
+.foot .g{padding:26px 0 0;row-gap:28px}
+.foot h5{margin:0 0 10px;font:700 11px var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.foot p,.foot a{font-size:15px;line-height:1.5;display:block}
+.foot a{text-decoration:none;min-height:32px;padding:3px 0}
+.foot a:hover{color:var(--sig);text-decoration:underline}
+.foot .big{font-size:26px;font-weight:800;letter-spacing:-.05em;line-height:1}
+
+/* ---------- tools ---------- */
+.tools{position:fixed;right:12px;bottom:12px;z-index:70;display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.tools button{display:flex;align-items:center;gap:8px;min-height:40px;padding:0 12px;background:#0B0B0B;color:#F4F4F0;border:1.5px solid #F4F4F0;cursor:pointer;font:700 11px var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.tools button i{width:10px;height:10px;background:var(--ph);display:block}
+.tools button[aria-pressed=false]{background:#F4F4F0;color:#0B0B0B;border-color:#0B0B0B}
+.tools button[aria-pressed=false] i{background:transparent;border:1.5px solid #0B0B0B}
+.tools button.gr i{background:transparent;border:1.5px solid currentColor;width:12px;height:12px}
+.tools button.gr[aria-pressed=true] i{background:currentColor}
+
+/* ---------- responsive ---------- */
+@media (max-width:1180px){
+  .nav,.sw{display:none}
+  .idx-fig{position:static;padding-left:0;margin-bottom:40px;order:-1}
+  .idx-fig,.idx-tab{--col:1/-1 !important}
+  .tw .wb{grid-template-columns:190px minmax(0,1fr)}
+}
+@media (max-width:1000px){
+  :root{--pad:20px}
+  .col{grid-column:1/-1 !important}
+  .hero-meta>div{grid-column:span 6 !important;padding-bottom:4px}
+  .hero-row{padding-top:30px;row-gap:36px}
+  .hero-l{padding:0 12px}
+  .sec-head{row-gap:18px}
+  .sec-no{padding-top:0}
+  .cell{grid-column:1/-1 !important}
+  .proarea .col{grid-column:1/-1 !important}
+  .pdetail{padding-left:0;margin-top:28px}
+  .stats li{grid-column:span 6}
+  .cols.local{inset:0 var(--pad)}
+  .edwrap{height:auto}
+  .tw .wb{height:420px}
+  .etabs button b{font-size:20px}
+  .proadds{grid-template-columns:1fr}
+  .proadds>div{border-left:0;border-top:1px solid var(--ink)}
+  .proadds>div:first-child{border-top:0}
+  .specs{margin-bottom:28px}
+  .cta-row>div{grid-column:1/-1 !important}
+  .cta-card{margin:0}
+  .foot .col{grid-column:span 6 !important}
+  .foot .col[style*='1/13']{grid-column:1/-1 !important}
+}
+@media (max-width:760px){
+  :root{--pad:16px}
+  body{font-size:16px}
+  .cols .g{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .cols i:nth-child(n+5){display:none}
+  .cols i:nth-child(4){border-right:1px solid var(--line)}
+  .brand .hm{display:none}
+  .bar{gap:8px}
+  .lang button{min-width:40px}
+  .btn{padding:0 14px;font-size:15px}
+  .btn.sm{padding:0 10px;font-size:13px}
+  .dlc{grid-template-columns:36px 1fr auto}
+  .idx button{grid-template-columns:36px 1fr auto;gap:2px 10px}
+  .idx .ex{grid-column:2/4;grid-row:2}
+  .idx .nt{grid-column:2/4;grid-row:3}
+  .idx .rw{grid-column:3;grid-row:1}
+  .idx-head{display:none}
+  .idx .nm{font-size:20px}
+  .tw .wb{grid-template-columns:124px minmax(0,1fr);height:400px}
+  .tw .side button{font-size:11px;padding:0 8px;gap:6px}
+  .tw .side button.file{padding-left:14px}
+  .tw .tool .lab{display:none}
+  .tw .tool{padding:0 2px}
+  .tw .tool .chips{margin-left:0}
+  .chip{width:28px}
+  .scroller{padding:14px}
+  .sbox input{font-size:21px}
+  .res li{grid-template-columns:56px minmax(0,1fr);gap:2px 10px}
+  .res li .sn{grid-column:1/-1}
+  .tryq span{display:none}
+  .etabs{flex-direction:column}
+  .etabs button{border-left:0;border-top:1px solid var(--ink)}
+  .etabs button:first-child{border-top:0}
+  .edwrap{grid-template-columns:1fr}
+  .edwrap .outl{display:none}
+  .ed{padding:16px;overflow:auto;max-height:420px}
+  .word{grid-template-columns:1fr;height:auto}
+  .pg-wrap{padding:12px}
+  .wpage{padding:18px}
+  .fmt{border-left:0;border-top:2px solid var(--ink)}
+  pre.src,pre.code{padding:14px;font-size:11.5px}
+  .findbox{position:static;margin:8px;width:max-content}
+  .cells{grid-template-columns:1fr}
+  .themes{max-width:none}
+  .proarea{display:block}
+  .pbul{grid-template-columns:1fr}
+  .p1,.gitw,.trans,.tasks{grid-template-columns:1fr;height:auto}
+  .p1 aside,.gitw aside,.trans aside,.tasks aside{border-right:0;border-bottom:2px solid var(--ink)}
+  .p1 aside .s:nth-child(n+7){display:none}
+  .gitw aside div:nth-child(n+4){display:none}
+  .tasks aside div:nth-child(n+4){display:none}
+  .tui{min-height:240px;font-size:11.5px;padding:14px}
+  .term{height:auto;padding-bottom:16px}
+  .dl2,.blk{font-size:11px}
+  .hh span{display:none}
+  .sbs p{padding:10px;font-size:13.5px}
+  .trans aside button{min-height:48px}
+  .q summary{grid-template-columns:44px 1fr 28px}
+  .qa{padding:0 12px 22px 12px}
+  .cmp th,.cmp td{padding:10px 6px}
+  .cmp tbody th{width:38%;font-size:14px}
+  .cmp td{font-size:13.5px}
+  .cmp thead th{padding:12px 6px}
+  .cmp thead th b{font-size:22px}
+  .cmp thead th small{font-size:9px}
+  .cta-h{padding-bottom:36px}
+  .cta-card{margin:0}
+  .cta-card h3{font-size:40px}
+  .tools{right:8px;bottom:8px}
+  .tools button{font-size:10px;padding:0 10px}
+  .stats b{font-size:clamp(56px,20vw,90px)}
+  svg .hs{display:none}
+  .hero-meta>div{grid-column:1/-1 !important}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important;scroll-behavior:auto !important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main" data-zh="跳到主要内容">Skip to content</a>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#0B0B0B" stroke-width="1" stroke-opacity=".55"/></pattern>
+</defs></svg>
+
+<div class="cols" aria-hidden="true"><div class="wrap"><div class="g"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div>
+
+<header class="top">
+  <div class="wrap bar">
+    <a class="brand" href="#top" aria-label="Folio"><img src="../assets/app-icon.png" width="30" height="30" alt=""><b>Folio</b><span class="mono mute hm" data-zh="规格书 · 修订 C">Spec sheet · Rev C</span></a>
+    <nav class="nav mono" aria-label="Sections" data-zh-aria-label="页面章节">
+      <a href="#index" data-zh="格式索引">Index</a>
+      <a href="#edit" data-zh="编辑器">Editors</a>
+      <a href="#pro" data-zh="Pro 工作台">Pro</a>
+      <a href="#compare" data-zh="版本对比">Compare</a>
+      <a href="#faq" data-zh="常见问题">FAQ</a>
+    </nav>
+    <div class="ctl">
+      <div class="sw" id="swQuick" role="group" aria-label="Signal colour" data-zh-aria-label="信号色"></div>
+      <div class="lang" role="group" aria-label="Language" data-zh-aria-label="语言">
+        <button type="button" data-l="en" aria-pressed="true">EN</button><button type="button" data-l="zh" aria-pressed="false">中文</button>
+      </div>
+      <a class="btn pri sm" href="#download"><span data-zh="获取">Get</span></a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ================= HERO ================= -->
+<section class="hero" id="top">
+  <div class="wrap">
+    <div class="hero-meta g mono">
+      <div style="grid-column:1/4" data-zh="FOLIO — MAC 全能文件查看器">Folio — The universal viewer for Mac</div>
+      <div style="grid-column:4/7" data-zh="规格书 · 修订 2026.10">Spec sheet · Rev 2026.10</div>
+      <div style="grid-column:7/10" data-zh="macOS 15+ · 目前免费">macOS 15+ · Free for now</div>
+      <div style="grid-column:10/13" data-zh="Windows · iPadOS · iOS 即将到来">Windows · iPadOS · iOS — coming</div>
+    </div>
+
+    <h1><span class="l sig" data-zh="一个 App，">One app.</span><span class="l" data-zh="看清每个文件。">See every file.</span></h1>
+
+    <div class="hero-row g">
+      <div class="col hero-l" style="--col:1/6">
+        <p class="lede" data-zh="14 类文件，一个 Mac 窗口原生打开。Markdown、Word、代码，看到就能改。Folio Pro 再加一个本地工作台：终端、Git、AI CLI 与自动文件快照。">Fourteen kinds of files open natively in one Mac window. Edit Markdown, Word and code in place. Folio Pro adds a local workbench: terminal, Git, AI CLI and automatic file snapshots.</p>
+        <div class="dl" id="dl-hero">
+          <article class="dlc">
+            <span class="id">A</span>
+            <h3>Folio</h3>
+            <span class="price" data-zh="免费">FREE</span>
+            <p class="spec mono" data-zh="Mac App Store · 沙盒 · 查看 + 轻编辑">Mac App Store · sandboxed · view + light edit</p>
+            <a class="btn" href="https://apps.apple.com/us/app/folio-universal-viewer/id6769624913?mt=12" rel="noopener"><span data-zh="前往 Mac App Store 下载">Get it on the Mac App Store</span><span class="ar" aria-hidden="true">↗</span></a>
+          </article>
+          <article class="dlc">
+            <span class="id">B</span>
+            <h3>Folio Pro</h3>
+            <span class="price" data-zh="免费">FREE</span>
+            <p class="spec mono" data-zh="直接下载 · Apple 芯片 · 本地工作台">Direct download · Apple silicon · local workbench</p>
+            <a class="btn pri" href="https://github.com/river-ranx/folio-web/releases/latest/download/Folio-Pro.zip" rel="noopener"><span data-zh="下载 Folio Pro (.zip)">Download Folio Pro (.zip)</span><span class="ar" aria-hidden="true">↓</span></a>
+          </article>
+        </div>
+        <p class="mono mute" data-zh="两个版本目前都免费 · 需要 macOS 15 或更高版本">Both editions are free for now · Requires macOS 15 or later</p>
+      </div>
+      <figure class="col fig hero-fig" style="--col:6/13" data-asset="assets/shots/hero-main.png" data-spec="2880×1800 · 主窗口：侧栏多根目录 + 顶部标签页 + PDF / 代码 / 音频波形 / 3D 并排">
+        <div id="heroSvg"></div>
+        <figcaption><b>FIG. 1</b><span data-zh="主窗口。① Finder 式标签页 ② 多根目录工作区 ③ 原生查看器">Main window. ① Finder-style tabs ② Multi-root workspace ③ Native viewers</span></figcaption>
+      </figure>
+    </div>
+
+    <ul class="stats">
+      <li><b>14</b><span class="mono" data-zh="类文件原生打开">file types opened natively</span></li>
+      <li><b>40<sup>+</sup></b><span class="mono" data-zh="种编程语言语法高亮">code languages, highlighted</span></li>
+      <li><b>15</b><span class="mono" data-zh="套主题，明暗自适应">themes, light &amp; dark</span></li>
+      <li><b>8</b><span class="mono" data-zh="种界面语言">interface languages</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= 01 INDEX ================= -->
+<section class="sec" id="index">
+  <div class="wrap">
+    <div class="sec-head g">
+      <div class="col sec-no" style="--col:1/3">§01<span data-zh="广度 / 格式索引">Breadth / Index</span></div>
+      <h2 class="col in" style="--col:3/13" data-zh="从此 Mac 上，没有打不开的文件。">Nothing your Mac can't open.</h2>
+      <p class="col lede in" style="--col:3/10" data-zh="双击文件，不再看到「没有可打开的应用程序」。14 类格式在同一个窗口原生渲染，压缩包可浏览，其余交给 QuickLook 兜底。悬停或聚焦任意一行，查看对应示意图。">Double-click, and instead of “No application is set to open this document”, it opens. Fourteen file types render natively in one window; archives can be browsed and QuickLook covers the rest. Hover or focus a row to see its drawing.</p>
+    </div>
+    <div class="g">
+      <div class="col idx-tab" style="--col:1/9">
+        <div class="idx-head mono mute" aria-hidden="true"><span>No.</span><span data-zh="格式">Format</span><span data-zh="常见扩展名（示例）">Typical extensions (e.g.)</span><span data-zh="说明">Note</span><span style="text-align:right" data-zh="权限">Mode</span></div>
+        <ol class="idx" id="idx"></ol>
+        <p class="legend mono"><span><b>R</b> = <span data-zh="查看">view</span></span><span><b>RW</b> = <span data-zh="查看 + 编辑">view + edit</span></span></p>
+      </div>
+      <figure class="col fig idx-fig" style="--col:9/13" data-asset="assets/shots/formats-14.png" data-spec="2400×1500 · 14 类格式拼图：每类一张真实窗口截图（PDF / Word / Excel … 3D / SQLite / 字体）">
+        <div class="idx-box">
+          <div class="idx-cap mono"><span id="fnum">FIG. 2.01</span><b id="fname">PDF</b><span id="fmode">R</span></div>
+          <svg id="fsvg" viewBox="0 0 480 340" role="img" aria-label="Line drawing of the selected format" data-zh-aria-label="所选格式的线稿示意"></svg>
+        </div>
+        <figcaption><b>FIG. 2</b><span data-zh="14 类格式 + 压缩包 + QuickLook 兜底（线稿）">14 formats + archives + QuickLook fallback (line drawings)</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 02 TABS ================= -->
+<section class="sec" id="tabs">
+  <div class="wrap">
+    <div class="sec-head g">
+      <div class="col sec-no" style="--col:1/3">§02<span data-zh="组织 / 标签页与工作区">Organise / Tabs &amp; workspaces</span></div>
+      <h2 class="col in" style="--col:3/13" data-zh="像 Finder，但什么都记得住。">Finder-style tabs that remember everything.</h2>
+      <p class="col lede in" style="--col:3/10" data-zh="在右侧试试：滚动页面，切到别的标签，再切回来。">Try it on the right: scroll the page, switch tabs, switch back.</p>
+    </div>
+    <div class="g">
+      <ul class="col specs" style="--col:1/6">
+        <li><h4 data-zh="标签页记得住">Tabs that remember</h4><p data-zh="每个标签页记住自己的文件夹、滚动位置和上次打开的文件。项目之间即时切换，不丢上下文，不打断心流。">Each tab keeps its own folder, scroll position and last-opened file. Jump between projects without losing your place or breaking your flow.</p></li>
+        <li><h4 data-zh="多根目录工作区">Multi-root workspaces</h4><p data-zh="把多个文件夹加入同一个工作区，在侧栏里并列成各自的根目录，不必先搬进同一个目录。">Add several folders to one workspace. Each stays its own root in the sidebar; nothing has to move into a single directory first.</p></li>
+        <li><h4 data-zh="彩色标签">Colour labels</h4><p data-zh="用彩色标签标记文件，并按颜色筛选。凌乱的目录，一眼就清楚。">Tag files with colour labels and filter by them. A messy directory, sorted at a glance.</p></li>
+      </ul>
+      <figure class="col fig tw" style="--col:6/13;padding-left:20px" data-asset="assets/shots/tabs-workspace.png" data-spec="2000×1250 · 多标签 + 多根目录侧栏 + 彩色标签筛选（标签栏显示 3 个不同文件夹）">
+        <div class="win">
+          <div class="win-bar"><div class="win-dots"><i></i><i></i><i></i></div><div class="tabs" id="tabsBar" role="tablist" aria-label="Tabs" data-zh-aria-label="标签页"></div></div>
+          <div class="wb">
+            <div class="side" id="tabSide"></div>
+            <div class="main">
+              <div class="tool"><span class="lab" data-zh="标签筛选">LABEL FILTER</span><div class="chips" id="chips"></div></div>
+              <div class="scroller" id="scroller" tabindex="0" aria-label="Document preview" data-zh-aria-label="文档预览"></div>
+            </div>
+          </div>
+        </div>
+        <p class="readout mono mute" id="readout" aria-live="polite"></p>
+        <figcaption><b>FIG. 3</b><span data-zh="标签页保存文件夹、滚动位置与上次文件（可交互）">Tabs persist folder, scroll position and last file (interactive)</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 03 SEARCH ================= -->
+<section class="sec" id="search">
+  <div class="wrap">
+    <div class="sec-head g">
+      <div class="col sec-no" style="--col:1/3">§03<span data-zh="查找 / 全文搜索">Find / Full-text search</span></div>
+      <h2 class="col in" style="--col:3/13" data-zh="搜进文件内容，而不只是文件名。">Search inside the file, not just its name.</h2>
+      <p class="col lede in" style="--col:3/10" data-zh="一次查询，跨所有打开的工作区、跨所有格式，包括 PDF、.docx、.pptx 里面的文字。下面是个能输入的示例。">One query across every open workspace and format, including the text inside PDF, .docx and .pptx files. The panel below is live: type into it.</p>
+    </div>
+    <div class="g">
+      <figure class="col fig" style="--col:3/13" data-asset="assets/shots/search.png" data-spec="2000×1250 · 全文搜索结果列表：文件名 + 页码/幻灯片 + 命中片段高亮">
+        <div class="win">
+          <div class="win-bar"><div class="win-dots"><i></i><i></i><i></i></div><div class="win-title" data-zh="搜索 · 全部工作区">Search · all workspaces</div></div>
+          <div class="sbox">
+            <svg viewBox="0 0 26 26" aria-hidden="true"><circle cx="10.5" cy="10.5" r="7.5" fill="none" stroke="currentColor" stroke-width="2.5"/><line x1="16" y1="16" x2="24" y2="24" stroke="currentColor" stroke-width="2.5"/></svg>
+            <input id="q" type="search" value="renewal" autocomplete="off" spellcheck="false" aria-label="Search all files" data-zh-aria-label="搜索所有文件">
+          </div>
+          <div class="tryq mono"><span data-zh="试试：">Try:</span><button type="button" data-q="renewal">renewal</button><button type="button" data-q="lease">lease</button><button type="button" data-q="invoice">invoice</button><button type="button" data-q="passport">passport</button></div>
+          <ul class="res" id="res" aria-live="polite"></ul>
+          <div class="sfoot mono mute"><span id="scount"></span><span data-zh="PDF · DOCX · PPTX 正文已索引">PDF · DOCX · PPTX text indexed</span></div>
+        </div>
+        <figcaption><b>FIG. 4</b><span data-zh="按内容找，而不是按文件名（演示数据）">Find by content, not by name (sample data)</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 04 EDITORS ================= -->
+<section class="sec" id="edit">
+  <div class="wrap">
+    <div class="sec-head g">
+      <div class="col sec-no" style="--col:1/3">§04<span data-zh="编辑 / 三个编辑器">Edit / Three editors</span></div>
+      <h2 class="col in" style="--col:3/13" data-zh="三个所见即所得编辑器，看到什么，存什么。">Three editors. What you see is what you save.</h2>
+      <p class="col lede in" style="--col:3/10" data-zh="Markdown、Word、代码都能就地修改，存回原格式。两个版本都有；标 PRO 的是 Folio Pro 在此之上再加的能力。">Markdown, Word and code can all be changed in place and saved back to their own format. Both editions include them; items marked PRO are what Folio Pro adds on top.</p>
+    </div>
+    <div class="etabs" role="tablist" aria-label="Editors" data-zh-aria-label="编辑器" id="etabs">
+      <button type="button" role="tab" id="et-0" aria-controls="ep-0" aria-selected="true"><span class="mono">E.01</span><b>Markdown</b><small data-zh="源码 ⇄ 可视">Source ⇄ visual</small></button>
+      <button type="button" role="tab" id="et-1" aria-controls="ep-1" aria-selected="false" tabindex="-1"><span class="mono">E.02</span><b>Word / .docx</b><small data-zh=".docx 进，.docx 出">.docx in, .docx out</small></button>
+      <button type="button" role="tab" id="et-2" aria-controls="ep-2" aria-selected="false" tabindex="-1"><span class="mono">E.03</span><b data-zh="代码">Code</b><small data-zh="40+ 种语言">40+ languages</small></button>
+    </div>
+
+    <!-- MARKDOWN -->
+    <div class="epanel g" role="tabpanel" id="ep-0" aria-labelledby="et-0">
+      <ul class="col specs" style="--col:1/6">
+        <li><h4 data-zh="源码 ⇄ 可视，一键切换">Source ⇄ visual, one switch</h4><p data-zh="在 Markdown 源码和所见即所得之间切换；还有专注模式。试试右侧的开关。">Flip between Markdown source and the WYSIWYG view; focus mode included. Try the switch on the right.</p></li>
+        <li><h4 data-zh="富表格、公式与图表">Rich tables, math, diagrams</h4><p data-zh="表格行列随手增删；KaTeX 数学公式与 Mermaid 流程图开箱即用。">Add or remove table rows and columns; KaTeX math and Mermaid diagrams work out of the box.</p></li>
+        <li><h4 data-zh="图片自动归档">Images filed for you</h4><p data-zh="粘贴或拖入的图片自动落盘到 assets/，文档里的相对路径自动维护。">Pasted or dragged images are written to assets/ and the relative paths stay correct.</p></li>
+        <li><h4 data-zh="大纲与查找替换">Outline, find &amp; replace</h4><p data-zh="大纲导航、⌘F 查找替换、任务列表、超链接。可导出为图片。<span class='pro-tag'>PRO</span>还可导出 PDF / HTML。">Outline navigation, ⌘F find &amp; replace, task lists and links. Export as image. <span class="pro-tag">PRO</span>also exports PDF / HTML.</p></li>
+      </ul>
+      <figure class="col fig" style="--col:6/13;padding-left:20px" data-asset="assets/shots/editor-markdown.png" data-spec="2000×1250 · Markdown 所见即所得：浮动工具栏 + 富表格 + 公式 + Mermaid + 大纲">
+        <div class="win">
+          <div class="win-bar"><div class="win-dots"><i></i><i></i><i></i></div><div class="win-title">release-notes.md</div>
+            <div class="seg" id="mdSeg"><button type="button" data-v="vis" aria-pressed="true" data-zh="可视">Visual</button><button type="button" data-v="src" aria-pressed="false" data-zh="源码">Source</button></div></div>
+          <div class="tbar" aria-hidden="true"><span>B</span><span>I</span><span>H1</span><span>≡</span><span>❝</span><span>&lt;/&gt;</span><span class="on">▦</span><span>☑</span><span>↗</span></div>
+          <div class="edwrap">
+            <div id="mdVis" class="ed">
+              <h6>Release notes</h6>
+              <p>Folio <b>1.4</b> opens every file. Write naturally; it saves as plain Markdown.</p>
+              <table><thead><tr><th>Feature</th><th>Status</th></tr></thead><tbody><tr><td>Tables</td><td>✓</td></tr><tr><td>Math</td><td>✓</td></tr></tbody></table>
+              <div class="math">∫₀¹ x² dx = ⅓</div>
+              <div class="flow"><span>Draft</span><i></i><span>Review</span><i></i><span>Ship</span></div>
+              <div class="imgph"><span>assets/img-0042.png</span></div>
+            </div>
+            <pre id="mdSrc" class="src" hidden><span class="a">#</span> Release notes
+
+Folio <span class="a">**</span>1.4<span class="a">**</span> opens every file.
+
+<span class="a">|</span> Feature <span class="a">|</span> Status <span class="a">|</span>
+<span class="a">|</span>---------<span class="a">|</span>--------<span class="a">|</span>
+<span class="a">|</span> Tables  <span class="a">|</span> ✓      <span class="a">|</span>
+
+<span class="a">$$</span>\int_0^1 x^2\,dx = \tfrac13<span class="a">$$</span>
+
+<span class="a">```mermaid</span>
+graph LR; Draft--&gt;Review--&gt;Ship
+<span class="a">```</span>
+
+<span class="a">![</span>shot<span class="a">]</span>(assets/img-0042.png)</pre>
+            <div class="outl" aria-hidden="true"><b data-zh="大纲">Outline</b><span class="on">Release notes</span><span class="i">Tables</span><span class="i">Math</span><span class="i">Flow</span><span class="i">Images</span></div>
+          </div>
+          <div class="statusbar mono"><span data-zh="已保存为 .md">Saved as .md</span><span>⌘F</span></div>
+        </div>
+        <figcaption><b>FIG. 5</b><span data-zh="Markdown 编辑器（可切换源码 / 可视）">Markdown editor (switch source / visual)</span></figcaption>
+      </figure>
+    </div>
+
+    <!-- WORD -->
+    <div class="epanel g" role="tabpanel" id="ep-1" aria-labelledby="et-1" hidden>
+      <ul class="col specs" style="--col:1/6">
+        <li><h4 data-zh=".docx 进，.docx 出">.docx in, .docx out</h4><p data-zh="编辑画面就是最终的 Word 文档。段落样式、表格、图片、水印在往返中保持无损。">The editing view is the finished Word document. Paragraph styles, tables, images and watermarks survive the round trip.</p></li>
+        <li><h4 data-zh="原生 macOS 格式面板">Native macOS format panel</h4><p data-zh="字体、字号、颜色、对齐、行距、高亮、缩放。右侧的字号与对齐可以直接试。">Font, size, colour, alignment, line spacing, highlight, zoom. Size and alignment on the right are live.</p></li>
+        <li><h4 data-zh="插入与页面设置">Insert &amp; page setup</h4><p data-zh="插入表格、图片、分页符、超链接；设置纸张、页边距、方向。">Insert tables, images, page breaks and links; set paper size, margins and orientation.</p></li>
+        <li><h4 data-zh="单文件历史版本">Per-file history</h4><p><span class="pro-tag">PRO</span><span data-zh="每份 Word 文档有自己的历史版本，可回看与恢复。">Each Word document gets its own version history to browse and restore.</span></p></li>
+      </ul>
+      <figure class="col fig" style="--col:6/13;padding-left:20px" data-asset="assets/shots/editor-word.png" data-spec="2000×1250 · Word 所见即所得：文档页 + 右侧原生格式面板">
+        <div class="win">
+          <div class="win-bar"><div class="win-dots"><i></i><i></i><i></i></div><div class="win-title">service-agreement.docx</div></div>
+          <div class="word">
+            <div class="pg-wrap"><div class="wpage" id="wpage"><span class="wm" aria-hidden="true">DRAFT</span>
+              <h6>Service Agreement</h6>
+              <p>This agreement is made between Atlas Ltd and the Client, and covers the services listed in the schedule below.</p>
+              <table><tr><th>Item</th><th>Term</th></tr><tr><td>Support</td><td>12 months</td></tr><tr><td>Review</td><td>Quarterly</td></tr></table>
+              <p>Either party may end the agreement with sixty days of written notice.</p>
+            </div></div>
+            <div class="fmt">
+              <h5 data-zh="格式">FORMAT</h5>
+              <div class="row"><span data-zh="字体">FONT</span><div class="fake">Georgia <i style="font-style:normal">▾</i></div></div>
+              <div class="row"><span data-zh="字号">SIZE</span><div class="step"><button type="button" id="fsDn" aria-label="Smaller" data-zh-aria-label="减小字号">−</button><output id="fsOut">13</output><button type="button" id="fsUp" aria-label="Larger" data-zh-aria-label="增大字号">+</button></div></div>
+              <div class="row"><span data-zh="对齐">ALIGN</span><div class="alg" id="alg"><button type="button" data-a="left" aria-pressed="true" aria-label="Left" data-zh-aria-label="左对齐">L</button><button type="button" data-a="center" aria-pressed="false" aria-label="Centre" data-zh-aria-label="居中">C</button><button type="button" data-a="justify" aria-pressed="false" aria-label="Justify" data-zh-aria-label="两端对齐">J</button></div></div>
+              <div class="row"><span data-zh="颜色">COLOUR</span><div class="cswatch"><i style="background:#000"></i><i style="background:var(--sig)"></i><i style="background:#fff"></i><i style="background:repeating-linear-gradient(45deg,#000 0 1px,#fff 1px 4px)"></i></div></div>
+              <div class="row"><span data-zh="行距">LINE</span><div class="fake">1.5 <i style="font-style:normal">▾</i></div></div>
+            </div>
+          </div>
+        </div>
+        <figcaption><b>FIG. 6</b><span data-zh="Word 编辑器与格式面板（字号与对齐可交互）">Word editor and format panel (size and alignment are live)</span></figcaption>
+      </figure>
+    </div>
+
+    <!-- CODE -->
+    <div class="epanel g" role="tabpanel" id="ep-2" aria-labelledby="et-2" hidden>
+      <ul class="col specs" style="--col:1/6">
+        <li><h4 data-zh="40+ 种语言">40+ languages</h4><p data-zh="语法高亮、括号匹配，为 review 与阅读精调的呈现。">Syntax colour and bracket matching, tuned for reading and review.</p></li>
+        <li><h4 data-zh="就地编辑与保存">Edit and save in place</h4><p data-zh="同一个编辑器，打开即可修改，存回原文件。">Same editor in both editions: open a file, change it, save it back.</p></li>
+        <li><h4 data-zh="统一的 ⌘F 查找">One ⌘F find overlay</h4><p data-zh="所有编辑器共用一致的查找浮层。">The find overlay behaves the same in every editor.</p></li>
+        <li><h4 data-zh="Diff 与冲突解决">Diff &amp; merge</h4><p><span class="pro-tag">PRO</span><span data-zh="并排 / 合并视图切换的 Diff 编辑器，以及 Merge 冲突解决。">A diff editor with side-by-side and merged views, plus merge-conflict resolution.</span></p></li>
+      </ul>
+      <figure class="col fig codewrap" style="--col:6/13;padding-left:20px" data-asset="assets/shots/editor-code.png" data-spec="2000×1250 · 代码编辑器：语法高亮 + 括号匹配 + ⌘F 查找浮层">
+        <div class="win" style="position:relative">
+          <div class="win-bar"><div class="win-dots"><i></i><i></i><i></i></div><div class="win-title">tabs.js</div></div>
+          <div class="findbox" aria-hidden="true">⌘F <span>retry</span> <b>2/5</b></div>
+<pre class="code" tabindex="0"><span class="ln">01</span><span class="cm">// Move to the next tab, wrapping at the end.</span>
+<span class="ln">02</span><span class="kw">export function</span> nextTab(tabs, i)<span class="br">{</span>
+<span class="ln">03</span>  <span class="kw">const</span> n = tabs.length;
+<span class="ln">04</span>  <span class="kw">if</span> (n === 0) <span class="kw">return</span> <span class="kw">null</span>;
+<span class="ln">05</span>
+<span class="ln">06</span>  <span class="kw">const</span> next = tabs[(i + 1) % n];
+<span class="ln">07</span>  <span class="kw">return</span> { ...next, retry: 0 };
+<span class="ln">08</span><span class="br">}</span>
+<span class="ln">09</span>
+<span class="ln">10</span><span class="cm">// Restore folder, scroll and last file.</span>
+<span class="ln">11</span><span class="kw">export function</span> restore(tab) {
+<span class="ln">12</span>  <span class="kw">return</span> load(tab.folder, tab.scroll, tab.last);
+<span class="ln">13</span>}</pre>
+        </div>
+        <figcaption><b>FIG. 7</b><span data-zh="代码编辑器：括号配对高亮与查找浮层">Code editor: bracket pairing and find overlay</span></figcaption>
+      </figure>
+    </div>
+
+    <div class="proadds">
+      <div><span class="mono lab"><span><span class="pro-tag">PRO</span>P.A</span></span><h4 data-zh="代码 Diff / Merge">Code diff &amp; merge</h4><p data-zh="并排或合并视图，直接解决冲突。">Side-by-side or merged view, resolve conflicts in place.</p></div>
+      <div><span class="mono lab"><span><span class="pro-tag">PRO</span>P.B</span></span><h4 data-zh="Word 历史版本">Word version history</h4><p data-zh="单个文件自己的历史，回看、恢复。">Each file's own history to browse and restore.</p></div>
+      <div><span class="mono lab"><span><span class="pro-tag">PRO</span>P.C</span></span><h4 data-zh="Markdown 导出 PDF / HTML">Markdown export to PDF / HTML</h4><p data-zh="除图片外，再多 PDF 与 HTML 两种导出。">On top of image export, PDF and HTML export.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 05 CRAFT ================= -->
+<section class="sec" id="craft">
+  <div class="wrap">
+    <div class="sec-head g">
+      <div class="col sec-no" style="--col:1/3">§05<span data-zh="质感 / 隐私">Finish / Privacy</span></div>
+      <h2 class="col in" style="--col:3/13" data-zh="原生的质感，默认留在本机。">Native to the eye. Local by default.</h2>
+      <p class="col lede in" style="--col:3/10" data-zh="Liquid Glass 界面、15 套主题、8 种语言。查看、搜索、编辑都在你的 Mac 上完成。">Liquid Glass interface, 15 themes, 8 languages. Viewing, searching and editing happen on your Mac.</p>
+    </div>
+    <div class="cells">
+      <div class="cell" style="grid-column:1/5">
+        <div class="mono hd"><b>C.01</b><span>Liquid Glass</span></div>
+        <h3 data-zh="让内容做主角的半透明界面。">Translucent chrome that lets content lead.</h3>
+        <figure class="fig" data-asset="assets/shots/liquid-glass.png" data-spec="1600×1000 · Liquid Glass 侧栏 / 工具栏叠在内容之上的特写">
+          <svg id="glassSvg" viewBox="0 0 400 210" role="img" aria-label="Three layers: content, glass, chrome" data-zh-aria-label="三层结构：内容、玻璃、界面"></svg>
+          <figcaption><b>FIG. 8</b><span data-zh="层级：内容 / 玻璃 / 界面">Layers: content / glass / chrome</span></figcaption>
+        </figure>
+      </div>
+      <div class="cell" style="grid-column:5/9">
+        <div class="mono hd"><b>C.02</b><span data-zh="15 套主题">15 themes</span></div>
+        <h3 data-zh="14 套精调主题色 + 跟随系统强调色。">14 tuned accents plus the system accent.</h3>
+        <p data-zh="明暗模式随系统自动切换。点一个色块，试试这个页面的信号色。">Light and dark follow the system. Click a swatch to recolour this page's signal colour.</p>
+        <div class="themes" id="themes" role="group" aria-label="Themes" data-zh-aria-label="主题"></div>
+      </div>
+      <div class="cell" style="grid-column:9/13">
+        <div class="mono hd"><b>C.03</b><span data-zh="8 种语言">8 languages</span></div>
+        <h3 data-zh="完整的 8 种界面语言。">Interface in 8 languages.</h3>
+        <ul class="langs">
+          <li><span>EN</span>English</li><li><span>简</span>简体中文</li>
+          <li><span>繁 HK</span>繁體中文</li><li><span>繁 TW</span>繁體中文</li>
+          <li><span>JA</span>日本語</li><li><span>DE</span>Deutsch</li>
+          <li><span>ES</span>Español</li><li><span>FR</span>Français</li>
+        </ul>
+      </div>
+      <div class="cell" style="grid-column:1/5">
+        <div class="mono hd"><b>C.04</b><span data-zh="轻快">Light on its feet</span></div>
+        <div class="big3"><b data-zh="秒开。">Opens instantly.</b><b data-zh="内存克制。">Light on memory.</b><b data-zh="拖拽即开。">Drag, drop, done.</b></div>
+        <p data-zh="像系统自带的一样原生，能打开的格式却多得多。">As native as something that ships with the system, with far more formats.</p>
+      </div>
+      <div class="cell" style="grid-column:5/13">
+        <div class="mono hd"><b>C.05</b><span data-zh="隐私">Privacy</span></div>
+        <h3 data-zh="查看、搜索、编辑，在你的 Mac 上完成。">Viewing, searching and editing happen on your Mac.</h3>
+        <figure class="fig" data-asset="assets/shots/privacy-diagram.png" data-spec="1800×900 · 隐私示意：本机处理范围 vs 仅在选择云端翻译时外发的文本">
+          <svg id="privSvg" viewBox="0 0 640 250" role="img" aria-label="Diagram: local processing versus optional cloud translation" data-zh-aria-label="示意：本机处理与可选的云端翻译"></svg>
+          <figcaption><b>FIG. 9</b><span data-zh="翻译是例外：只有你选了云端后端，所译文本才会发出（Pro）">Translation is the exception: text leaves only if you pick a cloud backend (Pro)</span></figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 06 PRO ================= -->
+<section class="sec dark" id="pro">
+  <div class="wrap">
+    <div class="cols local" aria-hidden="true"><div class="wrap"><div class="g"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div>
+    <div class="sec-head g">
+      <div class="col sec-no" style="--col:1/3">§06<span data-zh="仅 Folio Pro">Folio Pro only</span></div>
+      <h2 class="col in" style="--col:3/13" data-zh="同一个窗口里的本地工作台。">A local workbench, in the same window.</h2>
+      <p class="col lede in" style="--col:3/10" data-zh="Folio Pro 运行在沙盒之外，所以能做查看器做不到的事：启动 shell、调用 Git、承载你的 AI CLI。App Store 版没有这些。">Folio Pro runs outside the App Sandbox, so it can do what a viewer can't: start a shell, talk to Git, host your AI CLIs. The App Store edition does not include them.</p>
+      <div class="col in" style="--col:10/13;display:flex;align-items:flex-end"><a class="btn pri" style="width:100%" href="https://github.com/river-ranx/folio-web/releases/latest/download/Folio-Pro.zip" rel="noopener"><span data-zh="下载 Folio Pro">Download Folio Pro</span><span class="ar" aria-hidden="true">↓</span></a></div>
+    </div>
+
+    <div class="proarea">
+      <ul class="col plist" style="grid-column:1/5" role="tablist" aria-orientation="vertical" aria-label="Pro modules" data-zh-aria-label="Pro 模块" id="plist">
+        <li><button type="button" role="tab" id="pt-0" aria-controls="pp-0" aria-selected="true"><span class="pn">P.01</span><b data-zh="AI CLI 中枢">AI CLI hub</b><small data-zh="内嵌 Claude Code、Codex、Antigravity。">Claude Code, Codex and Antigravity, embedded.</small></button></li>
+        <li><button type="button" role="tab" id="pt-1" aria-controls="pp-1" aria-selected="false" tabindex="-1"><span class="pn">P.02</span><b data-zh="内置终端">Terminal</b><small data-zh="真 PTY，Warp 风格命令块。">A real PTY with command blocks.</small></button></li>
+        <li><button type="button" role="tab" id="pt-2" aria-controls="pp-2" aria-selected="false" tabindex="-1"><span class="pn">P.03</span><b data-zh="完整 Git">Git, in full</b><small data-zh="hunk 级暂存、rebase、blame、多仓库。">Hunk-level staging, rebase, blame, multi-repo.</small></button></li>
+        <li><button type="button" role="tab" id="pt-3" aria-controls="pp-3" aria-selected="false" tabindex="-1"><span class="pn">P.04</span><b data-zh="文件时光机">File time machine</b><small data-zh="自动存版本，不出现任何 Git 术语。">Automatic versions, no Git vocabulary.</small></button></li>
+        <li><button type="button" role="tab" id="pt-4" aria-controls="pp-4" aria-selected="false" tabindex="-1"><span class="pn">P.05</span><b data-zh="翻译">Translation</b><small data-zh="4 种后端，支持对照模式。">Four backends, side-by-side mode.</small></button></li>
+        <li><button type="button" role="tab" id="pt-5" aria-controls="pp-5" aria-selected="false" tabindex="-1"><span class="pn">P.06</span><b data-zh="任务">Tasks</b><small data-zh="Things 风格清单，iCloud 同步。">Things-style lists, synced with iCloud.</small></button></li>
+      </ul>
+
+      <div class="col pdetail" style="grid-column:5/13">
+        <!-- P1 -->
+        <div role="tabpanel" id="pp-0" aria-labelledby="pt-0">
+          <figure class="fig" data-asset="assets/shots/pro-ai-cli.png" data-spec="2000×1250 · AI CLI 中枢：左侧会话历史 + 主区内嵌 Claude Code TUI">
+            <div class="win"><div class="win-bar"><div class="win-dots"><i></i><i></i><i></i></div><div class="win-title" data-zh="AI · 会话与终端界面">AI · sessions &amp; TUI</div></div>
+              <div class="p1">
+                <aside><h5 data-zh="会话">SESSIONS</h5>
+                  <div class="gr">CLAUDE CODE</div><div class="s on"><span>Refactor export module</span><small>2h</small></div><div class="s"><span>Fix tab restore bug</span><small>1d</small></div>
+                  <div class="gr">CODEX</div><div class="s"><span>Write changelog</span><small>3d</small></div><div class="s"><span>Review PR notes</span><small>5d</small></div>
+                  <div class="gr">ANTIGRAVITY</div><div class="s"><span>Plan Windows port</span><small>1w</small></div>
+                  <span class="nw" data-zh="+ 新建会话">+ New session</span>
+                </aside>
+                <div class="tui" aria-hidden="true"><span class="m">~/.claude · ~/.codex · ~/.gemini</span><br><br>
+<span class="u">&gt;</span> summarise what changed since v1.4<br><br>
+● Reading CHANGELOG.md …<br>
+● Scanning 12 commits in 3 modules<br><br>
+Export now paginates before render; tab restore<br>keeps the last scroll offset.<br><br>
+<span class="u">&gt;</span> <span class="caret"></span></div>
+              </div></div>
+            <figcaption><b>FIG. 10</b><span data-zh="会话历史在侧栏，CLI 以 TUI 形态嵌在主区">Session history in the sidebar, the CLI embedded as a TUI</span></figcaption>
+          </figure>
+          <ul class="pbul">
+            <li data-zh="把本地的 Claude Code、Codex、Antigravity 以内嵌 TUI 形态放进主区。">Claude Code, Codex and Antigravity run as embedded TUIs in the main area.</li>
+            <li data-zh="自动扫描本地会话历史（~/.claude、~/.codex、~/.gemini），侧栏一键新建或续聊。">Local session history (~/.claude, ~/.codex, ~/.gemini) is scanned automatically; start or resume from the sidebar.</li>
+            <li data-zh="不解析、不保存消息；会话由各家 CLI 自行管理。">Folio does not parse or store messages; each CLI manages its own sessions.</li>
+            <li data-zh="尚未安装？引导面板提供一键运行 / 复制命令与文档链接。">Not installed yet? A setup sheet offers run-or-copy commands and a link to the docs.</li>
+          </ul>
+        </div>
+        <!-- P2 -->
+        <div role="tabpanel" id="pp-1" aria-labelledby="pt-1" hidden>
+          <figure class="fig" data-asset="assets/shots/pro-terminal.png" data-spec="2000×1250 · 内置终端：多会话标签 + Warp 风格命令块（路径 + 分支）">
+            <div class="win"><div class="win-bar"><div class="win-dots"><i></i><i></i><i></i></div><div class="win-title" data-zh="终端">Terminal</div></div>
+              <div class="term" aria-hidden="true">
+                <div class="tt"><span class="on">zsh · atlas</span><span>zsh · docs</span><span>+</span></div>
+                <div class="blk"><div class="ph"><span>~/atlas</span><b>⎇ main</b></div><div class="cm">git status -sb</div><div class="o">## main...origin/main
+ M README.md
+?? docs/guide.md</div></div>
+                <div class="blk"><div class="ph"><span>~/atlas</span><b>⎇ main</b></div><div class="cm">cd docs &amp;&amp; ls</div><div class="o">guide.md  assets/</div></div>
+                <div class="blk cur2"><div class="ph"><span>~/atlas/docs</span><b>⎇ main</b></div><div class="cm"><span class="caret"></span></div></div>
+              </div></div>
+            <figcaption><b>FIG. 11</b><span data-zh="命令块带着路径与 Git 分支">Command blocks carry path and Git branch</span></figcaption>
+          </figure>
+          <ul class="pbul">
+            <li data-zh="真正的 PTY 伪终端，运行 zsh。">A real pseudo-terminal (PTY) running zsh.</li>
+            <li data-zh="Warp 风格命令块，每块带当前路径与 Git 分支。">Warp-style command blocks, each with its path and Git branch.</li>
+            <li data-zh="多个终端会话，拖动排序。">Multiple sessions; drag to reorder.</li>
+            <li data-zh="cd 之后，标题与工作目录自动同步。">After cd, the tab title and working directory follow along.</li>
+          </ul>
+        </div>
+        <!-- P3 -->
+        <div role="tabpanel" id="pp-2" aria-labelledby="pt-2" hidden>
+          <figure class="fig" data-asset="assets/shots/pro-git.png" data-spec="2000×1250 · Git：变更列表 + hunk 级暂存 Diff + 推送预览与受保护分支警告">
+            <div class="win"><div class="win-bar"><div class="win-dots"><i></i><i></i><i></i></div><div class="win-title">atlas ▸ main</div></div>
+              <div class="gitw">
+                <aside><h5 data-zh="变更">CHANGES</h5><div class="on"><b>M</b>export.js</div><div><b>M</b>config.js</div><div><b>A</b>docs/guide.md</div></aside>
+                <div class="gdiff">
+                  <div class="hh"><button type="button" class="hunk" aria-pressed="true"><i></i><span data-zh="暂存此 hunk">Stage hunk</span></button><span>@@ -12,6 +12,8 @@ exportDoc</span></div>
+<div class="dl2"><span class="x">function exportDoc(doc) {</span><span class="r">  return render(doc);</span><span class="p">  const html = render(doc);</span><span class="p">  return paginate(html);</span><span class="x">}</span></div>
+                  <div class="hh" style="border-top:1px solid var(--ink)"><button type="button" class="hunk" aria-pressed="false"><i></i><span data-zh="暂存此 hunk">Stage hunk</span></button><span>@@ -31,4 +33,4 @@ DEFAULTS</span></div>
+<div class="dl2"><span class="x">const DEFAULTS = {</span><span class="r">  margin: 12,</span><span class="p">  margin: 16,</span><span class="x">  orientation: 'portrait',</span><span class="x">};</span></div>
+                  <div class="gfoot"><span id="hunkCount">STAGED 1 / 2 HUNKS</span><span class="warn" data-zh="⚠ main 为受保护分支">⚠ main is protected</span><span class="ch" data-zh="推送预览 · 2 个提交 → origin/main">Push preview · 2 commits → origin/main</span><span class="ch">Stash</span><span class="ch">Rebase</span><span class="ch">Blame</span></div>
+                </div>
+              </div></div>
+            <figcaption><b>FIG. 12</b><span data-zh="hunk 级暂存（可点击切换）">Hunk-level staging (click to toggle)</span></figcaption>
+          </figure>
+          <ul class="pbul">
+            <li data-zh="暂存、提交、推送、拉取、获取；hunk 级暂存与撤销。">Stage, commit, push, pull, fetch; stage and revert by hunk.</li>
+            <li data-zh="贮藏（stash）、rebase、revert、cherry-pick、分支与 Tag 管理。">Stash, rebase, revert, cherry-pick, branches and tags.</li>
+            <li data-zh="blame、单文件历史、合并冲突解决。">Blame, per-file history, merge-conflict resolution.</li>
+            <li data-zh="多仓库，一次聚焦一个；Diff 支持 unified / 并排。">Multiple repositories, one in focus; unified or side-by-side diff.</li>
+            <li data-zh="推送前有推送预览与受保护分支警告；HTTPS / SSH 凭据使用原生弹窗。">Push preview and protected-branch warnings; native dialogs for HTTPS and SSH credentials.</li>
+          </ul>
+        </div>
+        <!-- P4 -->
+        <div role="tabpanel" id="pp-3" aria-labelledby="pt-3" hidden>
+          <figure class="fig" data-asset="assets/shots/pro-snapshots.png" data-spec="2000×1250 · 文件时光机：时间轴（保留密度分层）+ 版本卡片 + 同步状态">
+            <div class="tlsvg lt"><svg id="tlSvg" viewBox="0 0 640 290" role="img" aria-label="Timeline of automatic versions with retention tiers" data-zh-aria-label="自动版本时间轴与保留分层"></svg></div>
+            <figcaption><b>FIG. 13</b><span data-zh="近期全留，越久越稀疏；锁定版本永不清理">Everything recent, sparser with age; locked versions are never pruned</span></figcaption>
+          </figure>
+          <ul class="pbul">
+            <li data-zh="底层是 Git，界面里没有任何 Git 术语：版本、备注、同步、恢复。">Git underneath, none of its vocabulary: versions, notes, sync, restore.</li>
+            <li data-zh="自动触发：5 秒检测变更、30 秒防抖、定时快照，退出前再存一份。">Automatic triggers: 5 s change scan, 30 s debounce, scheduled snapshots, and a final one on quit.</li>
+            <li data-zh="近 24 小时全保留，近 7 天每天一份，近 30 天每周一份，更早每月一份；锁定的版本不会被清理。">24 h: keep all. 7 days: daily. 30 days: weekly. Older: monthly. Locked versions are never pruned.</li>
+            <li data-zh="可选远端同步，失败自动退避重试；冲突时二选一：覆盖，或另存备份。">Optional remote sync with back-off retries; on conflict choose overwrite or keep a backup.</li>
+            <li data-zh="每个工作区独立历史；默认备份所有文件，白名单与黑名单可调。">Each workspace has its own history; all files by default, allow and deny lists adjustable.</li>
+          </ul>
+        </div>
+        <!-- P5 -->
+        <div role="tabpanel" id="pp-4" aria-labelledby="pt-4" hidden>
+          <figure class="fig" data-asset="assets/shots/pro-translate.png" data-spec="2000×1250 · 翻译：后端选择 + 原文/译文对照 + 落盘 _translation.md">
+            <div class="win"><div class="win-bar"><div class="win-dots"><i></i><i></i><i></i></div><div class="win-title" data-zh="翻译 · 对照模式">Translate · side by side</div></div>
+              <div class="trans">
+                <aside id="backends" role="radiogroup" aria-label="Translation backend" data-zh-aria-label="翻译后端"><h5 data-zh="后端">BACKEND</h5></aside>
+                <div class="sbs"><h5>EN</h5><h5>中文</h5>
+                  <p>Folio opens every file in one window.</p><p>Folio 在一个窗口里打开所有文件。</p>
+                  <p>Tabs remember your folder and scroll position.</p><p>标签页会记住文件夹和滚动位置。</p>
+                  <p>Edit Markdown and Word, then save in place.</p><p>编辑 Markdown 和 Word，就地保存。</p>
+                </div>
+                <div class="tfoot"><span id="tnotice"></span><span class="mute" style="color:var(--mute)">README_translation.md</span></div>
+              </div></div>
+            <figcaption><b>FIG. 14</b><span data-zh="选一个后端，看文本去向（可交互）">Pick a backend and see where the text goes (interactive)</span></figcaption>
+          </figure>
+          <ul class="pbul">
+            <li data-zh="选中翻译与全文翻译；全文译文落盘为 <文件名>_translation.md。">Translate a selection or the whole document; the full translation is saved as &lt;name&gt;_translation.md.</li>
+            <li data-zh="4 种后端：Apple 系统翻译、Gemini CLI、Google Cloud Translation、本地 Ollama。">Four backends: Apple Translation, Gemini CLI, Google Cloud Translation and local Ollama.</li>
+            <li data-zh="对照模式把原文与译文并排显示。">Side-by-side mode shows source and translation together.</li>
+            <li data-zh="代码标识符、路径、API 名受保护，避免误译；段落并行翻译。">Code identifiers, paths and API names are protected from mistranslation; paragraphs translate in parallel.</li>
+          </ul>
+        </div>
+        <!-- P6 -->
+        <div role="tabpanel" id="pp-5" aria-labelledby="pt-5" hidden>
+          <figure class="fig" data-asset="assets/shots/pro-tasks.png" data-spec="2000×1250 · 任务：Things 风格清单 + iCloud 同步状态 + 交给 AI 执行">
+            <div class="win"><div class="win-bar"><div class="win-dots"><i></i><i></i><i></i></div><div class="win-title" data-zh="任务">Tasks</div></div>
+              <div class="tasks">
+                <aside><div>Inbox<small>3</small></div><div class="on">Today<small>3</small></div><div>Upcoming<small>5</small></div><div>Anytime<small>9</small></div><div>Someday<small>2</small></div><div>Logbook<small>—</small></div></aside>
+                <div class="tlist"><h6>Today <span class="mono">iCloud ✓ <span data-zh="已同步">synced</span></span></h6>
+                  <button type="button" class="tk" aria-pressed="false"><i></i><span>Reply to design review</span><em>Today</em></button>
+                  <button type="button" class="tk" aria-pressed="false"><i></i><span>Tag release and write notes</span><span class="ai">▶ AI</span><em>Fri</em></button>
+                  <button type="button" class="tk" aria-pressed="true"><i></i><span>Back up Contracts folder</span><em>Done</em></button>
+                  <button type="button" class="tk" aria-pressed="false"><i></i><span>Renew domain</span><em>Evening</em></button>
+                </div>
+              </div></div>
+            <figcaption><b>FIG. 15</b><span data-zh="清单可点击勾选；▶ AI 表示交给 AI 去跑">Tick items off; ▶ AI hands a task to an AI agent</span></figcaption>
+          </figure>
+          <ul class="pbul">
+            <li data-zh="Things 风格的清单：收件箱、今天、计划、随时、某天、日志。">Things-style lists: Inbox, Today, Upcoming, Anytime, Someday, Logbook.</li>
+            <li data-zh="通过 iCloud 同步。">Syncs through iCloud.</li>
+            <li data-zh="可以把一条待办交给 AI，让它直接去跑。">Hand a to-do to an AI agent and let it run.</li>
+            <li data-zh="仅 Folio Pro 提供，App Store 版不含。">Only in Folio Pro; not in the App Store edition.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 07 COMPARE ================= -->
+<section class="sec" id="compare">
+  <div class="wrap">
+    <div class="sec-head g">
+      <div class="col sec-no" style="--col:1/3">§07<span data-zh="版本 / 规格表">Editions / Spec table</span></div>
+      <h2 class="col in" style="--col:3/13" data-zh="两个版本，一张规格表。">Two editions. One spec table.</h2>
+      <p class="col lede in" style="--col:3/10" data-zh="Folio 来自 Mac App Store，在沙盒内运行；Folio Pro 直接下载，在沙盒之外运行，多出一个本地工作台。">Folio comes from the Mac App Store and runs in the sandbox. Folio Pro is a direct download that runs outside it and adds the local workbench.</p>
+    </div>
+    <div class="g"><div class="col" style="--col:1/13">
+      <table class="cmp" id="cmp">
+        <thead><tr><th scope="col"><small data-zh="规格">Spec</small></th><th scope="col"><b>Folio</b><small data-zh="Mac App Store">Mac App Store</small></th><th scope="col" class="pro"><b>Folio Pro</b><small data-zh="直接下载">Direct download</small></th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="cmp-foot mono"><span><span class="y" style="display:inline-block;width:12px;height:12px;background:var(--sig);outline:1.5px solid var(--ink);vertical-align:-1px"></span> <span data-zh="包含">included</span></span><span>— <span data-zh="不含">not included</span></span><span data-zh="两个版本目前都免费。">Both editions are free for now.</span></div>
+    </div></div>
+  </div>
+</section>
+
+<!-- ================= 08 FAQ ================= -->
+<section class="sec" id="faq">
+  <div class="wrap">
+    <div class="sec-head g">
+      <div class="col sec-no" style="--col:1/3">§08<span data-zh="问答">Questions</span></div>
+      <h2 class="col in" style="--col:3/13" data-zh="常见问题。">Frequently asked.</h2>
+    </div>
+    <div class="g"><div class="col faq" style="--col:3/13" id="faqList"></div></div>
+  </div>
+</section>
+
+<!-- ================= 09 DOWNLOAD ================= -->
+<section class="sec cta" id="download">
+  <div class="wrap">
+    <div class="cols local" aria-hidden="true"><div class="wrap"><div class="g"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div>
+    <div class="sec-head g" style="padding-bottom:0">
+      <div class="col sec-no" style="--col:1/3">§09<span data-zh="下载">Download</span></div>
+    </div>
+    <h2 class="cta-h" data-zh="看清每个文件。">See every file.</h2>
+    <div class="cta-row">
+      <div style="grid-column:1/7"><article class="cta-card">
+        <div class="top2 mono"><b>A</b><span data-zh="免费">Free</span></div>
+        <h3>Folio</h3>
+        <p data-zh="查看一切，并就地编辑 Markdown、Word 与代码。来自 Mac App Store。">View everything; edit Markdown, Word and code in place. From the Mac App Store.</p>
+        <a class="btn" href="https://apps.apple.com/us/app/folio-universal-viewer/id6769624913?mt=12" rel="noopener"><span data-zh="前往 Mac App Store 下载">Get it on the Mac App Store</span><span class="ar" aria-hidden="true">↗</span></a>
+      </article></div>
+      <div style="grid-column:7/13"><article class="cta-card b">
+        <div class="top2 mono"><b>B</b><span data-zh="免费">Free</span></div>
+        <h3>Folio Pro</h3>
+        <p data-zh="Folio 的全部能力，再加终端、Git、AI CLI 中枢、文件时光机、翻译与任务。直接下载，Apple 芯片。">Everything in Folio, plus terminal, Git, AI CLI hub, file time machine, translation and tasks. Direct download, Apple silicon.</p>
+        <a class="btn" href="https://github.com/river-ranx/folio-web/releases/latest/download/Folio-Pro.zip" rel="noopener"><span data-zh="下载 Folio Pro (.zip)">Download Folio Pro (.zip)</span><span class="ar" aria-hidden="true">↓</span></a>
+      </article></div>
+    </div>
+    <p class="mono in" style="margin-top:28px" data-zh="macOS 15+ · Windows、iPadOS、iOS 版本即将到来">macOS 15+ · Windows, iPadOS and iOS versions are coming</p>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="g">
+      <div class="col in" style="--col:1/6"><p class="big">Folio</p><p class="mute" style="margin-top:8px" data-zh="Mac 上的全能文件查看器。">The universal viewer for Mac.</p></div>
+      <div class="col in" style="--col:6/9"><h5 data-zh="下载">Download</h5><a href="https://apps.apple.com/us/app/folio-universal-viewer/id6769624913?mt=12" rel="noopener">Folio — Mac App Store ↗</a><a href="https://github.com/river-ranx/folio-web/releases/latest/download/Folio-Pro.zip" rel="noopener">Folio Pro — .zip ↓</a></div>
+      <div class="col in" style="--col:9/11"><h5 data-zh="即将到来">Coming</h5><p>Windows</p><p>iPadOS</p><p>iOS</p></div>
+      <div class="col in" style="--col:11/13"><h5 data-zh="版次">Colophon</h5><p class="mute" data-zh="Inter Tight 与 JetBrains Mono 排印 · 修订 2026.10">Set in Inter Tight and JetBrains Mono · Rev 2026.10</p></div>
+      <div class="col in mono mute" style="--col:1/13;border-top:1px solid var(--ink);padding-top:14px" data-zh="© 2026 Folio。查看、搜索与编辑在你的 Mac 上完成。">© 2026 Folio. Viewing, searching and editing happen on your Mac.</div>
+    </div>
+  </div>
+</footer>
+
+<div class="tools" id="tools">
+  <button type="button" id="btnPh" aria-pressed="true"><i></i><span id="phLabel">标注 ON</span></button>
+  <button type="button" id="btnGrid" class="gr" aria-pressed="true"><i></i><span id="gridLabel">GRID ON</span></button>
+</div>
+
+<script>
+(()=>{
+'use strict';
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const qs=new URLSearchParams(location.search);
+const dbg={};(qs.get('s')||'').split(',').forEach(p=>{const [k,v]=p.split(':');if(k)dbg[k]=v});
+let lang='en';
+const T=(en,zh)=>lang==='zh'?zh:en;
+const z=(en,zh)=>`<span data-zh="${esc(zh)}">${en}</span>`;
+const onLang=[];
+
+/* ================= language ================= */
+const META={
+  en:{title:'Folio — One app. See every file. | The universal viewer for Mac',desc:'Folio opens 14 kinds of files natively on Mac and edits Markdown, Word and code in place. Folio Pro adds a local workbench: terminal, Git, AI CLI and file snapshots. Free, macOS 15+.'},
+  zh:{title:'Folio — 一个 App，看清每个文件 | Mac 全能文件查看器',desc:'Folio 在 Mac 上原生打开 14 类文件，Markdown、Word、代码看到就能改。Folio Pro 再加终端、Git、AI CLI 与文件快照的本地工作台。免费，需 macOS 15+。'}
+};
+function applyLang(l){
+  lang=l;
+  document.documentElement.setAttribute('lang',l==='zh'?'zh':'en');
+  $$('[data-zh]').forEach(el=>{
+    if(el.dataset.en===undefined)el.dataset.en=el.innerHTML;
+    el.innerHTML=l==='zh'?el.dataset.zh:el.dataset.en;
+  });
+  $$('[data-zh-aria-label]').forEach(el=>{
+    if(el.dataset.enAria===undefined)el.dataset.enAria=el.getAttribute('aria-label')||'';
+    el.setAttribute('aria-label',l==='zh'?el.dataset.zhAriaLabel:el.dataset.enAria);
+  });
+  document.title=META[l].title;
+  $('meta[name=description]').setAttribute('content',META[l].desc);
+  $$('.lang button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.l===l?'true':'false'));
+  store.set('folio-a-lang',l);
+  updToolLabels();
+  onLang.forEach(f=>f());
+}
+$$('.lang button').forEach(b=>b.addEventListener('click',()=>applyLang(b.dataset.l)));
+
+/* ================= themes ================= */
+const THEMES=[['#1D3CFF','Signal blue'],['#D01C03','Vermilion'],['#00703F','Green'],['#6A2BFF','Violet'],['#0B0B0B','Ink'],['#C4007A','Magenta'],['#006C7A','Teal'],['#3A2BB5','Indigo'],['#B3123A','Crimson'],['#1E6B2A','Forest'],['#0050C8','Cobalt'],['#8A1FA6','Plum'],['#2B2F36','Graphite'],['#0A6EBD','Azure'],['#0058D0','System']];
+let theme=0;
+function hexRgba(h,a){const n=parseInt(h.slice(1),16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`}
+function setTheme(i){
+  theme=i;const c=THEMES[i][0];
+  const r=document.documentElement.style;
+  r.setProperty('--sig',c);r.setProperty('--sig-soft',hexRgba(c,.12));
+  $$('.th-b,#themes button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.i===i?'true':'false'));
+  store.set('folio-a-theme',i);
+}
+function buildThemes(){
+  $('#swQuick').innerHTML=[0,1,2,3,4].map(i=>`<button type="button" class="th-b" data-i="${i}" aria-pressed="false" aria-label="${esc(THEMES[i][1])}" title="${esc(THEMES[i][1])}" style="--c:${THEMES[i][0]}"><i></i></button>`).join('');
+  $('#themes').innerHTML=THEMES.map((t,i)=>`<button type="button" class="${i===14?'sys':''}" data-i="${i}" aria-pressed="false" aria-label="${esc(t[1])}" title="${esc(t[1])}" style="--c:${t[0]}"><span>T${String(i+1).padStart(2,'0')}</span>${i===14?'':''}</button>`).join('');
+  $$('.th-b,#themes button').forEach(b=>b.addEventListener('click',()=>setTheme(+b.dataset.i)));
+}
+
+/* ================= SVG helpers ================= */
+const R=(x,y,w,h,c='o')=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" class="${c}"/>`;
+const Ln=(x1,y1,x2,y2,c='n')=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="${c}"/>`;
+const Tx=(x,y,s,c='',a='')=>`<text x="${x}" y="${y}" class="m ${c}" ${a}>${s}</text>`;
+const Ci=(cx,cy,r,c='n')=>`<circle cx="${cx}" cy="${cy}" r="${r}" class="${c}"/>`;
+const Pl=(p,c='n')=>`<polyline points="${p}" class="${c}"/>`;
+const Pg=(p,c='n')=>`<polygon points="${p}" class="${c}"/>`;
+const rnd=(i,s=1)=>{const v=Math.sin(i*12.9898+s*78.233)*43758.5453;return v-Math.floor(v)};
+const lines=(x,y,n,w,gap=11,s=1,c='g')=>{let o='';for(let i=0;i<n;i++){const ww=i===n-1?w*(.35+rnd(i,s)*.3):w*(.8+rnd(i,s)*.2);o+=R(x,y,ww.toFixed(0),4,c).replace('y="'+y+'"','y="'+(y+i*gap)+'"')}return o};
+const wave=(x,cy,n,gap,amp,s=3)=>{let d='';for(let i=0;i<n;i++){const env=Math.sin((i+.5)/n*Math.PI)*.65+.35;const h=Math.max(2,(rnd(i,s)*.8+.2)*amp*env);d+=`M${x+i*gap} ${(cy-h).toFixed(1)}V${(cy+h).toFixed(1)}`}return `<path d="${d}" class="wv"/>`};
+const marks=(w=480,h=340)=>{const m=10,l=12;let o='';[[m,m,1,1],[w-m,m,-1,1],[m,h-m,1,-1],[w-m,h-m,-1,-1]].forEach(([x,y,a,b])=>{o+=Ln(x,y,x+a*l,y,'t')+Ln(x,y,x,y+b*l,'t')});return o};
+const arrowH=(x1,x2,y,c='n')=>Ln(x1,y,x2,y,c)+Pg(`${x2},${y} ${x2-7},${y-4} ${x2-7},${y+4}`,'k');
+
+/* ---- hero ---- */
+function heroSVG(){
+  let s=`<svg viewBox="0 0 1000 650" role="img" aria-label="Wireframe of the Folio main window: sidebar with three roots, tabs, and PDF, code, audio and 3D viewers">`;
+  s+=Ln(50,28,900,28,'t')+Ln(50,20,50,36,'t')+Ln(900,20,900,36,'t')+Tx(475,19,'2000 PX','mm hs','text-anchor="middle"');
+  s+=Ln(938,60,938,620,'t')+Ln(930,60,946,60,'t')+Ln(930,620,946,620,'t')+`<text transform="translate(956 340) rotate(90)" text-anchor="middle" class="m mm hs">1250 PX</text>`;
+  s+=R(50,60,850,560,'o')+Ln(50,100,900,100)+Ci(74,80,6.5)+Ci(94,80,6.5)+Ci(114,80,6.5);
+  s+=R(150,68,150,32,'k')+Tx(168,89,'atlas','mw')+R(300,68,150,32,'n')+Tx(318,89,'Contracts')+R(450,68,150,32,'n')+Tx(468,89,'Shoots')+Tx(620,89,'+','mm');
+  s+=Ln(270,100,270,620)+Tx(66,126,'WORKSPACE','mm hs')+Tx(254,126,'3 ROOTS','mm hs','text-anchor="end"')+Ln(50,138,270,138,'t');
+  s+=Pl('62,156 68,162 74,156')+Tx(84,164,'atlas','mb')+R(248,155,10,10,'sf');
+  const fl=[0,1,2,3,4];fl.forEach(i=>{const y=186+i*26;if(i===1){s+=R(50,y-15,220,26,'sf')+R(84,y-9,10,13,'wf')+R(102,y-4,86,5,'wf')}else{s+=R(84,y-9,10,13,'o')+R(102,y-4,50+rnd(i,4)*70,5,'g')}});
+  s+=Pl('64,304 70,310 64,316')+Tx(84,312,'Contracts','mb')+R(248,303,10,10,'h');
+  s+=Pl('64,336 70,342 64,348')+Tx(84,344,'Shoots','mb')+R(248,335,10,10,'k');
+  s+=Ln(50,372,270,372,'t')+Tx(66,396,'LABELS','mm hs');
+  [ 'sf','k','h','g','o','sl','n' ].forEach((c,i)=>{s+=R(66+i*26,410,14,14,c==='n'?'o':c)});
+  s+=R(296,126,300,470,'o')+R(318,150,150,16,'k')+R(318,176,100,5,'g')+lines(318,200,6,256,11,1)+R(314,277,264,13,'sl')+R(318,281,200,4,'k')+R(318,330,90,9,'k')+lines(318,352,5,256,11,2);
+  s+=R(318,420,256,80,'n')+[0,1,2,3,4,5].map(i=>R(334+i*38,490-(14+rnd(i,6)*50),22,14+rnd(i,6)*50,i===3?'sf':'k')).join('')+Tx(318,584,'3 / 12','mm')+Tx(574,584,'PDF','mm','text-anchor="end"');
+  s+=R(620,126,260,150,'o')+Ln(620,148,880,148)+Tx(632,141,'CODE · .ts','mm');
+  const code=[[0,60,'g'],[1,110,'sf'],[1,150,'g'],[2,90,'g'],[1,70,'g'],[0,40,'sf'],[0,20,'g']];
+  code.forEach((r,i)=>{const y=168+i*15;s+=Tx(632,y+5,'0'+(i+1),'mm hs')+R(660+r[0]*18,y,r[1],5,r[2])});
+  s+=R(655,225,18,12,'sl');
+  s+=R(620,290,260,110,'o')+Ln(620,312,880,312)+Tx(632,305,'AUDIO · .wav','mm')+wave(634,356,40,6,26,5)+Ln(750,320,750,394,'ss')+Tx(632,392,'01:12','mm hs')+Tx(868,392,'03:48','mm hs','text-anchor="end"');
+  s+=R(620,414,260,182,'o')+Ln(620,436,880,436)+Tx(632,429,'3D · .usdz','mm');
+  s+=Pg('750,462 802,492 750,522 698,492','h')+Pg('750,462 802,492 802,552 750,582 698,552 698,492','n')+Ln(750,522,750,582)+Ln(802,492,802,552,'ss');
+  s+=Ln(646,572,682,572)+Ln(646,572,646,540)+Ln(646,572,628,586)+Tx(686,575,'X','mm hs')+Tx(640,536,'Y','mm hs')+Tx(618,598,'','mm');
+  s+=Ci(225,60,12,'sf')+Tx(225,64,'1','mw mb','text-anchor="middle"');
+  s+=Ci(50,230,12,'sf')+Tx(50,234,'2','mw mb','text-anchor="middle"');
+  s+=Ci(608,360,12,'sf')+Tx(608,364,'3','mw mb','text-anchor="middle"');
+  s+='</svg>';
+  return s;
+}
+
+/* ---- formats ---- */
+const DRAW={
+ pdf:()=>R(60,50,60,80)+R(60,140,60,80,'n')+R(60,230,60,60,'n')+lines(70,66,5,38,9,2)+R(150,36,180,268)+R(168,56,92,12,'k')+lines(168,82,5,140,11,1)+R(164,135,148,12,'sl')+R(168,139,110,4,'k')+lines(168,158,6,140,11,3)+R(168,232,60,8,'k')+lines(168,250,4,140,11,4)+Tx(240,296,'3 / 12','mm','text-anchor="middle"')+Tx(352,56,'OUTLINE','mm')+[0,1,2,3,4,5,6].map(i=>R(352+(i%3===1?10:0),68+i*18,60-(i%3===1?10:0)-rnd(i,2)*12,5,i===2?'sf':'g')).join(''),
+ word:()=>R(40,40,64,20,'sf')+Tx(72,54,'.docx','mw mb','text-anchor="middle"')+R(120,66,230,244)+R(138,84,100,12,'k')+lines(138,108,4,194,11,1)+R(138,160,194,66,'n')+Ln(138,182,332,182,'t')+Ln(138,204,332,204,'t')+Ln(203,160,203,226,'t')+lines(138,238,5,194,11,2)+R(372,66,82,150)+Tx(380,82,'FONT','mm')+R(380,88,66,14,'n')+Tx(380,120,'SIZE','mm')+R(380,126,66,14,'n')+Tx(380,158,'COLOUR','mm')+[0,1,2,3].map(i=>R(380+i*17,164,13,13,i===1?'sf':'n')).join('')+Tx(380,196,'ALIGN','mm')+lines(380,202,3,60,5,5,'k'),
+ excel:()=>R(70,40,340,24)+Tx(80,56,'fx  =SUM(C2:C7)')+R(70,76,340,22,'g')+(()=>{let o='';for(let i=0;i<7;i++)o+=Ln(98+i*52,76,98+i*52,310,'t');for(let j=0;j<9;j++)o+=Ln(70,98+j*26,410,98+j*26,'t');o+=R(70,76,340,234,'n');'ABCDEF'.split('').forEach((l,i)=>{o+=Tx(98+i*52+26,91,l,'mb','text-anchor="middle"')});for(let j=0;j<8;j++)o+=Tx(80,98+j*26+17,j+1,'mm');o+=R(202,176,52,26,'sl')+R(202,176,52,26,'ss');for(let j=0;j<8;j++)for(let i=0;i<6;i++){if((i*3+j*5)%4!==1)o+=R(98+i*52+14+(i%2?10:0),98+j*26+11,24+rnd(i+j*6,3)*8,4,'g')}return o})(),
+ ppt:()=>[0,1,2,3].map(i=>R(60,50+i*58,70,50,i===0?'ss':'o')+lines(70,62+i*58,2,50,8,i+1)).join('')+R(150,50,270,152)+R(172,70,130,14,'k')+R(172,94,90,5,'g')+Ln(300,184,408,184,'t')+[30,52,40,70,56].map((h,i)=>R(310+i*20,184-h,14,h,i===3?'sf':'k')).join('')+Tx(150,224,'NOTES','mm')+lines(150,232,4,270,11,3),
+ iwork:()=>R(40,80,128,80)+R(52,96,56,10,'k')+lines(52,116,3,90,9,1)+R(190,50,104,140)+R(204,66,60,10,'k')+lines(204,88,7,76,11,2)+R(316,80,124,110)+Ln(316,102,440,102,'t')+Ln(316,126,440,126,'t')+Ln(316,150,440,150,'t')+Ln(316,174,440,174,'t')+Ln(358,80,358,190,'t')+Ln(400,80,400,190,'t')+R(358,126,42,24,'sl')+Tx(104,184,'KEYNOTE','mb','text-anchor="middle"')+Tx(242,214,'PAGES','mb','text-anchor="middle"')+Tx(378,214,'NUMBERS','mb','text-anchor="middle"')+Tx(104,198,'.key','mm','text-anchor="middle"')+Tx(242,228,'.pages','mm','text-anchor="middle"')+Tx(378,228,'.numbers','mm','text-anchor="middle"'),
+ md:()=>R(40,50,182,226)+Tx(52,74,'# Release notes','mb')+Tx(52,96,'- **fast** to open')+Tx(52,112,'- tables, $E=mc^2$')+Tx(52,136,'| a | b |')+Tx(52,152,'|---|---|')+Tx(52,168,'| 1 | 2 |')+Tx(52,194,'```mermaid')+Tx(52,210,'A --&gt; B')+Tx(52,226,'```')+R(48,62,10,16,'sl')+arrowH(228,254,160)+Ln(254,160,228,160)+Pg('228,160 235,156 235,164','k')+R(260,50,182,226)+R(272,66,100,14,'k')+[0,1].map(i=>Ci(278,100+i*14,2.5,'k')+R(288,98+i*14,90-i*20,4,'g')).join('')+R(272,124,158,44,'n')+Ln(272,146,430,146,'t')+Ln(350,124,350,168,'t')+Tx(272,196,'E = mc²','mb')+R(272,210,40,22,'n')+arrowH(312,330,221)+R(330,210,40,22,'n')+arrowH(370,388,221)+R(388,210,40,22,'sf')+Tx(40,298,'SOURCE','mm')+Tx(260,298,'VISUAL','mm'),
+ code:()=>R(50,40,380,250)+Ln(92,40,92,290,'t')+[[0,'g',120,0],[0,'sf',70,1],[1,'g',90,0],[1,'sf',50,1],[1,'g',70,0],[0,'g',0,0],[1,'sf',46,0],[1,'g',140,0],[0,'g',16,0],[0,'g',0,0],[0,'sf',60,0],[1,'g',110,0]].map((r,i)=>{const y=58+i*20;return Tx(62,y+5,String(i+1).padStart(2,'0'),'mm')+(r[2]?R(104+r[0]*18,y,r[2],5,r[1]):'')+(r[3]?R(104+r[0]*18+r[2]+8,y,50,5,'g'):'')}).join('')+R(100,92,16,14,'sl')+R(100,254,12,14,'sl')+R(322,48,100,24)+Tx(330,64,'⌘F retry  2/5')+Pl('106,106 106,254','t d'),
+ image:()=>R(80,50,320,200)+Ci(160,110,18)+Pl('80,250 168,164 224,214 290,138 400,250','n')+Pg('290,138 335,184 290,184 262,170','h')+Pg('168,164 200,194 150,194','h')+Ln(70,40,92,40,'t')+Ln(70,40,70,62,'t')+Ln(410,40,388,40,'t')+Ln(410,40,410,62,'t')+Ln(70,260,92,260,'t')+Ln(70,260,70,238,'t')+Ln(410,260,388,260,'t')+Ln(410,260,410,238,'t')+R(80,264,320,24,'g')+Tx(90,280,'4032 × 3024 · HEIC'),
+ audio:()=>R(50,70,380,150)+Ln(50,145,430,145,'t')+wave(66,145,56,6.4,54,7)+Ln(236,80,236,210,'ss')+Tx(66,246,'01:12','mb')+Tx(414,246,'03:48','mm','text-anchor="end"')+Ci(240,284,14)+Pg('235,277 235,291 248,284','k'),
+ video:()=>R(70,40,340,196)+Array.from({length:17},(_,i)=>R(78+i*20,45,10,5,'k')+R(78+i*20,226,10,5,'k')).join('')+Ci(240,138,28)+Pg('231,122 231,154 258,138','k')+Ln(70,262,410,262,'t')+Ln(70,262,240,262,'ss')+Ci(240,262,5,'sf')+Tx(70,286,'00:42','mb')+Tx(410,286,'01:30','mm','text-anchor="end"'),
+ '3d':()=>`<ellipse cx="240" cy="214" rx="140" ry="48" class="t d"/>`+Pg('240,70 300,105 240,140 180,105','h')+Pg('240,70 300,105 300,175 240,210 180,175 180,105','n')+Ln(240,140,240,210)+Ln(300,105,300,175,'ss')+Ln(180,240,300,240,'t')+Ln(180,234,180,246,'t')+Ln(300,234,300,246,'t')+Tx(240,256,'104','mm','text-anchor="middle"')+Ln(70,290,110,290)+Ln(70,290,70,254)+Ln(70,290,52,304)+Tx(114,293,'X','mm')+Tx(66,250,'Y','mm')+Tx(40,314,'Z','mm'),
+ sqlite:()=>R(40,40,134,250)+Tx(50,60,'main.db','mb')+Ln(40,70,174,70,'t')+['▸ users','▾ orders','    id','    user_id','    total','▸ plans'].map((s,i)=>(i===1?R(40,80+i*22-14,134,20,'sf'):'')+Tx(50,80+i*22,s,i===1?'mw':'')).join('')+R(184,40,256,250)+R(184,40,256,24,'g')+['id','user','total','date'].map((s,i)=>Tx(194+i*62,56,s,'mb')).join('')+Array.from({length:8},(_,j)=>Ln(184,64+j*28,440,64+j*28,'t')+(j===3?R(184,92,256,28,'sl'):'')+[0,1,2,3].map(i=>R(194+i*62,76+j*28,18+rnd(j*4+i,3)*30,4,'g')).join('')).join('')+Tx(194,306,'orders · 1,204 rows','mm'),
+ csv:()=>R(50,40,380,250)+R(50,40,380,26,'g')+Array.from({length:5},(_,i)=>Ln(126+i*76,40,126+i*76,290,'t')).join('')+['id','city','qty','price','date'].map((s,i)=>Tx(60+i*76,57,s,'mb')).join('')+R(202,66,76,224,'sl')+Pg('262,50 270,50 266,57','sf')+Array.from({length:8},(_,j)=>Ln(50,92+j*25,430,92+j*25,'t')+[0,1,2,3,4].map(i=>R(60+i*76,100+j*25,16+rnd(j*5+i,5)*38,4,'g')).join('')).join('')+Tx(124,309,',','mm')+Tx(200,309,',','mm')+Tx(276,309,',','mm'),
+ font:()=>[[83,'CAP'],[117,'x'],[205,'BASE'],[239,'DESC']].map(([y,l])=>Ln(50,y,400,y,l==='BASE'?'ss':'t d')+Tx(408,y+3,l,'mm')).join('')+`<text x="225" y="205" text-anchor="middle" class="k" style="font:800 170px 'Inter Tight','Helvetica Neue',Arial,sans-serif;letter-spacing:-.04em">Aa</text>`+Tx(240,292,'ABCDEFGHIJKLM 0123456789','mm','text-anchor="middle"'),
+ zip:()=>R(50,40,140,250)+Array.from({length:14},(_,i)=>R(116,40+i*18,10,10,i%2?'k':'o')).join('')+R(70,120,34,34,'n')+Tx(87,142,'ZIP','mb','text-anchor="middle"')+arrowH(196,226,165)+R(226,40,214,250)+['▾ project.zip','  ▸ src','  ▾ docs','      guide.md','      logo.png','  README.md','  LICENSE'].map((s,i)=>Tx(238,64+i*26,s,i===3?'mb':'')).join('')+R(226,114,214,24,'sl'),
+ ql:()=>R(60,60,150,200)+Pg('180,60 210,90 180,90','g')+Tx(135,176,'?','mb','style="font-size:56px" text-anchor="middle"')+arrowH(220,262,160)+R(270,60,150,76,'n')+lines(282,76,4,126,10,3)+R(300,170,90,52)+Tx(345,202,'SPACE','mb','text-anchor="middle"')+Tx(345,250,'QUICKLOOK','mm','text-anchor="middle"')
+};
+const FORMATS=[
+ ['pdf','PDF','.pdf','Native rendering. Text stays searchable.','原生渲染，正文可被搜索。','R'],
+ ['word','Word','.docx','Edit in place; .docx in, .docx out.','原位编辑，.docx 进、.docx 出。','RW'],
+ ['excel','Excel','.xlsx','Sheets and cells, readable at a glance.','工作表与单元格，一眼读懂。','R'],
+ ['ppt','PowerPoint','.pptx','Slides rendered faithfully.','幻灯片忠实渲染。','R'],
+ ['iwork','iWork','.key .pages .numbers','Keynote, Pages and Numbers.','Keynote、Pages 与 Numbers。','R'],
+ ['md','Markdown','.md','Rendered, or edited visually.','渲染查看，或所见即所得编辑。','RW'],
+ ['code','Code','40+ languages','Syntax colour, bracket matching, editable.','语法高亮、括号匹配，可直接编辑。','RW'],
+ ['image','Images','.png .jpg .heic','Drag in, see it.','拖进来，直接看。','R'],
+ ['audio','Audio','.mp3 .wav .m4a','Waveform view with playback.','波形视图，可直接播放。','R'],
+ ['video','Video','.mp4 .mov','Plays in the tab; no extra player.','标签页内播放，无需另装播放器。','R'],
+ ['3d','3D models','.usdz .obj','Orbit and inspect.','旋转查看模型。','R'],
+ ['sqlite','SQLite','.sqlite .db','Browse tables and rows.','浏览数据表与行。','R'],
+ ['csv','CSV','.csv','Rows and columns as a table.','行列直接成表。','R'],
+ ['font','Fonts','.ttf .otf','See the typeface at a glance.','字体样式一览。','R'],
+ ['zip','Archives','.zip','Browse what is inside.','查看压缩包里有什么。','R'],
+ ['ql','Everything else','QuickLook','Falls back to QuickLook.','其余格式交给 QuickLook 兜底。','R']
+];
+function buildIndex(){
+  $('#idx').innerHTML=FORMATS.map((f,i)=>{
+    const no=i<14?String(i+1).padStart(2,'0'):'+'+'AB'[i-14];
+    return `<li data-i="${i}"><button type="button"><span class="no">${no}</span><span class="nm">${i===15?z('Everything else','其余全部'):f[1]}</span><span class="ex">${f[2]}</span><span class="nt" data-zh="${esc(f[4])}">${f[3]}</span><span class="rw">${f[5]}</span></button></li>`}).join('');
+  const sel=i=>{
+    $$('#idx li').forEach(li=>li.classList.toggle('on',+li.dataset.i===i));
+    const f=FORMATS[i];
+    $('#fsvg').innerHTML=marks()+DRAW[f[0]]();
+    $('#fnum').textContent='FIG. 2.'+String(i+1).padStart(2,'0');
+    $('#fname').textContent=i===15?T('FALLBACK','兜底'):f[1].toUpperCase();
+    $('#fmode').textContent=f[5];
+  };
+  $$('#idx li').forEach(li=>{
+    const b=$('button',li),i=+li.dataset.i;
+    ['mouseenter','focus','click'].forEach(e=>b.addEventListener(e,()=>sel(i)));
+  });
+  onLang.push(()=>{const on=$('#idx li.on');if(on)sel(+on.dataset.i)});
+  sel(+(dbg.fmt||0));
+}
+
+/* ================= 02 tabs ================= */
+const LBL={r:'#E5322D',o:'#F08A24',y:'#F2C230',g:'#2FA84F',b:'#2F6BFF',p:'#9A4BD0',k:'#8A8A85'};
+const TABS=[
+ {dir:'~/Projects/atlas',name:'atlas',scroll:0,last:1,files:[['spec-v3.pdf','b'],['roadmap.md','g'],['schema.sqlite','p'],['hero.png','r'],['render.usdz','k']]},
+ {dir:'~/Documents/Contracts',name:'Contracts',scroll:.62,last:0,files:[['MSA-2026.pdf','r'],['Lease-2026.pdf','r'],['Terms.docx','b'],['Invoices.xlsx','g'],['Notes.md','k']]},
+ {dir:'~/Media/Shoots',name:'Shoots',scroll:.35,last:3,files:[['IMG_2041.heic','y'],['interview.wav','o'],['b-roll.mov','o'],['cover.png','y'],['fonts/Display.otf','k']]}
+];
+function buildTabs(){
+  let cur=dbg.tab!==undefined?+dbg.tab:1, filter=null;
+  const bar=$('#tabsBar'),side=$('#tabSide'),sc=$('#scroller'),ro=$('#readout'),chips=$('#chips');
+  chips.innerHTML=Object.entries(LBL).map(([k,c])=>`<button type="button" class="chip" data-k="${k}" aria-pressed="false" aria-label="Label ${k}" style="--c:${c}"><i></i></button>`).join('');
+  const doc=(i)=>{let h=`<h6>${esc(TABS[i].files[TABS[i].last][0])}</h6>`;for(let p=0;p<14;p++){h+=`<div class="b"><i class="h"></i>${Array.from({length:4},(_,j)=>`<i style="width:${70+Math.round(rnd(p*4+j,i+2)*30)}%"></i>`).join('')}</div>`;if(p%3===2)h+=`<span class="pgm">p.${(p+1)/3} / 5</span>`}return h};
+  function pct(){const m=sc.scrollHeight-sc.clientHeight;return m>0?sc.scrollTop/m:0}
+  function readout(){ro.innerHTML=`<span>${T('TAB','标签')} <b>${cur+1}/3</b></span><span><b>${TABS[cur].dir}</b></span><span>${T('SCROLL','滚动')} <b>${Math.round(pct()*100)}%</b></span><span>${T('LAST','上次')} <b>${esc(TABS[cur].files[TABS[cur].last][0])}</b></span>`}
+  function render(restore){
+    bar.innerHTML=TABS.map((t,i)=>`<button type="button" role="tab" id="tb-${i}" aria-selected="${i===cur}" tabindex="${i===cur?0:-1}">${esc(t.name)}</button>`).join('');
+    $$('button',bar).forEach((b,i)=>{b.addEventListener('click',()=>go(i));b.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();const n=(i+(e.key==='ArrowRight'?1:2))%3;go(n);$('#tb-'+n).focus()}})});
+    side.innerHTML=`<h5>${T('WORKSPACE · 3 ROOTS','工作区 · 3 个根目录')}</h5>`+TABS.map((t,i)=>`<button type="button" class="root" data-r="${i}" ${i===cur?'aria-current="true"':''}><span class="t">${i===cur?'▾':'▸'} ${esc(t.name)}</span></button>`+(i===cur?t.files.map((f,j)=>`<button type="button" class="file${j===t.last?' cur':''}${filter&&f[1]!==filter?' dim':''}" data-f="${j}"><i class="lb" style="--c:${LBL[f[1]]}"></i><span class="t">${esc(f[0])}</span></button>`).join(''):'')).join('');
+    $$('.root',side).forEach(b=>b.addEventListener('click',()=>go(+b.dataset.r)));
+    $$('.file',side).forEach(b=>b.addEventListener('click',()=>{TABS[cur].last=+b.dataset.f;render(false);sc.innerHTML=doc(cur);sc.scrollTop=TABS[cur].scroll*(sc.scrollHeight-sc.clientHeight);readout()}));
+    if(restore){sc.innerHTML=doc(cur);const m=sc.scrollHeight-sc.clientHeight;sc.scrollTop=TABS[cur].scroll*m}
+    readout();
+  }
+  function go(i){if(i===cur)return;TABS[cur].scroll=pct();cur=i;render(true)}
+  sc.addEventListener('scroll',()=>{TABS[cur].scroll=pct();readout()});
+  $$('.chip',chips).forEach(c=>c.addEventListener('click',()=>{const k=c.dataset.k;filter=filter===k?null:k;$$('.chip',chips).forEach(x=>x.setAttribute('aria-pressed',x.dataset.k===filter?'true':'false'));render(false);const m=sc.scrollHeight-sc.clientHeight;sc.scrollTop=TABS[cur].scroll*m;readout()}));
+  render(true);
+  onLang.push(()=>{render(false);const m=sc.scrollHeight-sc.clientHeight;sc.scrollTop=TABS[cur].scroll*m;readout()});
+}
+
+/* ================= 03 search ================= */
+const DOCS=[
+ ['Atlas-MSA-v3.pdf','PDF','p.7','…the agreement renews automatically unless terminated 60 days before the end of the term…'],
+ ['Renewal-checklist.docx','DOCX','¶ 12','Send the renewal notice to procurement before the first of the month.'],
+ ['Q4-Review.pptx','PPTX','slide 14','Renewal rate by segment: enterprise vs. mid-market, FY25 to FY26.'],
+ ['notes/pricing.md','MD','L 41','## Renewal pricing: keep the uplift under the cap.'],
+ ['billing/invoices.csv','CSV','row 218','INV-2041 · Atlas Ltd · renewal invoice · paid'],
+ ['src/billing/renew.ts','CODE','L 88','export function scheduleRenewal(plan: Plan) {'],
+ ['Lease-2026.pdf','PDF','p.3','The lease may be extended; renewal terms shall be agreed in writing.'],
+ ['db/subscriptions.sqlite','SQLITE','plans','plan_id=17 · status=pending_renewal'],
+ ['Handbook.pages','PAGES','p.22','Passport renewal request form and where to submit it.'],
+ ['Lease-2026.pdf','PDF','p.9','The landlord shall issue an invoice for the lease deposit within 14 days.'],
+ ['billing/invoices.csv','CSV','row 3','INV-1003 · Northwind · lease deposit invoice · 2025-11-14 · paid'],
+ ['Onboarding.docx','DOCX','¶ 4','Submit a copy of your passport and signed invoice details to finance.']
+];
+function buildSearch(){
+  const q=$('#q'),res=$('#res'),cnt=$('#scount');
+  function run(){
+    const v=q.value.trim(),lc=v.toLowerCase();
+    const hits=lc?DOCS.filter(d=>(d[0]+' '+d[3]).toLowerCase().includes(lc)):DOCS.slice(0,0);
+    const re=lc?new RegExp('('+lc.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','ig'):null;
+    const hl=s=>esc(s).replace(re?new RegExp('('+esc(lc).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','ig'):/$^/,'<mark>$1</mark>');
+    res.innerHTML=hits.length?hits.map(d=>`<li><span class="ty">${d[1]}</span><span class="fl">${hl(d[0])}<small>${esc(d[2])}</small></span><span class="sn">${hl(d[3])}</span></li>`).join(''):`<li class="empty" style="display:block">${v?T('No matches. Try “renewal”, “lease” or “invoice”.','没有匹配项。试试 “renewal”、“lease” 或 “invoice”。'):T('Type to search every open workspace.','输入关键词，搜索所有已打开的工作区。')}</li>`;
+    const files=new Set(hits.map(h=>h[0])).size;
+    cnt.textContent=v?T(`${hits.length} matches in ${files} files`,`${files} 个文件中有 ${hits.length} 处匹配`):'';
+  }
+  q.addEventListener('input',run);
+  $$('.tryq button').forEach(b=>b.addEventListener('click',()=>{q.value=b.dataset.q;run();q.focus()}));
+  onLang.push(run);run();
+}
+
+/* ================= 04 editors ================= */
+function tabsKeys(list,tabSel,onSel){
+  const tabs=$$(tabSel,list);
+  tabs.forEach((t,i)=>{
+    t.addEventListener('click',()=>onSel(i));
+    t.addEventListener('keydown',e=>{
+      const k=e.key;let n=null;
+      if(k==='ArrowRight'||k==='ArrowDown')n=(i+1)%tabs.length;
+      if(k==='ArrowLeft'||k==='ArrowUp')n=(i+tabs.length-1)%tabs.length;
+      if(k==='Home')n=0;if(k==='End')n=tabs.length-1;
+      if(n!==null){e.preventDefault();onSel(n);tabs[n].focus()}
+    });
+  });
+  return tabs;
+}
+function buildEditors(){
+  const tabs=$$('#etabs [role=tab]');
+  const sel=i=>{tabs.forEach((t,j)=>{t.setAttribute('aria-selected',j===i);t.tabIndex=j===i?0:-1;$('#'+t.getAttribute('aria-controls')).hidden=j!==i})};
+  tabsKeys($('#etabs'),'[role=tab]',sel);sel(+(dbg.ed||0));
+  $$('#mdSeg button').forEach(b=>b.addEventListener('click',()=>{const src=b.dataset.v==='src';$('#mdVis').hidden=src;$('#mdSrc').hidden=!src;$$('#mdSeg button').forEach(x=>x.setAttribute('aria-pressed',x===b))}));
+  let fs=13;const pg=$('#wpage');
+  const setFs=n=>{fs=Math.max(10,Math.min(18,n));pg.style.setProperty('--fs',fs+'px');$('#fsOut').textContent=fs};
+  $('#fsUp').addEventListener('click',()=>setFs(fs+1));$('#fsDn').addEventListener('click',()=>setFs(fs-1));
+  $$('#alg button').forEach(b=>b.addEventListener('click',()=>{pg.style.setProperty('--ta',b.dataset.a);$$('#alg button').forEach(x=>x.setAttribute('aria-pressed',x===b))}));
+}
+
+/* ================= 05 craft ================= */
+function buildCraft(){
+  const L=(y,cls,label,lz)=>Pg(`36,${y+30} 196,${y+30} 262,${y} 102,${y}`,cls);
+  $('#glassSvg').innerHTML=
+    L(148,'h')+L(92,'o')+L(36,'o')+
+    Pg('36,122 196,122 262,92 102,92','sl')+Pg('36,122 196,122 262,92 102,92','ss d')+
+    Ln(36,66,36,178,'t d')+Ln(196,66,196,178,'t d')+Ln(262,36,262,148,'t d')+Ln(102,36,102,148,'t d')+
+    Ln(262,51,296,51,'t')+Ln(262,107,296,107,'t')+Ln(262,163,296,163,'t')+
+    Tx(302,48,'CHROME','mb')+Tx(302,60,'sidebar · toolbar','mm hs')+Tx(302,104,'GLASS','mb ms')+Tx(302,116,'translucent','mm hs')+Tx(302,160,'CONTENT','mb')+Tx(302,172,'your file','mm hs')+
+    Tx(36,198,'z-order ↑','mm');
+  $('#privSvg').innerHTML=
+    R(10,24,380,206,'o')+Tx(24,46,'YOUR MAC','mb')+R(296,34,84,20,'sf')+Tx(338,48,'ON DEVICE','mw mb','text-anchor="middle"')+
+    [['VIEW',24],['SEARCH',130],['EDIT',236]].map(([s,x])=>R(x,72,92,44,'n')+Tx(x+46,99,s,'mb','text-anchor="middle"')).join('')+
+    R(24,130,304,36,'n')+Tx(36,152,'APPLE TRANSLATION · OLLAMA (LOCAL MODEL)')+
+    Tx(24,196,'Files, search index and edits stay here.','mm hs')+
+    R(470,60,160,140,'n d')+Tx(482,82,'CLOUD','mb')+R(484,98,132,30,'o')+Tx(550,117,'Gemini CLI','','text-anchor="middle"')+R(484,138,132,30,'o')+Tx(550,157,'Google Cloud','','text-anchor="middle"')+Tx(482,190,'translate text only','mm hs')+
+    Ln(380,148,462,148,'ss d')+Pg('462,148 452,143 452,153','sf')+Tx(421,138,'TEXT','ms mb','text-anchor="middle"')+Tx(421,170,'OPT-IN','mm hs','text-anchor="middle"')+
+    marks(640,250);
+}
+
+/* ================= 06 pro ================= */
+function buildPro(){
+  const tabs=$$('#plist [role=tab]');
+  const sel=i=>{tabs.forEach((t,j)=>{t.setAttribute('aria-selected',j===i);t.tabIndex=j===i?0:-1;$('#'+t.getAttribute('aria-controls')).hidden=j!==i})};
+  tabsKeys($('#plist'),'[role=tab]',sel);sel(+(dbg.pro||0));
+  // git hunks
+  const hk=$$('.hunk'),upd=()=>{$('#hunkCount').textContent=T(`STAGED ${hk.filter(h=>h.getAttribute('aria-pressed')==='true').length} / 2 HUNKS`,`已暂存 ${hk.filter(h=>h.getAttribute('aria-pressed')==='true').length} / 2 个 HUNK`)};
+  hk.forEach(h=>h.addEventListener('click',()=>{h.setAttribute('aria-pressed',h.getAttribute('aria-pressed')!=='true');upd()}));
+  onLang.push(upd);upd();
+  // tasks
+  $$('.tk').forEach(b=>b.addEventListener('click',()=>b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')!=='true')));
+  // translation backends
+  const BE=[['Apple Translation','Apple 系统翻译','ON MAC','在本机',false,'ON DEVICE · text stays on this Mac.','在本机：文本不离开这台 Mac。'],['Local Ollama','本地 Ollama','ON MAC · OFFLINE','在本机 · 可离线',false,'ON DEVICE · local model, works offline.','在本机：本地模型，可离线使用。'],['Gemini CLI','Gemini CLI','CLOUD','云端',true,'CLOUD · the text you translate is sent to Gemini.','云端：所译文本会发送给 Gemini。'],['Google Cloud Translation','Google Cloud Translation','CLOUD','云端',true,'CLOUD · the text you translate is sent to Google Cloud.','云端：所译文本会发送给 Google Cloud。']];
+  let be=+(dbg.be||0);
+  const box=$('#backends');
+  function rb(){
+    box.innerHTML=`<h5>${T('BACKEND','后端')}</h5>`+BE.map((b,i)=>`<button type="button" role="radio" aria-checked="${i===be}" data-i="${i}"><i></i><b>${T(b[0],b[1])}</b><small>${T(b[2],b[3])}</small></button>`).join('');
+    $$('button',box).forEach(x=>x.addEventListener('click',()=>{be=+x.dataset.i;rb()}));
+    const n=$('#tnotice'),c=BE[be][4];
+    n.textContent=T(BE[be][5],BE[be][6]);
+    n.style.cssText=c?'background:var(--sig);color:#fff;padding:3px 8px;font-weight:700':'font-weight:700';
+  }
+  onLang.push(rb);rb();
+}
+function timeline(){
+  let s=marks(640,290)+Tx(30,34,'VERSION TIMELINE','mb')+Tx(610,34,'NOW ▸','mm','text-anchor="end"');
+  const tiers=[[30,230,40,14,'OLDER','monthly'],[230,380,15,20,'30 DAYS','weekly'],[380,520,10,28,'7 DAYS','daily'],[520,610,3,36,'24 H','all']];
+  s+=Ln(30,176,610,176);
+  tiers.forEach(([a,b,step,h,l1,l2],i)=>{
+    for(let x=a+(i?0:20);x<=b-(i<3?1:0);x+=step)s+=Ln(x,176-h,x,176,'t');
+    if(i)s+=Ln(a,70,a,206,'t d');
+    s+=Tx(a+6,198,l1,'mb hs')+Tx(a+6,210,l2,'mm hs');
+  });
+  s+=Ln(300,176,300,120,'n')+R(262,98,76,22,'sf')+Tx(300,113,'LOCKED','mw mb','text-anchor="middle"');
+  s+=Ln(574,56,574,196,'ss')+Ci(574,176,6,'sf');
+  s+=R(414,52,150,50,'o')+Tx(424,70,'v128 · today 14:02','mb')+Tx(424,86,'note: auto','mm')+R(500,76,56,18,'sf')+Tx(528,89,'Restore','mw mb','text-anchor="middle"');
+  s+=R(30,240,580,36,'n')+Tx(42,262,'SYNC ▸ remote · pushed 2 min ago ✓')+R(518,248,84,20,'sf')+Tx(560,262,'SYNC NOW','mw mb','text-anchor="middle"');
+  s+=Tx(30,230,'5 s scan → 30 s debounce → scheduled → final snapshot on quit','mm hs');
+  $('#tlSvg').innerHTML=s;
+}
+
+/* ================= 07 compare / 08 faq ================= */
+const CMP=[
+ ['#','Distribution','发行'],
+ ['Channel','渠道',['Mac App Store · sandboxed','Mac App Store · 沙盒'],['Direct download · notarized · Apple silicon','官网直接下载 · 已公证 · Apple 芯片']],
+ ['Price','价格',['Free for now','目前免费'],['Free for now','目前免费']],
+ ['System','系统',['macOS 15+','macOS 15+'],['macOS 15+','macOS 15+']],
+ ['#','View & organise','查看与组织'],
+ ['14 file types, native (+ archives, QuickLook)','14 类格式原生打开（+ 压缩包、QuickLook）',1,1],
+ ['Finder-style tabs that remember folder, scroll, last file','Finder 式标签页，记住文件夹、滚动位置、上次文件',1,1],
+ ['Multi-root workspaces · colour labels','多根目录工作区 · 彩色标签',1,1],
+ ['Full-text search, incl. PDF, .docx, .pptx','全文搜索，含 PDF、.docx、.pptx',1,1],
+ ['Liquid Glass · 15 themes · light & dark','Liquid Glass · 15 套主题 · 明暗自适应',1,1],
+ ['8 interface languages','8 种界面语言',1,1],
+ ['#','Edit','编辑'],
+ ['Markdown WYSIWYG: source ⇄ visual, tables, math, diagrams','Markdown 所见即所得：源码 ⇄ 可视、表格、公式、图表',1,1],
+ ['Word / .docx WYSIWYG, saved back as .docx','Word / .docx 所见即所得，存回 .docx',1,1],
+ ['Code editor, 40+ languages','代码编辑器，40+ 种语言',1,1],
+ ['Markdown export','Markdown 导出',['Image','图片'],['Image · PDF · HTML','图片 · PDF · HTML']],
+ ['Code diff & merge','代码 Diff 与 Merge',0,1],
+ ['Word version history','Word 历史版本',0,1],
+ ['#','Workbench','工作台'],
+ ['AI CLI hub (Claude Code · Codex · Antigravity)','AI CLI 中枢（Claude Code · Codex · Antigravity）',0,1],
+ ['Built-in terminal','内置终端',0,1],
+ ['Git client','Git 客户端',0,1],
+ ['File time machine (automatic versions)','文件时光机（自动版本）',0,1],
+ ['Translation','翻译',['Apple Translation (Markdown)','Apple 系统翻译（Markdown）'],['4 backends: Apple · Gemini CLI · Google Cloud · Ollama; side-by-side','4 种后端：Apple · Gemini CLI · Google Cloud · Ollama；对照模式']],
+ ['Tasks with iCloud sync','任务 + iCloud 同步',0,1]
+];
+function buildCompare(){
+  let n=0,h='';
+  const cell=(v,cls)=>{
+    if(Array.isArray(v))return `<td class="${cls}">${z(v[0],v[1])}</td>`;
+    return v?`<td class="${cls}"><span class="y" aria-hidden="true"></span><span class="sr" data-zh="包含">Included</span></td>`:`<td class="${cls}"><span class="no" aria-hidden="true">—</span><span class="sr" data-zh="不含">Not included</span></td>`;
+  };
+  CMP.forEach(r=>{
+    if(r[0]==='#'){h+=`<tr class="grp"><th scope="colgroup" colspan="3">${z(r[1],r[2])}</th></tr>`;return}
+    n++;
+    h+=`<tr><th scope="row"><small>C.${String(n).padStart(2,'0')}</small>${z(r[0],r[1])}</th>${cell(r[2],'')}${cell(r[3],'pro')}</tr>`;
+  });
+  $('#cmp tbody').innerHTML=h;
+}
+const FAQ=[
+ ['Is Folio free?','Folio 免费吗？','Yes. Folio on the Mac App Store and Folio Pro (direct download) are both free for now.','是的。Mac App Store 版 Folio 与直接下载的 Folio Pro，目前都免费。'],
+ ['Which edition should I pick?','我该选哪个版本？','Pick <b>Folio</b> to open any file and make light edits to Markdown, Word and code. Pick <b>Folio Pro</b> if you also want the terminal, Git, AI CLI hub, file time machine, four translation backends and tasks in the same window.','想打开任何文件，并轻量编辑 Markdown、Word 与代码，选 <b>Folio</b>。想在同一个窗口里再有终端、Git、AI CLI 中枢、文件时光机、4 种翻译后端与任务，选 <b>Folio Pro</b>。'],
+ ['Why isn’t Folio Pro on the Mac App Store?','为什么 Folio Pro 不在 Mac App Store？','The terminal, Git and AI CLIs need to start other programs on your Mac, which the App Store sandbox does not allow. Folio Pro is signed with a Developer ID, notarized, and runs outside the sandbox.','终端、Git 与 AI CLI 需要在你的 Mac 上启动其他程序，而 App Store 沙盒不允许。Folio Pro 使用 Developer ID 签名并经过公证，在沙盒之外运行。'],
+ ['Does my data leave my Mac?','我的数据会离开 Mac 吗？','Viewing, searching and editing happen on your Mac. Translation is the exception, and only if you choose it: Gemini CLI and Google Cloud send the text you translate to those services, while Apple Translation and a local Ollama model do not. The AI CLIs you embed (Claude Code, Codex, Antigravity) talk to their own providers under their own settings; Folio does not parse or store your messages.','查看、搜索、编辑都在你的 Mac 上完成。翻译是例外，且仅在你选择时发生：Gemini CLI 与 Google Cloud 会把你要翻译的文本发送到对应服务，Apple 系统翻译和本地 Ollama 则不会。你嵌入的 AI CLI（Claude Code、Codex、Antigravity）按各自设置与其服务商通信；Folio 不解析、不保存你的消息。'],
+ ['Will editing break my documents?','编辑会破坏我的文档吗？','Word files are saved back as .docx with paragraph styles, tables, images and watermarks preserved. Markdown stays plain .md, and images you paste are written into an <b>assets/</b> folder next to it with relative paths kept in sync.','Word 文件会存回 .docx，段落样式、表格、图片与水印保持无损。Markdown 仍是纯 .md，粘贴的图片会写入旁边的 <b>assets/</b> 文件夹，相对路径自动保持一致。'],
+ ['What do I need to run it?','需要什么环境？','macOS 15 or later. Folio Pro is built for Apple silicon. The AI CLIs are installed separately; if one is missing, Folio shows a setup sheet.','macOS 15 或更高版本。Folio Pro 面向 Apple 芯片。AI CLI 需另行安装；缺少时 Folio 会弹出引导面板。'],
+ ['What about Windows, iPad and iPhone?','Windows、iPad 和 iPhone 呢？','Windows, iPadOS and iOS versions are coming.','Windows、iPadOS 与 iOS 版本即将到来。']
+];
+function buildFaq(){
+  $('#faqList').innerHTML=FAQ.map((f,i)=>`<details class="q"${i<2?' open':''}><summary><span class="mono">Q.${String(i+1).padStart(2,'0')}</span><span class="qt" data-zh="${esc(f[1])}">${f[0]}</span><i class="pm" aria-hidden="true"></i></summary><div class="qa" data-zh="${esc(f[3])}">${f[2]}</div></details>`).join('');
+}
+
+/* ================= placeholders / tools ================= */
+function placeholders(){
+  $$('figure[data-asset]').forEach(f=>{
+    const t=document.createElement('span');t.className='ph-tag';t.textContent='示意图 · 待替换 / PLACEHOLDER';f.prepend(t);
+    const n=document.createElement('div');n.className='ph-note';n.innerHTML='▸ <b>'+esc(f.dataset.asset)+'</b> · '+esc(f.dataset.spec);f.append(n);
+  });
+}
+function updToolLabels(){
+  const ph=$('#btnPh').getAttribute('aria-pressed')==='true',gr=$('#btnGrid').getAttribute('aria-pressed')==='true';
+  $('#phLabel').textContent=lang==='zh'?('标注 '+(ph?'ON':'OFF')):('Labels '+(ph?'ON':'OFF'));
+  $('#gridLabel').textContent=lang==='zh'?('网格 '+(gr?'ON':'OFF')):('Grid '+(gr?'ON':'OFF'));
+}
+function tools(){
+  const bp=$('#btnPh'),bg=$('#btnGrid');
+  const sp=v=>{bp.setAttribute('aria-pressed',v);document.body.classList.toggle('no-ph',!v);store.set('folio-a-ph',v?'1':'0');updToolLabels()};
+  const sg=v=>{bg.setAttribute('aria-pressed',v);document.body.classList.toggle('no-grid',!v);store.set('folio-a-grid',v?'1':'0');updToolLabels()};
+  bp.addEventListener('click',()=>sp(bp.getAttribute('aria-pressed')!=='true'));
+  bg.addEventListener('click',()=>sg(bg.getAttribute('aria-pressed')!=='true'));
+  sp(store.get('folio-a-ph')!=='0');sg(store.get('folio-a-grid')!=='0');
+}
+
+/* ================= init ================= */
+$('#heroSvg').innerHTML=heroSVG();
+buildThemes();buildIndex();buildTabs();buildSearch();buildEditors();buildCraft();buildPro();timeline();buildCompare();buildFaq();placeholders();tools();
+const st=store.get('folio-a-theme');setTheme(st!==null&&THEMES[+st]?+st:0);
+const sl=store.get('folio-a-lang');
+applyLang(dbg.lang||sl||((navigator.language||'en').toLowerCase().startsWith('zh')?'zh':'en'));
+})();
+</script>
+</body>
+</html>
