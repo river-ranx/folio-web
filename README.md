@@ -16,8 +16,7 @@ The Folio Pro URL lives in one place: the `PRO_URL` constant in `index.html`'s `
 ## Stack
 
 - Pure static site — single `index.html`, no build step, no framework
-- Inline CSS / vanilla JS for theme & i18n (English is the markup; Chinese lives in `data-zh` attributes)
-- Product screenshots are CSS wireframe **schematics** (`figure[data-asset]`) — each shows its target asset path and size; use the bottom-left toggle to hide the labels
+- Inline CSS / vanilla JS for theme & i18n
 - Hosted on GitHub Pages (main branch, root)
 
 ## Languages
