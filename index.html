@@ -31,8 +31,6 @@
       --bg-elevated: #FFFAF1;
       --bg-subtle: rgba(110, 75, 30, 0.045);
       --bg-hover: rgba(110, 75, 30, 0.075);
-      --bg-cream: #F6E8D4;
-      --bg-cream-soft: #FCEFDB;
       --border: rgba(110, 75, 30, 0.12);
       --border-strong: rgba(110, 75, 30, 0.20);
       --text: #1E1A14;
@@ -49,14 +47,47 @@
       --btn-accent-bg-hover: #B85C09;
       --btn-accent-fg: #FFFFFF;
       --nav-bg: rgba(251, 246, 238, 0.78);
-      --halo-1: rgba(238, 127, 31, 0.30);
-      --halo-2: rgba(255, 195, 130, 0.26);
-      --halo-3: rgba(255, 230, 195, 0.20);
-      --grid-line: rgba(110, 75, 30, 0.05);
+      /* 悬浮导航的"玻璃"：半透明面纱 + 很轻的模糊，让身后的色块透出来（对照 Craft：白 .4→.8，blur 4px，无描边） */
+      --nav-veil-top: rgba(255, 252, 246, 0.50);
+      --nav-veil-bot: rgba(255, 252, 246, 0.86);
+      --nav-rim: rgba(255, 255, 255, 0.85);
+      --nav-drop: rgba(43, 32, 24, 0.30);
       --shadow-card: 0 1px 2px rgba(60, 40, 20, 0.04), 0 0 0 1px var(--border);
       --shadow-window: 0 24px 60px rgba(60, 40, 20, 0.14), 0 8px 24px rgba(60, 40, 20, 0.07);
       --shadow-pop: 0 14px 36px -10px rgba(60, 40, 20, 0.22), 0 0 0 1px var(--border);
       --pro-col: rgba(238, 127, 31, 0.05);
+      /* 插画色板：纯色块 + 粗描边 + 硬阴影，不用渐变。
+         --ink 给卡片描边/硬阴影；--ill-line 给 SVG 插画内部线条。 */
+      --ink: #2B2018;
+      --ink-shadow: #2B2018;
+      --ill-line: #2B2018;
+      --ill-paper: #FFF8E8;
+      --ill-sun: #FFC857;
+      --ill-tomato: #E9634B;
+      --ill-sage: #8DBF98;
+      --ill-sky: #8FCBE0;
+      --ill-butter: #FFD36B;
+      --ill-blush: #F7BFAF;
+      --ill-hill-1: #CFE3B9;
+      --ill-hill-2: #A9CF9F;
+      --ill-hill-3: #7FB48A;
+      --ill-butter-soft: #FFF0C2;
+      --ill-sage-soft: #E2EFD9;
+      --ill-sky-soft: #DCEFF6;
+      --ill-blush-soft: #FADFD6;
+      --ill-peri: #A9B8F2;
+      --ill-mist: #DAD7E0;
+      /* 画框天空（首屏 / 收尾 CTA）及其上的文字色 —— 浅蓝底上琥珀与次级文字都要加深才达标 */
+      --hero-sky: #CBE8F6;
+      --hero-dim: #4A4033;
+      --hero-accent: #C4510B;
+      /* 大色块面板（展示区）及其上的次级文字 */
+      --pn-sky: #BFE0F0;
+      --pn-butter: #FFE08A;
+      --pn-sage: #BFE3C4;
+      --pn-blush: #F8C9BC;
+      --pn-peri: #C3CCF7;
+      --panel-dim: #4F4436;
       --theme-icon-sun: none;
       --theme-icon-moon: block;
     }
@@ -65,13 +96,12 @@
        .pro-zone 复用同一套暗色 token：Folio Pro 的区块在浅色页面里也是深色「工作间」，
        颜色只在这里定义一次，不另写一份。 */
     html.dark,
-    .pro-zone {
+    .pro-zone,
+    .navbar.on-dark {
       --bg: #0B0907;
       --bg-elevated: #131110;
       --bg-subtle: rgba(255, 230, 200, 0.04);
       --bg-hover: rgba(255, 230, 200, 0.07);
-      --bg-cream: #1A1611;
-      --bg-cream-soft: #15120F;
       --border: rgba(255, 222, 195, 0.10);
       --border-strong: rgba(255, 222, 195, 0.17);
       --text: #FAF6F0;
@@ -87,14 +117,42 @@
       --btn-accent-bg-hover: var(--accent-strong);
       --btn-accent-fg: #1A1611;
       --nav-bg: rgba(11, 9, 7, 0.72);
-      --halo-1: rgba(255, 154, 74, 0.36);
-      --halo-2: rgba(255, 196, 130, 0.18);
-      --halo-3: rgba(255, 220, 160, 0.14);
-      --grid-line: rgba(255, 222, 195, 0.05);
+      --nav-veil-top: rgba(24, 20, 16, 0.50);
+      --nav-veil-bot: rgba(24, 20, 16, 0.84);
+      --nav-rim: rgba(255, 236, 210, 0.16);
+      --nav-drop: rgba(0, 0, 0, 0.55);
       --shadow-card: 0 1px 0 rgba(255,255,255,0.04) inset, 0 0 0 1px var(--border);
       --shadow-window: 0 24px 60px rgba(0, 0, 0, 0.45), 0 8px 24px rgba(0, 0, 0, 0.25);
       --shadow-pop: 0 14px 36px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--border);
       --pro-col: rgba(255, 154, 74, 0.06);
+      --ink: #CDBBA0;
+      --ink-shadow: #5A3C20;
+      --ill-line: #1A120B;
+      --ill-paper: #E9DCC4;
+      --ill-sun: #F2B84B;
+      --ill-tomato: #D9573F;
+      --ill-sage: #6FA17C;
+      --ill-sky: #6FAFC6;
+      --ill-butter: #E8B94C;
+      --ill-blush: #D79A89;
+      --ill-hill-1: #2A3A2B;
+      --ill-hill-2: #223124;
+      --ill-hill-3: #1A271D;
+      --ill-butter-soft: #2A2216;
+      --ill-sage-soft: #1E2A21;
+      --ill-sky-soft: #1B2830;
+      --ill-blush-soft: #30201C;
+      --ill-peri: #4B5A9E;
+      --ill-mist: #5A5560;
+      --hero-sky: #1D2535;
+      --hero-dim: #B3A794;
+      --hero-accent: #FF9A4A;
+      --pn-sky: #1F3340;
+      --pn-butter: #3A2F14;
+      --pn-sage: #1F3626;
+      --pn-blush: #3D2621;
+      --pn-peri: #262B4D;
+      --panel-dim: #B3A794;
       --theme-icon-sun: block;
       --theme-icon-moon: none;
     }
@@ -582,20 +640,13 @@
     /* ===== Hero ===== */
     .hero {
       position: relative;
-      padding: 152px 0 64px;
+      padding: 152px 0 0;
       text-align: center;
       overflow: hidden;
-      background:
-        radial-gradient(ellipse 80% 60% at 50% 0%, var(--bg-cream-soft) 0%, transparent 65%),
-        var(--bg);
+      background: var(--bg);
     }
 
-    html.dark .hero {
-      background:
-        radial-gradient(ellipse 80% 60% at 50% 0%, var(--bg-cream) 0%, transparent 65%),
-        var(--bg);
-    }
-
+    /* 插画场景：两侧漂浮的文件卡片 + 底部草地。纯色块，无渐变/模糊 */
     .hero-bg {
       position: absolute;
       inset: 0;
@@ -604,65 +655,54 @@
       overflow: hidden;
     }
 
-    .hero-bg::before {
-      content: '';
+    .hero-scene {
       position: absolute;
-      inset: 0;
-      background-image: radial-gradient(circle at center, var(--grid-line) 1px, transparent 1px);
-      background-size: 28px 28px;
-      mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 30%, transparent 75%);
-      -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 30%, transparent 75%);
-    }
-
-    .halo {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(90px);
-      will-change: transform;
-    }
-
-    .halo-primary {
-      width: 720px;
-      height: 520px;
-      background: var(--halo-1);
-      top: -180px;
+      top: 0;
       left: 50%;
+      width: max(1440px, 100%);
+      height: 820px;
       transform: translateX(-50%);
-      opacity: 0.95;
-      animation: haloPulse 14s ease-in-out infinite;
     }
 
-    .halo-secondary {
-      width: 420px;
-      height: 320px;
-      background: var(--halo-2);
-      top: 120px;
-      left: 8%;
-      opacity: 0.8;
-      animation: haloDrift1 18s ease-in-out infinite;
+    .hero-ground {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 190px;
     }
 
-    .halo-tertiary {
-      width: 460px;
-      height: 340px;
-      background: var(--halo-3);
-      top: 60px;
-      right: 6%;
-      opacity: 0.85;
-      animation: haloDrift2 22s ease-in-out infinite;
+    /* 插画填色（SVG 内部直接用 class，不依赖上下文选择器，<use> 里也能生效） */
+    .il-line  { stroke: var(--ill-line); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+    .il-shadow { fill: var(--ink-shadow); }
+    /* 直接画在页面底色上的线条（光线、波浪）跟随 --ink，深色下才看得见 */
+    .il-deco  { stroke: var(--ink); }
+    .f-paper  { fill: var(--ill-paper); }
+    .f-sun    { fill: var(--ill-sun); }
+    .f-tomato { fill: var(--ill-tomato); }
+    .f-sage   { fill: var(--ill-sage); }
+    .f-sky    { fill: var(--ill-sky); }
+    .f-butter { fill: var(--ill-butter); }
+    .f-blush  { fill: var(--ill-blush); }
+    .f-hill1  { fill: var(--ill-hill-1); }
+    .f-hill2  { fill: var(--ill-hill-2); }
+    .f-hill3  { fill: var(--ill-hill-3); }
+    .f-ink    { fill: var(--ill-line); }
+    .f-none   { fill: none; }
+
+    .il-bob { animation: ilBob 7s ease-in-out infinite; }
+    .il-bob.d1 { animation-duration: 8.5s; animation-delay: -2s; }
+    .il-bob.d2 { animation-duration: 6.5s; animation-delay: -4s; }
+    .il-bob.d3 { animation-duration: 9s;   animation-delay: -1s; }
+    @keyframes ilBob {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-10px); }
     }
 
-    @keyframes haloPulse {
-      0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.95; }
-      50%      { transform: translateX(-50%) scale(1.08); opacity: 1; }
-    }
-    @keyframes haloDrift1 {
-      0%, 100% { transform: translate(0, 0); }
-      50%      { transform: translate(60px, -40px); }
-    }
-    @keyframes haloDrift2 {
-      0%, 100% { transform: translate(0, 0); }
-      50%      { transform: translate(-70px, 30px); }
+    /* 场景按 1440 宽居中铺开，窄屏下两侧卡片会被裁掉，只剩中间空白，直接隐藏 */
+    @media (max-width: 900px) {
+      .hero-scene { display: none; }
     }
 
     .hero-content {
@@ -771,11 +811,7 @@
     }
 
     .hero-ed-pro {
-      border-color: var(--accent);
-      background:
-        radial-gradient(ellipse 90% 70% at 100% 0%, var(--accent-glow) 0%, transparent 62%),
-        var(--bg-elevated);
-      box-shadow: var(--shadow-window);
+      background: var(--ill-butter-soft);
     }
 
     .hero-ed-head {
@@ -910,7 +946,7 @@
     /* ===== Hero Window ===== */
     .hero-window {
       max-width: 1100px;
-      margin: 56px auto 0;
+      margin: 56px auto 72px;
       padding: 0 28px;
       position: relative;
       z-index: 1;
@@ -1345,11 +1381,7 @@
     }
 
     .lineup-card.pro-zone {
-      border-color: var(--border-strong);
-      background:
-        radial-gradient(ellipse 90% 70% at 100% 0%, var(--accent-glow) 0%, transparent 62%),
-        var(--bg-elevated);
-      box-shadow: var(--shadow-window);
+      background: var(--bg-elevated);
     }
 
     .lineup-top {
@@ -1505,22 +1537,18 @@
       overflow: hidden;
       border-top: 1px solid var(--border);
       border-bottom: 1px solid var(--border);
-      background:
-        radial-gradient(ellipse 80% 50% at 50% 0%, var(--bg-cream) 0%, transparent 70%),
-        var(--bg);
+      background: var(--bg);
+      position: relative;
     }
 
-    .pro::before {
-      content: '';
+    /* 夜空插画：月亮 + 星星（纯色块），取代原来的琥珀光晕 */
+    .pro-sky {
       position: absolute;
       top: 0;
       left: 50%;
+      width: max(1440px, 100%);
+      height: 320px;
       transform: translateX(-50%);
-      width: 820px;
-      height: 360px;
-      background: radial-gradient(ellipse at center top, var(--accent-glow) 0%, transparent 70%);
-      filter: blur(50px);
-      opacity: 0.7;
       pointer-events: none;
     }
 
@@ -1566,9 +1594,9 @@
       max-width: 1040px;
       margin: 0 auto;
       border-radius: 14px;
-      border: 1px solid var(--border-strong);
+      border: 2px solid var(--ink);
       background: var(--bg-elevated);
-      box-shadow: var(--shadow-window), 0 40px 120px -40px var(--accent-glow);
+      box-shadow: 8px 8px 0 var(--ink-shadow);
       overflow: hidden;
       font-family: 'JetBrains Mono', ui-monospace, monospace;
       font-size: 12.5px;
@@ -1926,29 +1954,18 @@
       text-align: center;
       position: relative;
       overflow: hidden;
-      border-top: 1px solid var(--border);
-      background:
-        radial-gradient(ellipse 60% 50% at 50% 0%, var(--bg-cream-soft) 0%, transparent 70%),
-        var(--bg);
+      padding-bottom: 230px;
+      background: var(--bg);
     }
 
-    html.dark .cta-section {
-      background:
-        radial-gradient(ellipse 60% 50% at 50% 0%, var(--bg-cream) 0%, transparent 70%),
-        var(--bg);
-    }
-
-    .cta-section::before {
-      content: '';
+    .cta-section > .cta-ground {
       position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 720px;
-      height: 340px;
-      background: radial-gradient(ellipse at center top, var(--accent-glow) 0%, transparent 70%);
-      filter: blur(40px);
-      z-index: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 190px;
+      pointer-events: none;
     }
 
     .cta-section > .container { position: relative; z-index: 1; }
@@ -2104,13 +2121,283 @@
       .split-text h2 { font-size: 30px; }
     }
 
+    /* ===== Illustration layer =====
+       粗描边 + 硬阴影 + 纯色块 + 纸张颗粒。所有色值来自 :root / html.dark 的 --ink / --ill-* token。 */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 0.04;
+      background-size: 180px 180px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.4 -0.2'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    html.dark body::after { filter: invert(1); opacity: 0.035; }
+
+    .hero-ed, .lineup-card, .pillar, .hero-window-inner, .banner-card, .split-image {
+      border: 2px solid var(--ink);
+      box-shadow: 6px 6px 0 var(--ink-shadow);
+    }
+    .hero-ed-pro { border-color: var(--ink); box-shadow: 6px 6px 0 var(--ink-shadow); }
+    .lineup-card.pro-zone { border-color: var(--ink); box-shadow: 6px 6px 0 var(--ink-shadow); }
+
+    .split-image, .pillar { transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease; }
+    .split-image:hover, .pillar:hover {
+      transform: translate(-2px, -2px);
+      border-color: var(--ink);
+      box-shadow: 8px 8px 0 var(--ink-shadow);
+    }
+
+    .hero-icon { border: 2px solid var(--ill-line); box-shadow: 4px 4px 0 var(--ink-shadow); }
+    html.dark .hero-icon { box-shadow: 4px 4px 0 var(--ink-shadow); }
+
+    .hero-badge {
+      background: var(--ill-butter);
+      border: 2px solid var(--ill-line);
+      color: var(--ill-line);
+      box-shadow: 2px 2px 0 var(--ink-shadow);
+    }
+    .hero-badge .dot { background: var(--ill-tomato); box-shadow: none; border: 1.5px solid var(--ill-line); width: 8px; height: 8px; }
+
+    .hero-ed-flag { background: var(--ill-tomato); color: var(--ill-line); border: 2px solid var(--ill-line); }
+
+    /* 按钮：按下去会"压"进阴影里 */
+    .btn, .nav-cta { border: 2px solid var(--ill-line); transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.18s ease; }
+    .btn { border-radius: 12px; }
+    .btn-accent, .hero-ed-pro .hero-ed-btn { box-shadow: 3px 3px 0 var(--ink-shadow); }
+    .btn-accent:hover { box-shadow: 4px 4px 0 var(--ink-shadow); transform: translate(-1px, -1px); }
+    .btn-ghost { background: var(--bg-elevated); border-color: var(--ink); box-shadow: 3px 3px 0 var(--ink-shadow); }
+    .btn-ghost:hover { background: var(--ill-butter-soft); border-color: var(--ink); box-shadow: 4px 4px 0 var(--ink-shadow); transform: translate(-1px, -1px); }
+    .btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink-shadow); }
+    .nav-cta { box-shadow: 2px 2px 0 var(--ink-shadow); }
+
+    /* 四张支柱卡各一个色块，编号徽章同色系 */
+    .pillar:nth-child(1) { background: var(--ill-butter-soft); }
+    .pillar:nth-child(2) { background: var(--ill-sage-soft); }
+    .pillar:nth-child(3) { background: var(--ill-sky-soft); }
+    .pillar:nth-child(4) { background: var(--ill-blush-soft); }
+    .pillar-num { color: var(--ill-line); border: 2px solid var(--ill-line); }
+    .pillar:nth-child(1) .pillar-num { background: var(--ill-butter); }
+    .pillar:nth-child(2) .pillar-num { background: var(--ill-sage); }
+    .pillar:nth-child(3) .pillar-num { background: var(--ill-sky); }
+    .pillar:nth-child(4) .pillar-num { background: var(--ill-blush); }
+
+    /* 功能区：色带 + 手绘波浪边，格子换成描边小卡 */
+    .features { position: relative; border: 0; background: var(--ill-sage-soft); }
+    .features::before, .features::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 24px;
+      background: var(--ill-sage-soft);
+      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='24' viewBox='0 0 120 24'%3E%3Cpath d='M0 12Q30 0 60 12T120 12V24H0Z'/%3E%3C/svg%3E") repeat-x bottom / 120px 24px;
+              mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='24' viewBox='0 0 120 24'%3E%3Cpath d='M0 12Q30 0 60 12T120 12V24H0Z'/%3E%3C/svg%3E") repeat-x bottom / 120px 24px;
+      pointer-events: none;
+    }
+    .features::before { top: -23px; }
+    .features::after { bottom: -23px; transform: scaleY(-1); }
+    .features-grid { gap: 2px; background: var(--ink); border: 2px solid var(--ink); box-shadow: 6px 6px 0 var(--ink-shadow); }
+    .feature { background: var(--bg-elevated); }
+    .feature:hover { background: var(--ill-butter-soft); }
+    .feature-icon { color: var(--ill-line); border: 2px solid var(--ill-line); width: 36px; height: 36px; }
+    .feature:nth-child(4n+1) .feature-icon { background: var(--ill-butter); }
+    .feature:nth-child(4n+2) .feature-icon { background: var(--ill-sage); }
+    .feature:nth-child(4n+3) .feature-icon { background: var(--ill-sky); }
+    .feature:nth-child(4n)   .feature-icon { background: var(--ill-blush); }
+
+    /* 格式条：贴纸感的小标签 */
+    .format-chip { border: 2px solid var(--ink); }
+    .format-chip:nth-child(4n+1) { background: var(--ill-butter-soft); }
+    .format-chip:nth-child(4n+2) { background: var(--ill-sage-soft); }
+    .format-chip:nth-child(4n+3) { background: var(--ill-sky-soft); }
+    .format-chip:nth-child(4n)   { background: var(--ill-blush-soft); }
+    .format-chip:hover { border-color: var(--ink); color: var(--text); transform: rotate(-2deg); }
+
+    /* ===== Craft-inspired layer =====
+       悬浮胶囊导航 · 内缩圆角画框 · 撕纸拼贴 · 大色块面板 · 手绘抖动 · 滚动视差 */
+    .f-peri { fill: var(--ill-peri); }
+    .f-mist { fill: var(--ill-mist); }
+    .il-sage-line { stroke: var(--ill-sage); stroke-width: 2.5; }
+
+    section { scroll-margin-top: 96px; }
+
+    /* --- 悬浮胶囊导航 --- */
+    .navbar {
+      top: 14px;
+      height: auto;
+      padding: 0 16px;
+      pointer-events: none;
+      border-bottom: 0;
+      background: none;
+    }
+    .navbar.scrolled { background: none; backdrop-filter: none; -webkit-backdrop-filter: none; border-bottom-color: transparent; }
+    .navbar { color: var(--text); }
+    /* 玻璃胶囊：无描边；面纱半透明 + 仅 4px 模糊，所以滚到哪种底色上就自然带上那种底色。
+       顶部 1px 高光代替描边，柔和投影把它从页面上托起来。 */
+    .navbar-inner {
+      pointer-events: auto;
+      max-width: 980px;
+      height: 56px;
+      padding: 0 9px 0 18px;
+      border-radius: 999px;
+      border: 0;
+      background: linear-gradient(var(--nav-veil-top) 10%, var(--nav-veil-bot));
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      box-shadow: inset 0 1px 0 var(--nav-rim), 0 2px 6px rgba(43, 32, 24, 0.06), 0 12px 30px -12px var(--nav-drop);
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+    }
+    .navbar.scrolled .navbar-inner { box-shadow: inset 0 1px 0 var(--nav-rim), 0 2px 6px rgba(43, 32, 24, 0.08), 0 16px 36px -12px var(--nav-drop); }
+    .nav-links { gap: 4px; }
+    .nav-links a { display: block; padding: 7px 13px; border-radius: 999px; color: var(--text); transition: color 0.15s ease, background 0.15s ease; }
+    .nav-links a:hover { background: var(--bg-hover); }
+    .icon-btn, .lang-trigger { color: var(--text); }
+    .icon-btn, .lang-trigger { border-radius: 999px; }
+    .icon-btn { width: 38px; height: 38px; }
+    .lang-trigger { height: 38px; }
+    .mobile-toggle { border-radius: 999px; width: 38px; height: 38px; }
+    /* 主按钮：黑色胶囊（深色模式下反相为奶油色），hover 才亮琥珀 */
+    .nav-cta {
+      height: 38px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 999px;
+      background: var(--text);
+      color: var(--bg);
+      box-shadow: none;
+    }
+    .nav-cta:hover { background: var(--btn-accent-bg-hover); color: var(--btn-accent-fg); transform: translateY(-1px); }
+    .mobile-menu {
+      top: 82px;
+      left: 14px;
+      right: 14px;
+      padding: 8px 20px 14px;
+      border: 0;
+      border-radius: 24px;
+      box-shadow: inset 0 1px 0 var(--nav-rim), 0 18px 40px -14px var(--nav-drop);
+    }
+
+    /* --- 首屏：内缩圆角画框 --- */
+    .hero {
+      margin: 12px 12px 0;
+      border-radius: 36px;
+      background: var(--hero-sky);
+      isolation: isolate;
+    }
+    .hero-subtitle, .hero-meta { color: var(--hero-dim); }
+    .hero-meta .sep { background: var(--hero-dim); }
+    .hero h1 .serif { color: var(--hero-accent); }
+    .hero-content { pointer-events: none; z-index: 2; }
+    .hero-content > * { pointer-events: auto; }
+
+    /* 撕纸拼贴：挂在 .hero-window 上，上沿比窗口高 170px、下沿对齐 hero 底 ——
+       高度由窗口本身决定，不再依赖写死的像素，窗口多高拼贴就多高。三层各按不同速度视差（--py 由脚本写入 scrollY） */
+    .hero-window .hero-collage {
+      position: absolute;
+      z-index: -1;
+      left: 50%;
+      width: 100vw;
+      top: -170px;
+      bottom: -72px;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+    .hc {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      will-change: transform;
+    }
+    .hc-back  { transform: translateY(calc(var(--py, 0) * 0.10px)); }
+    .hc-mid   { transform: translateY(calc(var(--py, 0) * 0.06px)); }
+    .hc-front { transform: translateY(calc(var(--py, 0) * 0.02px)); }
+    .hero-scene { transform: translate(-50%, calc(var(--py, 0) * 0.14px)); pointer-events: none; }
+
+    /* 漂浮的文件卡片：悬停时"翘一下" */
+    .hero-scene .il-bob {
+      pointer-events: auto;
+      cursor: default;
+      transform-box: fill-box;
+      transform-origin: center;
+      transition: scale 0.3s cubic-bezier(.34, 1.56, .64, 1), rotate 0.3s cubic-bezier(.34, 1.56, .64, 1);
+    }
+    .hero-scene .il-bob:hover { scale: 1.09; rotate: -3deg; }
+
+    /* --- 展示区：大色块面板，里面放产品截图卡片 --- */
+    .split, .split + .split { padding: 24px 0; }
+    .split-inner {
+      position: relative;
+      overflow: hidden;
+      width: calc(100% - 56px);
+      max-width: 1144px;
+      padding: 64px 60px;
+      border: 2px solid var(--ink);
+      border-radius: 32px;
+      gap: 56px;
+    }
+    .tone-sky    .split-inner { background: var(--pn-sky); }
+    .tone-butter .split-inner { background: var(--pn-butter); }
+    .tone-sage   .split-inner { background: var(--pn-sage); }
+    .tone-blush  .split-inner { background: var(--pn-blush); }
+    .tone-peri   .split-inner { background: var(--pn-peri); }
+    .split-inner > * { position: relative; z-index: 1; }
+    .split-text p { color: var(--panel-dim); }
+    .split-text h2 .serif { color: var(--hero-accent); }
+    /* 面板角落的撕纸碎片 */
+    .split-inner::before {
+      content: '';
+      position: absolute;
+      z-index: 0;
+      right: -36px;
+      bottom: -46px;
+      width: 280px;
+      height: 200px;
+      background: var(--ill-paper);
+      opacity: 0.5;
+      transform: rotate(8deg);
+      pointer-events: none;
+      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 280 200'%3E%3Cpath d='M6 40 L38 22 L70 34 L104 10 L142 26 L180 8 L214 30 L250 18 L274 52 L262 92 L276 130 L252 168 L214 158 L176 190 L138 170 L102 192 L66 172 L34 184 L12 150 L24 112 L4 78Z'/%3E%3C/svg%3E") center / contain no-repeat;
+              mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 280 200'%3E%3Cpath d='M6 40 L38 22 L70 34 L104 10 L142 26 L180 8 L214 30 L250 18 L274 52 L262 92 L276 130 L252 168 L214 158 L176 190 L138 170 L102 192 L66 172 L34 184 L12 150 L24 112 L4 78Z'/%3E%3C/svg%3E") center / contain no-repeat;
+    }
+    .split.reverse .split-inner::before { right: auto; left: -36px; transform: rotate(-8deg); }
+
+    /* --- Pro / CTA：同样做成内缩画框，与首屏呼应 --- */
+    .pro { margin: 24px 12px; border: 0; border-radius: 36px; }
+    .cta-section {
+      margin: 24px 12px 12px;
+      border: 0;
+      border-radius: 36px;
+      background: var(--hero-sky);
+    }
+    .cta-section h2 .serif { color: var(--hero-accent); }
+    .cta-section > .container > p,
+    .cta-section .cta-note,
+    .cta-section .eyebrow { color: var(--hero-dim); }
+
+    @media (max-width: 768px) {
+      .navbar { top: 10px; padding: 0 12px; }
+      .navbar-inner { padding: 0 8px 0 14px; height: 52px; }
+      .mobile-menu { top: 72px; left: 12px; right: 12px; }
+      .hero, .pro, .cta-section { margin-left: 8px; margin-right: 8px; border-radius: 28px; }
+      .split-inner { width: calc(100% - 24px); padding: 32px 22px; gap: 28px; border-radius: 26px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hc { transform: none !important; }
+      .hero-scene { transform: translateX(-50%) !important; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation-duration: 0.001ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.001ms !important;
       }
-      .halo { animation: none !important; }
+      .il-bob { animation: none !important; }
       .formats-track { animation: none !important; }
       .pw-cursor { animation: none !important; }
       .reveal { opacity: 1 !important; transform: none !important; }
@@ -2129,6 +2416,35 @@
   </style>
 </head>
 <body class="loading">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <filter id="rough" x="-3%" y="-3%" width="106%" height="106%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="4" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="3.5" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <g id="il-ground">
+        <path d="M0 118 C200 58 420 58 640 108 S1060 150 1240 88 S1400 78 1440 88 V190 H0Z" class="f-hill1 il-line"/>
+        <path d="M0 150 C240 108 480 118 720 150 S1160 176 1440 128 V190 H0Z" class="f-hill2 il-line"/>
+        <path d="M0 180 C300 160 600 186 900 172 S1300 164 1440 176 V190 H0Z" class="f-hill3 il-line"/>
+        <!-- 棒棒糖树 -->
+        <path d="M118 150V108" fill="none" class="il-line" stroke-width="4"/>
+        <circle cx="118" cy="92" r="30" class="f-sage il-line"/>
+        <path d="M108 96q8 -10 16 0" fill="none" class="il-line" stroke-width="2.5"/>
+        <path d="M1318 138V96" fill="none" class="il-line" stroke-width="4"/>
+        <circle cx="1318" cy="78" r="34" class="f-butter il-line"/>
+        <path d="M1246 128V104" fill="none" class="il-line" stroke-width="4"/>
+        <circle cx="1246" cy="92" r="20" class="f-tomato il-line"/>
+        <!-- 草丛与小花 -->
+        <path d="M300 152q-1 -10 -9 -17M300 152q-2 -12 1 -22M300 152q3 -9 11 -14" fill="none" class="il-line"/>
+        <path d="M560 156q-1 -10 -9 -17M560 156q-2 -12 1 -22M560 156q3 -9 11 -14" fill="none" class="il-line"/>
+        <path d="M980 160q-1 -10 -9 -17M980 160q-2 -12 1 -22M980 160q3 -9 11 -14" fill="none" class="il-line"/>
+        <path d="M410 168V148M850 164V144M1130 170V150" fill="none" class="il-line"/>
+        <circle cx="410" cy="144" r="8" class="f-blush il-line" stroke-width="2.5"/>
+        <circle cx="850" cy="140" r="8" class="f-butter il-line" stroke-width="2.5"/>
+        <circle cx="1130" cy="146" r="8" class="f-blush il-line" stroke-width="2.5"/>
+      </g>
+    </defs>
+  </svg>
   <!-- Navigation -->
   <nav class="navbar" role="navigation">
     <div class="navbar-inner">
@@ -2188,9 +2504,84 @@
   <!-- Hero -->
   <section class="hero">
     <div class="hero-bg" aria-hidden="true">
-      <div class="halo halo-primary"></div>
-      <div class="halo halo-secondary"></div>
-      <div class="halo halo-tertiary"></div>
+
+      <svg class="hero-scene" viewBox="0 0 1440 820" focusable="false">
+        <!-- 云 -->
+        <g class="il-bob d1"><g transform="translate(150 118)">
+          <path d="M0 40 a22 22 0 0 1 8 -42 a30 30 0 0 1 56 -8 a24 24 0 0 1 44 20 a20 20 0 0 1 -6 30Z" class="f-paper il-line"/>
+        </g></g>
+        <!-- 文档 -->
+        <g transform="translate(110 236)"><g class="il-bob"><g filter="url(#rough)" transform="rotate(-8 64 82)">
+          <rect x="7" y="8" width="128" height="164" rx="12" class="il-shadow"/>
+          <rect width="128" height="164" rx="12" class="f-paper il-line"/>
+          <rect x="14" y="16" width="54" height="12" rx="6" class="f-tomato il-line" stroke-width="2"/>
+          <path d="M14 54h100M14 72h100M14 90h72M14 108h100M14 126h58" fill="none" class="il-line"/>
+        </g></g></g>
+        <!-- 表格 -->
+        <g transform="translate(196 462)"><g class="il-bob d2"><g filter="url(#rough)" transform="rotate(6 75 56)">
+          <rect x="7" y="8" width="150" height="112" rx="12" class="il-shadow"/>
+          <rect width="150" height="112" rx="12" class="f-sage il-line"/>
+          <path d="M0 28H150M0 56H150M0 84H150M50 0V112M100 0V112" fill="none" class="il-line" stroke-width="2"/>
+          <rect x="54" y="60" width="42" height="20" class="f-butter il-line" stroke-width="2"/>
+        </g></g></g>
+        <!-- 图片 -->
+        <g transform="translate(78 560)"><g class="il-bob d3"><g filter="url(#rough)" transform="rotate(-5 70 54)">
+          <rect x="7" y="8" width="140" height="108" rx="12" class="il-shadow"/>
+          <rect width="140" height="108" rx="12" class="f-sky il-line"/>
+          <circle cx="104" cy="34" r="14" class="f-sun il-line"/>
+          <path d="M3 100 L46 50 L80 84 L104 64 L137 100 Q140 108 128 108 H12 Q0 108 3 100Z" class="f-sage il-line"/>
+        </g></g></g>
+        <!-- 音符 -->
+        <g class="il-bob d1"><g transform="translate(318 352)">
+          <circle r="32" class="f-butter il-line"/>
+          <path d="M-6 12V-14L12 -18V8" fill="none" class="il-line" stroke-width="3.5"/>
+          <circle cx="-10" cy="13" r="6" class="f-ink"/><circle cx="8" cy="9" r="6" class="f-ink"/>
+        </g></g>
+
+        <!-- 太阳 -->
+        <g transform="translate(1160 158)"><g class="il-bob d2">
+          <path d="M0 -78V-62M0 62V78M-78 0H-62M62 0H78M-55 -55l11 11M44 44l11 11M55 -55l-11 11M-44 44l-11 11" fill="none" class="il-line il-deco"/>
+          <circle r="46" class="f-sun il-line"/>
+          <path d="M-18 -4q6 -8 12 0M10 -4q6 -8 12 0M-12 14q12 10 24 0" fill="none" class="il-line" stroke-width="2.5"/>
+        </g></g>
+        <!-- PDF -->
+        <g transform="translate(1236 262)"><g class="il-bob"><g filter="url(#rough)" transform="rotate(7 60 78)">
+          <rect x="7" y="8" width="120" height="156" rx="12" class="il-shadow"/>
+          <rect width="120" height="156" rx="12" class="f-tomato il-line"/>
+          <text x="60" y="76" text-anchor="middle" font-family="Inter, sans-serif" font-weight="700" font-size="34" class="f-paper" letter-spacing="-1">PDF</text>
+          <path d="M18 104h84M18 122h84M18 140h52" fill="none" class="il-line" stroke-width="3"/>
+        </g></g></g>
+        <!-- 幻灯片 -->
+        <g transform="translate(1100 468)"><g class="il-bob d3"><g filter="url(#rough)" transform="rotate(-6 85 59)">
+          <rect x="7" y="8" width="170" height="118" rx="12" class="il-shadow"/>
+          <rect width="170" height="118" rx="12" class="f-butter il-line"/>
+          <rect x="20" y="62" width="26" height="40" class="f-tomato il-line" stroke-width="2"/>
+          <rect x="58" y="42" width="26" height="60" class="f-sage il-line" stroke-width="2"/>
+          <rect x="96" y="54" width="26" height="48" class="f-sky il-line" stroke-width="2"/>
+          <path d="M20 26h60" fill="none" class="il-line" stroke-width="4"/>
+        </g></g></g>
+        <!-- 视频 -->
+        <g transform="translate(1186 604)"><g class="il-bob d1"><g filter="url(#rough)" transform="rotate(5 76 52)">
+          <rect x="7" y="8" width="152" height="104" rx="12" class="il-shadow"/>
+          <rect width="152" height="104" rx="12" class="f-sky il-line"/>
+          <circle cx="76" cy="52" r="26" class="f-paper il-line"/>
+          <path d="M69 40L90 52L69 64Z" class="f-tomato il-line" stroke-width="2.5"/>
+        </g></g></g>
+        <!-- 云（右） -->
+        <g class="il-bob d2"><g transform="translate(1290 196) scale(0.7)">
+          <path d="M0 40 a22 22 0 0 1 8 -42 a30 30 0 0 1 56 -8 a24 24 0 0 1 44 20 a20 20 0 0 1 -6 30Z" class="f-paper il-line"/>
+        </g></g>
+
+        <!-- 点缀：星芒、圆点、波浪线 -->
+        <path transform="translate(66 190) scale(1.1)" d="M0 -14 Q0 0 14 0 Q0 0 0 14 Q0 0 -14 0 Q0 0 0 -14Z" class="f-sun il-line" stroke-width="2"/><path transform="translate(330 230) scale(0.8)" d="M0 -14 Q0 0 14 0 Q0 0 0 14 Q0 0 -14 0 Q0 0 0 -14Z" class="f-blush il-line" stroke-width="2"/><path transform="translate(70 470) scale(0.9)" d="M0 -14 Q0 0 14 0 Q0 0 0 14 Q0 0 -14 0 Q0 0 0 -14Z" class="f-sun il-line" stroke-width="2"/><path transform="translate(384 560) scale(1)" d="M0 -14 Q0 0 14 0 Q0 0 0 14 Q0 0 -14 0 Q0 0 0 -14Z" class="f-sun il-line" stroke-width="2"/>
+        <path transform="translate(1060 300) scale(1)" d="M0 -14 Q0 0 14 0 Q0 0 0 14 Q0 0 -14 0 Q0 0 0 -14Z" class="f-sun il-line" stroke-width="2"/><path transform="translate(1360 470) scale(0.9)" d="M0 -14 Q0 0 14 0 Q0 0 0 14 Q0 0 -14 0 Q0 0 0 -14Z" class="f-blush il-line" stroke-width="2"/><path transform="translate(1090 640) scale(0.8)" d="M0 -14 Q0 0 14 0 Q0 0 0 14 Q0 0 -14 0 Q0 0 0 -14Z" class="f-sun il-line" stroke-width="2"/>
+        <circle cx="300" cy="150" r="7" class="f-tomato il-line" stroke-width="2"/>
+        <circle cx="1100" cy="210" r="6" class="f-sage il-line" stroke-width="2"/>
+        <circle cx="400" cy="480" r="6" class="f-sky il-line" stroke-width="2"/>
+        <circle cx="1366" cy="560" r="7" class="f-butter il-line" stroke-width="2"/>
+        <path d="M44 330q10 -12 20 0t20 0t20 0" fill="none" class="il-line il-deco" stroke-width="3"/>
+        <path d="M1316 540q10 -12 20 0t20 0t20 0" fill="none" class="il-line il-deco" stroke-width="3"/>
+      </svg>
     </div>
     <div class="container">
       <div class="hero-content" id="heroContent">
@@ -2249,6 +2640,25 @@
     </div>
 
     <div class="hero-window reveal">
+      <div class="hero-collage" aria-hidden="true">
+        <svg class="hc hc-back" viewBox="0 0 1440 1000" preserveAspectRatio="xMidYMax slice" focusable="false">
+          <g filter="url(#rough)">
+            <path d="M-21 1000 L-19 974 L-13 948 L-21 922 L-20 896 L-19 870 L-25 844 L-20 818 L-18 792 L-15 766 L-26 740 L-23 714 L-27 688 L-15 662 L-17 636 L-27 610 L-12 584 L-13 558 L-18 532 L-18 506 L-25 480 L-28 454 L-20 428 L-27 402 L-23 372 L-3 356 L15 336 L40 324 L59 307 L84 294 L100 273 L121 258 L144 237 L170 220 L192 198 L214 176 L243 167 L273 155 L302 141 L327 126 L347 144 L364 166 L378 188 L396 208 L401 236 L421 255 L430 283 L450 303 L457 332 L472 355 L498 372 L510 398 L515 428 L538 444 L548 470 L573 485 L594 502 L604 528 L619 550 L643 565 L665 583 L682 606 L695 633 L717 651 L744 664 L763 685 L784 700 L805 717 L817 743 L843 753 L859 774 L881 790 L905 808 L896 835 L906 863 L898 890 L906 918 L901 945 L905 973 L900 1000Z" class="f-peri il-line"/>
+            <path d="M696 999 L715 976 L720 949 L719 921 L736 898 L733 869 L743 844 L758 820 L762 793 L761 764 L783 742 L778 713 L787 686 L810 666 L821 638 L837 614 L851 588 L868 564 L891 544 L894 516 L907 490 L911 462 L919 436 L935 411 L935 382 L944 355 L956 330 L955 298 L965 270 L986 246 L995 218 L996 187 L1006 157 L1029 138 L1048 116 L1054 85 L1080 68 L1085 44 L1109 65 L1131 87 L1155 108 L1177 133 L1175 163 L1198 182 L1203 209 L1221 230 L1234 260 L1254 233 L1274 206 L1303 180 L1318 205 L1345 215 L1363 235 L1381 257 L1404 236 L1421 209 L1437 182 L1453 160 L1465 186 L1468 212 L1464 239 L1461 265 L1467 291 L1465 318 L1462 344 L1459 370 L1466 396 L1462 422 L1454 449 L1452 475 L1457 501 L1457 528 L1459 554 L1466 580 L1467 606 L1468 632 L1453 659 L1457 685 L1453 711 L1468 738 L1458 764 L1460 790 L1456 816 L1463 842 L1452 869 L1467 895 L1459 921 L1456 948 L1454 974 L1460 1000Z" class="f-mist il-line"/>
+          </g>
+        </svg>
+        <svg class="hc hc-mid" viewBox="0 0 1440 1000" preserveAspectRatio="xMidYMax slice" focusable="false">
+          <g filter="url(#rough)"><path d="M-20 1000 L-20 422 L24 372 L24 422 L44 407 L88 358 L88 407 L108 392 L152 343 L152 392 L172 378 L216 328 L216 378 L236 362 L280 313 L280 362 L300 348 L344 298 L344 348 L364 333 L408 284 L408 333 L428 318 L472 269 L472 318 L492 304 L536 254 L536 304 L556 289 L600 240 L600 289 L620 274 L664 225 L664 274 L684 260 L728 210 L728 260 L748 244 L792 195 L792 244 L812 230 L856 180 L856 230 L876 215 L920 166 L920 215 L940 200 L984 151 L984 200 L1004 186 L1048 136 L1048 186 L1070 1000Z" class="f-paper il-line"/></g>
+        </svg>
+        <svg class="hc hc-front" viewBox="0 0 1440 1000" preserveAspectRatio="xMidYMax slice" focusable="false">
+          <defs><clipPath id="ruledClip"><path d="M1106 1000 L1112 974 L1120 949 L1124 923 L1127 897 L1124 871 L1129 845 L1129 819 L1130 793 L1138 767 L1145 742 L1148 716 L1149 690 L1154 667 L1164 639 L1179 614 L1198 592 L1212 567 L1228 541 L1254 525 L1281 509 L1305 490 L1329 470 L1357 466 L1384 458 L1408 443 L1432 429 L1466 424 L1456 450 L1466 476 L1457 503 L1459 529 L1462 555 L1457 581 L1466 607 L1464 633 L1461 660 L1466 686 L1456 712 L1463 738 L1464 764 L1465 791 L1458 817 L1461 843 L1458 869 L1458 895 L1456 921 L1454 948 L1458 974 L1460 1000Z"/></clipPath></defs>
+          <g filter="url(#rough)">
+            <path d="M1062 474 L1078 457 L1095 442 L1113 427 L1126 407 L1145 393 L1161 380 L1186 370 L1210 357 L1236 352 L1259 343 L1284 348 L1308 356 L1332 360 L1356 370 L1381 377 L1398 360 L1421 353 L1443 344 L1456 328 L1458 352 L1461 376 L1458 400 L1459 424 L1461 448 L1458 469 L1442 490 L1418 500 L1403 521 L1380 531 L1356 527 L1331 525 L1308 516 L1284 513 L1260 507 L1234 513 L1211 528 L1187 540 L1161 546 L1139 552 L1121 566 L1101 576 L1078 579 L1062 592 L1059 568 L1064 544 L1058 520 L1062 496 L1060 472Z" class="f-ink"/>
+            <path d="M1106 1000 L1112 974 L1120 949 L1124 923 L1127 897 L1124 871 L1129 845 L1129 819 L1130 793 L1138 767 L1145 742 L1148 716 L1149 690 L1154 667 L1164 639 L1179 614 L1198 592 L1212 567 L1228 541 L1254 525 L1281 509 L1305 490 L1329 470 L1357 466 L1384 458 L1408 443 L1432 429 L1466 424 L1456 450 L1466 476 L1457 503 L1459 529 L1462 555 L1457 581 L1466 607 L1464 633 L1461 660 L1466 686 L1456 712 L1463 738 L1464 764 L1465 791 L1458 817 L1461 843 L1458 869 L1458 895 L1456 921 L1454 948 L1458 974 L1460 1000Z" class="f-butter il-line"/>
+            <g clip-path="url(#ruledClip)" fill="none" class="il-sage-line"><path d="M1090 438H1470"/><path d="M1090 464H1470"/><path d="M1090 490H1470"/><path d="M1090 516H1470"/><path d="M1090 542H1470"/><path d="M1090 568H1470"/><path d="M1090 594H1470"/><path d="M1090 620H1470"/><path d="M1090 646H1470"/><path d="M1090 672H1470"/><path d="M1090 698H1470"/><path d="M1090 724H1470"/><path d="M1090 750H1470"/><path d="M1090 776H1470"/><path d="M1090 802H1470"/><path d="M1090 828H1470"/><path d="M1090 854H1470"/><path d="M1090 880H1470"/><path d="M1090 906H1470"/><path d="M1090 932H1470"/><path d="M1090 958H1470"/><path d="M1090 984H1470"/></g>
+          </g>
+        </svg>
+      </div>
       <div class="hero-window-inner">
         <img src="assets/welcome/folio-welcome.png" alt="Folio welcome window" loading="lazy">
       </div>
@@ -2360,7 +2770,7 @@
     </section>
 
     <!-- Split 1: Code Reading -->
-    <section class="split reveal">
+    <section class="split tone-sky reveal">
       <div class="split-inner">
         <div class="split-text">
           <span class="eyebrow">code reading</span>
@@ -2379,7 +2789,7 @@
     </section>
 
     <!-- Split 2: Image Viewer -->
-    <section class="split reverse reveal">
+    <section class="split tone-butter reverse reveal">
       <div class="split-inner">
         <div class="split-image">
           <img src="assets/landings/03-image-viewer.png" alt="Folio image viewer" loading="lazy">
@@ -2398,7 +2808,7 @@
     </section>
 
     <!-- Split 3: Markdown -->
-    <section class="split reveal">
+    <section class="split tone-sage reveal">
       <div class="split-inner">
         <div class="split-text">
           <span class="eyebrow">markdown</span>
@@ -2417,7 +2827,7 @@
     </section>
 
     <!-- Split 4: Office & PDF -->
-    <section class="split reverse reveal">
+    <section class="split tone-blush reverse reveal">
       <div class="split-inner">
         <div class="split-image">
           <img src="assets/landings/05-office-pdf.png" alt="Folio Office docs and PDF" loading="lazy">
@@ -2436,7 +2846,7 @@
     </section>
 
     <!-- Split 5: Video -->
-    <section class="split reveal">
+    <section class="split tone-peri reveal">
       <div class="split-inner">
         <div class="split-text">
           <span class="eyebrow">video player</span>
@@ -2468,7 +2878,7 @@
     </section>
 
     <!-- Themes -->
-    <section class="split reverse reveal" id="themes" style="padding-top:96px;">
+    <section class="split tone-sage reverse reveal" id="themes" style="padding-top:96px;">
       <div class="split-inner">
         <div class="split-image">
           <img src="assets/landings/07-themes.png" alt="Folio themes" loading="lazy">
@@ -2546,7 +2956,20 @@
 
     <!-- Folio Pro -->
     <section class="pro pro-zone" id="pro">
-      <div class="container">
+    <svg class="pro-sky" viewBox="0 0 1440 320" aria-hidden="true" focusable="false">
+      <g transform="translate(1196 112)"><g class="il-bob d2">
+        <circle r="46" class="f-butter il-line"/>
+        <circle cx="-14" cy="-12" r="9" class="f-sun il-line" stroke-width="2"/>
+        <circle cx="16" cy="8" r="12" class="f-sun il-line" stroke-width="2"/>
+        <circle cx="-6" cy="24" r="6" class="f-sun il-line" stroke-width="2"/>
+      </g></g>
+      <path transform="translate(1090 70) scale(1)" d="M0 -14 Q0 0 14 0 Q0 0 0 14 Q0 0 -14 0 Q0 0 0 -14Z" class="f-butter il-line" stroke-width="2"/><path transform="translate(1330 210) scale(0.8)" d="M0 -14 Q0 0 14 0 Q0 0 0 14 Q0 0 -14 0 Q0 0 0 -14Z" class="f-butter il-line" stroke-width="2"/><path transform="translate(1380 60) scale(0.7)" d="M0 -14 Q0 0 14 0 Q0 0 0 14 Q0 0 -14 0 Q0 0 0 -14Z" class="f-butter il-line" stroke-width="2"/>
+      <path transform="translate(250 90) scale(1)" d="M0 -14 Q0 0 14 0 Q0 0 0 14 Q0 0 -14 0 Q0 0 0 -14Z" class="f-butter il-line" stroke-width="2"/><path transform="translate(130 200) scale(0.7)" d="M0 -14 Q0 0 14 0 Q0 0 0 14 Q0 0 -14 0 Q0 0 0 -14Z" class="f-butter il-line" stroke-width="2"/><path transform="translate(360 200) scale(0.6)" d="M0 -14 Q0 0 14 0 Q0 0 0 14 Q0 0 -14 0 Q0 0 0 -14Z" class="f-butter il-line" stroke-width="2"/>
+      <circle cx="190" cy="40" r="5" class="f-butter il-line" stroke-width="2"/>
+      <circle cx="1010" cy="170" r="5" class="f-butter il-line" stroke-width="2"/>
+      <circle cx="60" cy="110" r="4" class="f-butter il-line" stroke-width="2"/>
+    </svg>
+          <div class="container">
         <div class="section-head reveal">
           <span class="pro-badge"><b>PRO</b><span data-i18n="pro.badge">Folio 的全部，再多一点</span></span>
           <h2><span data-i18n="pro.h2.line1">看见每个文件，</span><span class="serif" data-i18n="pro.h2.serif">然后直接动手。</span></h2>
@@ -2818,6 +3241,7 @@
 
     <!-- Final CTA -->
     <section class="cta-section" id="download">
+      <svg class="cta-ground" viewBox="0 0 1440 190" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false"><use href="#il-ground"/></svg>
       <div class="container">
         <span class="eyebrow reveal" style="margin-bottom:20px;" data-i18n="cta.eyebrow">准备好了吗？</span>
         <h2 class="reveal">One app.<span class="serif">See every file.</span></h2>
@@ -3429,9 +3853,30 @@
 
     // ===== Navbar scrolled =====
     const navbar = document.querySelector('.navbar');
+    // 首屏撕纸/卡片视差：只写一个 CSS 变量，位移全由 CSS 的 calc 决定；rAF 合并，尊重 reduced-motion
+    const heroEl = document.querySelector('.hero');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let parallaxQueued = false;
+    function updateParallax() {
+      parallaxQueued = false;
+      heroEl.style.setProperty('--py', Math.min(window.scrollY, 2400));
+    }
+    // 导航正压在深色的 Pro 画框上时，切到深色 token（CSS 里 .navbar.on-dark 复用 .pro-zone 那一套）
+    const proZoneEl = document.getElementById('pro');
+    function syncNavTone() {
+      const r = proZoneEl.getBoundingClientRect();
+      const navMid = navbar.getBoundingClientRect().top + 28;
+      navbar.classList.toggle('on-dark', r.top < navMid && r.bottom > navMid);
+    }
+    syncNavTone();
     window.addEventListener('scroll', () => {
+      syncNavTone();
       if (window.scrollY > 12) navbar.classList.add('scrolled');
       else navbar.classList.remove('scrolled');
+      if (!reduceMotion && !parallaxQueued) {
+        parallaxQueued = true;
+        requestAnimationFrame(updateParallax);
+      }
     }, { passive: true });
 
     // ===== Mobile menu =====
