@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- 标记 JS 可用：仅当本脚本执行（JS 开启）才给 <html> 加 .js，
-       入场/滚动显形动画都挂在 html.js 下 → 无 JS / 慢载时内容默认可见，不再首屏以下整片空白。 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <!-- 标记 JS 可用：入场/滚动显形动画都挂在 html.js 下 → 无 JS / 慢载时内容默认可见 -->
   <script>document.documentElement.classList.add('js');</script>
   <title>Folio — One app. See every file.</title>
   <meta name="description" content="Folio turns your Mac into one quiet, focused workspace. Documents, spreadsheets, slides, PDFs, notes, images, audio and video — all in a single window.">
@@ -12,2252 +11,325 @@
   <meta property="og:description" content="The universal viewer for Mac. One window for every file.">
   <meta property="og:type" content="website">
   <meta property="og:image" content="assets/landings/01-hero.png">
-  <meta name="theme-color" content="#FBF6EE" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#0B0907" media="(prefers-color-scheme: dark)">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0B0907">
+  <meta name="color-scheme" content="dark">
   <link rel="icon" type="image/png" href="assets/app-icon.png">
   <link rel="apple-touch-icon" href="assets/app-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    /* ===== Reset ===== */
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    /* ===== Design Tokens — Light (default, matches Folio landings) ===== */
-    :root {
-      --bg: #FBF6EE;
-      --bg-elevated: #FFFAF1;
-      --bg-subtle: rgba(110, 75, 30, 0.045);
-      --bg-hover: rgba(110, 75, 30, 0.075);
-      --bg-cream: #F6E8D4;
-      --bg-cream-soft: #FCEFDB;
-      --border: rgba(110, 75, 30, 0.12);
-      --border-strong: rgba(110, 75, 30, 0.20);
-      --text: #1E1A14;
-      --text-dim: #6E614E;
-      --text-mute: #978872;
-      --accent: #EE7F1F;
-      --accent-strong: #D26A0D;
-      --accent-soft: rgba(238, 127, 31, 0.10);
-      --accent-glow: rgba(238, 127, 31, 0.20);
-      /* 琥珀「文字色」：浅底上 5.8:1（品牌琥珀作文字仅 ~2.7:1），用于链接 hover */
-      --link: #9A4A06;
-      /* 主 CTA 按钮（白字）— 浅色用更深的琥珀，白字达 WCAG AA 大字 3.62:1（品牌琥珀 #EE7F1F 仅 2.73:1） */
-      --btn-accent-bg: var(--accent-strong);
-      --btn-accent-bg-hover: #B85C09;
-      --btn-accent-fg: #FFFFFF;
-      --nav-bg: rgba(251, 246, 238, 0.78);
-      --halo-1: rgba(238, 127, 31, 0.30);
-      --halo-2: rgba(255, 195, 130, 0.26);
-      --halo-3: rgba(255, 230, 195, 0.20);
-      --grid-line: rgba(110, 75, 30, 0.05);
-      --shadow-card: 0 1px 2px rgba(60, 40, 20, 0.04), 0 0 0 1px var(--border);
-      --shadow-window: 0 24px 60px rgba(60, 40, 20, 0.14), 0 8px 24px rgba(60, 40, 20, 0.07);
-      --shadow-pop: 0 14px 36px -10px rgba(60, 40, 20, 0.22), 0 0 0 1px var(--border);
-      --pro-col: rgba(238, 127, 31, 0.05);
-      --theme-icon-sun: none;
-      --theme-icon-moon: block;
-    }
-
-    /* ===== Dark mode overrides =====
-       .pro-zone 复用同一套暗色 token：Folio Pro 的区块在浅色页面里也是深色「工作间」，
-       颜色只在这里定义一次，不另写一份。 */
-    html.dark,
-    .pro-zone {
-      --bg: #0B0907;
-      --bg-elevated: #131110;
-      --bg-subtle: rgba(255, 230, 200, 0.04);
-      --bg-hover: rgba(255, 230, 200, 0.07);
-      --bg-cream: #1A1611;
-      --bg-cream-soft: #15120F;
-      --border: rgba(255, 222, 195, 0.10);
-      --border-strong: rgba(255, 222, 195, 0.17);
-      --text: #FAF6F0;
-      --text-dim: #A29586;
-      --text-mute: #6C6357;
-      --accent: #FF9A4A;
-      --accent-strong: #FFAD68;
-      --accent-soft: rgba(255, 154, 74, 0.14);
-      --accent-glow: rgba(255, 154, 74, 0.30);
-      --link: #FFAD68;
-      /* 暗色：亮琥珀做底（白字仅 2.11:1），改用深字 → ≈9:1。hover 再提亮一档更跳。 */
-      --btn-accent-bg: var(--accent);
-      --btn-accent-bg-hover: var(--accent-strong);
-      --btn-accent-fg: #1A1611;
-      --nav-bg: rgba(11, 9, 7, 0.72);
-      --halo-1: rgba(255, 154, 74, 0.36);
-      --halo-2: rgba(255, 196, 130, 0.18);
-      --halo-3: rgba(255, 220, 160, 0.14);
-      --grid-line: rgba(255, 222, 195, 0.05);
-      --shadow-card: 0 1px 0 rgba(255,255,255,0.04) inset, 0 0 0 1px var(--border);
-      --shadow-window: 0 24px 60px rgba(0, 0, 0, 0.45), 0 8px 24px rgba(0, 0, 0, 0.25);
-      --shadow-pop: 0 14px 36px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--border);
-      --pro-col: rgba(255, 154, 74, 0.06);
-      --theme-icon-sun: block;
-      --theme-icon-moon: none;
-    }
-
-    /* 自定义属性会继承，但 color/background 是父级算好的值，需要在区块上重新取一次 */
-    .pro-zone {
-      color: var(--text);
-      background: var(--bg);
-    }
-
-    html {
-      scroll-behavior: smooth;
-      font-size: 16px;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      text-rendering: optimizeLegibility;
-    }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.5;
-      letter-spacing: -0.011em;
-      transition: background 0.3s ease, color 0.3s ease;
-      overflow-x: hidden;
-      font-feature-settings: "ss01", "cv11";
-    }
-
-    body.loading * {
-      transition: none !important;
-      animation: none !important;
-    }
-
-    /* ===== Typography ===== */
-    h1, h2, h3, h4 {
-      color: var(--text);
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      line-height: 1.1;
-    }
-
-    h1 { font-weight: 700; letter-spacing: -0.04em; }
-
-    .serif {
-      font-family: 'Instrument Serif', 'Iowan Old Style', 'Georgia', serif;
-      font-style: italic;
-      font-weight: 400;
-      letter-spacing: -0.01em;
-    }
-
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: 0.02em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-    }
-
-    .eyebrow::before {
-      content: '';
-      width: 12px;
-      height: 1px;
-      background: var(--text-mute);
-    }
-
-    .accent { color: var(--accent); }
-    .mute { color: var(--text-dim); }
-
-    a { color: inherit; text-decoration: none; }
-
-    /* ===== Layout ===== */
-    .container {
-      max-width: 1080px;
-      margin: 0 auto;
-      padding: 0 28px;
-    }
-
-    .container-wide {
-      max-width: 1240px;
-      margin: 0 auto;
-      padding: 0 28px;
-    }
-
-    section {
-      padding: 96px 0;
-      scroll-margin-top: 72px;
-      position: relative;
-    }
-
-    .section-head {
-      max-width: 680px;
-      margin: 0 auto 56px;
-      text-align: center;
-    }
-
-    .section-head .eyebrow { margin-bottom: 18px; }
-
-    .section-head h2 {
-      font-size: clamp(34px, 4.6vw, 52px);
-      margin-bottom: 16px;
-    }
-
-    .section-head p {
-      font-size: 17px;
-      color: var(--text-dim);
-      line-height: 1.55;
-    }
-
-    /* ===== Navigation ===== */
-    .navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: transparent;
-      border-bottom: 1px solid transparent;
-      transition: background 0.25s ease, border-color 0.25s ease, backdrop-filter 0.25s ease;
-    }
-
-    .navbar.scrolled {
-      background: var(--nav-bg);
-      backdrop-filter: saturate(180%) blur(20px);
-      -webkit-backdrop-filter: saturate(180%) blur(20px);
-      border-bottom-color: var(--border);
-    }
-
-    .navbar-inner {
-      width: 100%;
-      max-width: 1240px;
-      padding: 0 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 600;
-      font-size: 16px;
-      letter-spacing: -0.015em;
-    }
-
-    .brand img {
-      width: 26px;
-      height: 26px;
-      border-radius: 7px;
-    }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 28px;
-      list-style: none;
-    }
-
-    .nav-links a {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text-dim);
-      transition: color 0.15s ease;
-    }
-
-    .nav-links a:hover { color: var(--text); }
-
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .icon-btn {
-      width: 34px;
-      height: 34px;
-      border: 1px solid transparent;
-      border-radius: 8px;
-      background: transparent;
-      color: var(--text-dim);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-    }
-
-    .icon-btn:hover {
-      background: var(--bg-hover);
-      color: var(--text);
-      border-color: var(--border);
-    }
-
-    .icon-btn svg {
-      width: 16px;
-      height: 16px;
-      fill: currentColor;
-    }
-
-    .icon-sun { display: var(--theme-icon-sun); }
-    .icon-moon { display: var(--theme-icon-moon); }
-
-    /* ===== Language switcher ===== */
-    .lang-switch {
-      position: relative;
-    }
-
-    .lang-trigger {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      height: 34px;
-      padding: 0 12px;
-      border-radius: 8px;
-      border: 1px solid transparent;
-      background: transparent;
-      color: var(--text-dim);
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 13px;
-      font-weight: 500;
-      letter-spacing: -0.005em;
-      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-    }
-
-    .lang-trigger:hover {
-      background: var(--bg-hover);
-      color: var(--text);
-      border-color: var(--border);
-    }
-
-    .lang-trigger svg {
-      width: 14px;
-      height: 14px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 1.8;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .lang-trigger .caret {
-      width: 10px;
-      height: 10px;
-      stroke-width: 2.2;
-      opacity: 0.7;
-      transition: transform 0.2s ease;
-    }
-
-    .lang-switch.open .caret { transform: rotate(180deg); }
-
-    .lang-menu {
-      position: absolute;
-      top: calc(100% + 6px);
-      right: 0;
-      min-width: 160px;
-      background: var(--bg-elevated);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 6px;
-      box-shadow: var(--shadow-pop);
-      opacity: 0;
-      transform: translateY(-4px);
-      pointer-events: none;
-      transition: opacity 0.18s ease, transform 0.18s ease;
-      z-index: 110;
-    }
-
-    .lang-switch.open .lang-menu {
-      opacity: 1;
-      transform: translateY(0);
-      pointer-events: auto;
-    }
-
-    .lang-menu button {
-      display: flex;
-      width: 100%;
-      align-items: center;
-      gap: 10px;
-      padding: 9px 12px;
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 13.5px;
-      font-weight: 500;
-      color: var(--text);
-      text-align: left;
-      border-radius: 6px;
-      transition: background 0.15s ease;
-    }
-
-    .lang-menu button:hover { background: var(--bg-hover); }
-
-    .lang-menu button[aria-current="true"] {
-      color: var(--accent);
-      background: var(--accent-soft);
-    }
-
-    .lang-menu button .check {
-      width: 14px;
-      height: 14px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2.2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      opacity: 0;
-    }
-
-    .lang-menu button[aria-current="true"] .check { opacity: 1; }
-
-    .nav-cta {
-      display: inline-flex;
-      align-items: center;
-      height: 34px;
-      padding: 0 16px;
-      border-radius: 8px;
-      background: var(--btn-accent-bg);
-      color: var(--btn-accent-fg);
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: -0.005em;
-      transition: background 0.2s ease, transform 0.15s ease;
-    }
-
-    .nav-cta:hover { background: var(--btn-accent-bg-hover); }
-
-    .mobile-toggle {
-      display: none;
-      width: 34px;
-      height: 34px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: transparent;
-      cursor: pointer;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-    }
-
-    .mobile-toggle span {
-      width: 16px;
-      height: 1.5px;
-      background: var(--text);
-      border-radius: 2px;
-      transition: transform 0.25s ease, opacity 0.2s ease;
-    }
-
-    .mobile-toggle.open span:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
-    .mobile-toggle.open span:nth-child(2) { opacity: 0; }
-    .mobile-toggle.open span:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
-
-    .mobile-menu {
-      display: none;
-      position: fixed;
-      top: 64px;
-      left: 0;
-      right: 0;
-      z-index: 99;
-      background: var(--nav-bg);
-      backdrop-filter: saturate(180%) blur(20px);
-      -webkit-backdrop-filter: saturate(180%) blur(20px);
-      border-bottom: 1px solid var(--border);
-      padding: 12px 28px 20px;
-    }
-
-    .mobile-menu.open { display: block; }
-
-    .mobile-menu a {
-      display: block;
-      padding: 12px 0;
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--text);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .mobile-menu a:last-child { border-bottom: none; }
-
-    /* ===== Buttons ===== */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      height: 46px;
-      padding: 0 24px;
-      border-radius: 10px;
-      font-size: 14.5px;
-      font-weight: 600;
-      letter-spacing: -0.005em;
-      cursor: pointer;
-      border: 1px solid transparent;
-      transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.15s ease, box-shadow 0.2s ease;
-      white-space: nowrap;
-    }
-
-    .btn:active { transform: translateY(0.5px); }
-
-    .btn-accent {
-      background: var(--btn-accent-bg);
-      color: var(--btn-accent-fg);
-      box-shadow: 0 8px 24px -8px rgba(238, 127, 31, 0.55), 0 2px 4px rgba(238, 127, 31, 0.12);
-    }
-
-    .btn-accent:hover {
-      background: var(--btn-accent-bg-hover);
-      box-shadow: 0 10px 28px -8px rgba(238, 127, 31, 0.7), 0 2px 4px rgba(238, 127, 31, 0.15);
-    }
-
-    .btn-ghost {
-      background: transparent;
-      color: var(--text);
-      border-color: var(--border-strong);
-    }
-
-    .btn-ghost:hover {
-      background: var(--bg-hover);
-      border-color: var(--text-mute);
-    }
-
-    .cta-buttons.cta-choices {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      width: 100%;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    /* 两行式按钮：标题 + 一句话说明，箭头靠右 */
-    .btn-stack {
-      height: auto;
-      min-height: 64px;
-      padding: 12px 20px;
-      justify-content: space-between;
-      gap: 14px;
-      text-align: left;
-      border-radius: 12px;
-    }
-
-    .btn-stack-text {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      min-width: 0;
-    }
-
-    .btn-title {
-      font-size: 15.5px;
-      font-weight: 650;
-      letter-spacing: -0.01em;
-      line-height: 1.2;
-    }
-
-    .btn-sub {
-      font-size: 12.5px;
-      font-weight: 500;
-      line-height: 1.3;
-      opacity: 0.82;
-    }
-
-    .btn svg {
-      width: 15px;
-      height: 15px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    /* ===== Hero ===== */
-    .hero {
-      position: relative;
-      padding: 152px 0 64px;
-      text-align: center;
-      overflow: hidden;
-      background:
-        radial-gradient(ellipse 80% 60% at 50% 0%, var(--bg-cream-soft) 0%, transparent 65%),
-        var(--bg);
-    }
-
-    html.dark .hero {
-      background:
-        radial-gradient(ellipse 80% 60% at 50% 0%, var(--bg-cream) 0%, transparent 65%),
-        var(--bg);
-    }
-
-    .hero-bg {
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      overflow: hidden;
-    }
-
-    .hero-bg::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image: radial-gradient(circle at center, var(--grid-line) 1px, transparent 1px);
-      background-size: 28px 28px;
-      mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 30%, transparent 75%);
-      -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 30%, transparent 75%);
-    }
-
-    .halo {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(90px);
-      will-change: transform;
-    }
-
-    .halo-primary {
-      width: 720px;
-      height: 520px;
-      background: var(--halo-1);
-      top: -180px;
-      left: 50%;
-      transform: translateX(-50%);
-      opacity: 0.95;
-      animation: haloPulse 14s ease-in-out infinite;
-    }
-
-    .halo-secondary {
-      width: 420px;
-      height: 320px;
-      background: var(--halo-2);
-      top: 120px;
-      left: 8%;
-      opacity: 0.8;
-      animation: haloDrift1 18s ease-in-out infinite;
-    }
-
-    .halo-tertiary {
-      width: 460px;
-      height: 340px;
-      background: var(--halo-3);
-      top: 60px;
-      right: 6%;
-      opacity: 0.85;
-      animation: haloDrift2 22s ease-in-out infinite;
-    }
-
-    @keyframes haloPulse {
-      0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.95; }
-      50%      { transform: translateX(-50%) scale(1.08); opacity: 1; }
-    }
-    @keyframes haloDrift1 {
-      0%, 100% { transform: translate(0, 0); }
-      50%      { transform: translate(60px, -40px); }
-    }
-    @keyframes haloDrift2 {
-      0%, 100% { transform: translate(0, 0); }
-      50%      { transform: translate(-70px, 30px); }
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    html.js .hero-content > * {
-      opacity: 0;
-      transform: translateY(12px);
-    }
-
-    html.js .hero-content.loaded > * {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .hero-content.loaded .hero-icon { transition: opacity 0.5s ease 0.05s, transform 0.5s ease 0.05s; }
-    .hero-content.loaded .hero-badge { transition: opacity 0.4s ease 0.15s, transform 0.4s ease 0.15s; }
-    .hero-content.loaded h1 { transition: opacity 0.5s ease 0.25s, transform 0.5s ease 0.25s; }
-    .hero-content.loaded .hero-subtitle { transition: opacity 0.5s ease 0.38s, transform 0.5s ease 0.38s; }
-    .hero-content.loaded .hero-editions { transition: opacity 0.5s ease 0.48s, transform 0.5s ease 0.48s; }
-    .hero-content.loaded .hero-meta { transition: opacity 0.4s ease 0.58s, transform 0.4s ease 0.58s; }
-
-    .hero-icon {
-      width: 72px;
-      height: 72px;
-      border-radius: 18px;
-      box-shadow: 0 16px 40px rgba(238, 127, 31, 0.22), 0 4px 10px rgba(60, 40, 20, 0.10);
-      margin-bottom: 30px;
-    }
-
-    html.dark .hero-icon {
-      box-shadow: 0 16px 48px rgba(255, 154, 74, 0.28), 0 4px 10px rgba(0,0,0,0.3);
-    }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      height: 28px;
-      padding: 0 14px 0 10px;
-      border-radius: 999px;
-      background: var(--accent-soft);
-      border: 1px solid var(--accent-soft);
-      color: var(--accent);
-      font-size: 12.5px;
-      font-weight: 600;
-      letter-spacing: -0.005em;
-      margin-bottom: 28px;
-    }
-
-    .hero-badge .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-glow);
-    }
-
-    .hero h1 {
-      font-size: clamp(46px, 8vw, 96px);
-      line-height: 1.0;
-      margin-bottom: 22px;
-      max-width: 14ch;
-    }
-
-    .hero h1 .serif {
-      color: var(--accent);
-      font-size: 1.05em;
-      display: inline-block;
-    }
-
-    .hero-subtitle {
-      font-size: 19px;
-      color: var(--text-dim);
-      max-width: 580px;
-      line-height: 1.55;
-      margin-bottom: 36px;
-    }
-
-    /* 首屏版本选择：两张等宽卡片放在同一个 grid 里，等高由 stretch 保证，按钮用 margin-top:auto 沉底对齐 */
-    .hero-editions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      width: 100%;
-      max-width: 640px;
-      margin-bottom: 36px;
-      text-align: left;
-    }
-
-    .hero-ed {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-      padding: 22px 22px 22px;
-      border: 1px solid var(--border-strong);
-      border-radius: 18px;
-      background: var(--bg-elevated);
-      box-shadow: var(--shadow-card);
-    }
-
-    .hero-ed-pro {
-      border-color: var(--accent);
-      background:
-        radial-gradient(ellipse 90% 70% at 100% 0%, var(--accent-glow) 0%, transparent 62%),
-        var(--bg-elevated);
-      box-shadow: var(--shadow-window);
-    }
-
-    .hero-ed-head {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      gap: 2px 10px;
-    }
-
-    .hero-ed-name {
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      line-height: 1.2;
-    }
-
-    .hero-ed-channel {
-      font-size: 12.5px;
-      color: var(--text-dim);
-    }
-
-    /* 角标压在卡片上边框，不占标题行，避免窄屏或英文下换行 */
-    .hero-ed-flag {
-      position: absolute;
-      top: 0;
-      right: 20px;
-      transform: translateY(-50%);
-      padding: 2px 10px;
-      border: 1px solid var(--accent);
-      border-radius: 999px;
-      background: var(--bg-elevated);
-      color: var(--link);
-      font-size: 11.5px;
-      font-weight: 650;
-      line-height: 1.5;
-      white-space: nowrap;
-    }
-
-    .hero-ed-list {
-      display: flex;
-      flex-direction: column;
-      gap: 9px;
-      list-style: none;
-      font-size: 14px;
-      line-height: 1.45;
-      color: var(--text);
-    }
-
-    .hero-ed-list li {
-      position: relative;
-      padding-left: 22px;
-    }
-
-    .hero-ed-list li::before {
-      content: '';
-      position: absolute;
-      left: 1px;
-      top: 0.32em;
-      width: 10px;
-      height: 6px;
-      border-left: 2px solid var(--accent);
-      border-bottom: 2px solid var(--accent);
-      transform: rotate(-45deg);
-    }
-
-    .hero-ed-list li.is-off { color: var(--text-dim); }
-
-    .hero-ed-list li.is-off::before {
-      top: 0.62em;
-      left: 0;
-      width: 10px;
-      height: 0;
-      border-left: 0;
-      border-bottom: 2px solid var(--text-mute);
-      transform: none;
-    }
-
-    .hero-ed-btn {
-      margin-top: auto;
-      width: 100%;
-      height: 48px;
-      border-radius: 12px;
-      font-size: 15.5px;
-      font-weight: 650;
-    }
-
-    .hero-ed-pro .hero-ed-btn { box-shadow: 0 8px 24px -8px rgba(238, 127, 31, 0.55), 0 2px 4px rgba(238, 127, 31, 0.12); }
-
-    .hero-meta-free {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      color: var(--text);
-      font-weight: 500;
-    }
-
-    .hero-meta-free::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-    }
-
-    .hero-meta {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
-      font-size: 12px;
-      color: var(--text-dim);   /* 原 --text-mute 对比度不到 AA */
-    }
-
-    .hero-meta .sep {
-      width: 3px;
-      height: 3px;
-      border-radius: 50%;
-      background: var(--text-mute);
-      opacity: 0.6;
-    }
-
-    .hero-meta-link {
-      text-decoration: underline;
-      text-decoration-color: var(--border-strong);
-      text-decoration-thickness: 1px;
-      text-underline-offset: 4px;
-      transition: color 0.15s ease, text-decoration-color 0.15s ease;
-    }
-
-    .hero-meta-link:hover { color: var(--text); text-decoration-color: var(--accent); }
-
-    /* ===== Hero Window ===== */
-    .hero-window {
-      max-width: 1100px;
-      margin: 56px auto 0;
-      padding: 0 28px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .hero-window-inner {
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: var(--shadow-window);
-      border: 1px solid var(--border);
-      background: var(--bg-elevated);
-      position: relative;
-    }
-
-    .hero-window-inner img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-
-    /* ===== Showcase banner ===== */
-    .showcase-banner {
-      padding: 32px 0 96px;
-    }
-
-    .banner-card {
-      max-width: 1160px;
-      margin: 0 auto;
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: var(--shadow-window);
-      border: 1px solid var(--border);
-      position: relative;
-    }
-
-    .banner-card img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-
-    /* ===== Split section ===== */
-    .split {
-      padding: 96px 0;
-    }
-
-    .split + .split { padding-top: 32px; }
-
-    .split-inner {
-      display: grid;
-      grid-template-columns: minmax(260px, 1fr) minmax(420px, 1.45fr);
-      gap: 64px;
-      align-items: center;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 28px;
-    }
-
-    .split.reverse .split-inner {
-      grid-template-columns: minmax(420px, 1.45fr) minmax(260px, 1fr);
-    }
-
-    .split.reverse .split-text { order: 2; }
-
-    .split-text { max-width: 460px; }
-
-    .split-text .eyebrow { margin-bottom: 16px; }
-
-    .split-text h2 {
-      font-size: clamp(32px, 4vw, 46px);
-      line-height: 1.05;
-      margin-bottom: 18px;
-      letter-spacing: -0.025em;
-    }
-
-    .split-text h2 .serif {
-      display: block;
-      color: var(--accent);
-      font-size: 1em;
-      letter-spacing: -0.015em;
-      margin-top: 4px;
-    }
-
-    .split-text p {
-      font-size: 16px;
-      color: var(--text-dim);
-      line-height: 1.65;
-      margin-bottom: 24px;
-    }
-
-    .split-text ul {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .split-text ul li {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      font-size: 14.5px;
-      color: var(--text);
-      line-height: 1.5;
-    }
-
-    .split-text ul li::before {
-      content: '';
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: var(--accent);
-      margin-top: 9px;
-      flex-shrink: 0;
-    }
-
-    .split-image {
-      border-radius: 18px;
-      overflow: hidden;
-      box-shadow: var(--shadow-window);
-      border: 1px solid var(--border);
-      background: var(--bg-elevated);
-      position: relative;
-      transition: transform 0.5s ease;
-    }
-
-    .split-image:hover { transform: translateY(-4px); }
-
-    .split-image img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-
-    /* ===== Pillars ===== */
-    .pillars { padding: 64px 0 96px; }
-
-    .pillars-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 28px;
-    }
-
-    .pillar {
-      padding: 28px 24px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background: var(--bg-elevated);
-      transition: border-color 0.2s ease, transform 0.25s ease, background 0.2s ease, box-shadow 0.25s ease;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .pillar:hover {
-      border-color: var(--accent);
-      transform: translateY(-3px);
-      box-shadow: 0 12px 30px -12px var(--accent-glow);
-    }
-
-    .pillar-num {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #FFFFFF;
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .pillar h3 {
-      font-size: 17px;
-      font-weight: 600;
-      letter-spacing: -0.015em;
-    }
-
-    .pillar p {
-      font-size: 13.5px;
-      color: var(--text-dim);
-      line-height: 1.6;
-    }
-
-    /* ===== Features ===== */
-    .features {
-      padding: 96px 0;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      background: var(--bg-subtle);
-    }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      overflow: hidden;
-    }
-
-    .feature {
-      padding: 26px 24px;
-      background: var(--bg);
-      transition: background 0.2s ease;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .feature:hover { background: var(--bg-subtle); }
-
-    .feature-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      background: var(--accent-soft);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 8px;
-      color: var(--accent);
-    }
-
-    .feature-icon svg {
-      width: 16px;
-      height: 16px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 1.8;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .feature h3 {
-      font-size: 15.5px;
-      font-weight: 600;
-      letter-spacing: -0.015em;
-    }
-
-    .feature p {
-      font-size: 13.5px;
-      color: var(--text-dim);
-      line-height: 1.6;
-    }
-
-    /* ===== Formats marquee ===== */
-    .formats-strip {
-      padding: 72px 0;
-      border-bottom: 1px solid var(--border);
-      overflow: hidden;
-      background: var(--bg);
-    }
-
-    .formats-strip .container { text-align: center; }
-
-    .formats-strip .eyebrow { margin-bottom: 14px; }
-
-    .formats-strip h3 {
-      font-size: clamp(22px, 2.8vw, 28px);
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      margin-bottom: 28px;
-      color: var(--text);
-    }
-
-    .formats-marquee {
-      position: relative;
-      mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
-      -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
-      overflow: hidden;
-    }
-
-    .formats-track {
-      display: flex;
-      gap: 10px;
-      animation: marquee 38s linear infinite;
-      width: max-content;
-    }
-
-    .format-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      height: 38px;
-      padding: 0 18px;
-      border-radius: 999px;
-      background: var(--bg-elevated);
-      border: 1px solid var(--border);
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text);
-      white-space: nowrap;
-      transition: border-color 0.2s ease, color 0.2s ease;
-    }
-
-    .format-chip:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    .format-chip .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-    }
-
-    @keyframes marquee {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-50%); }
-    }
-
-    /* ===== FAQ ===== */
-    .faq { padding: 120px 0; }
-
-    .faq-list {
-      max-width: 760px;
-      margin: 0 auto;
-      border-top: 1px solid var(--border);
-    }
-
-    .faq-item { border-bottom: 1px solid var(--border); }
-
-    .faq-q {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-      padding: 24px 0;
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 16px;
-      font-weight: 500;
-      color: var(--text);
-      text-align: left;
-      letter-spacing: -0.012em;
-      transition: color 0.2s ease;
-    }
-
-    .faq-q:hover { color: var(--accent); }
-
-    .faq-icon {
-      width: 28px;
-      height: 28px;
-      flex-shrink: 0;
-      margin-left: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      border: 1px solid var(--border);
-      transition: transform 0.3s ease, background 0.2s ease;
-    }
-
-    .faq-icon svg {
-      width: 12px;
-      height: 12px;
-      stroke: var(--text-dim);
-      fill: none;
-      stroke-width: 2.2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .faq-item.open .faq-icon {
-      transform: rotate(180deg);
-      background: var(--accent-soft);
-    }
-
-    .faq-item.open .faq-icon svg { stroke: var(--accent); }
-
-    .faq-a {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.35s ease, padding 0.3s ease;
-    }
-
-    .faq-item.open .faq-a {
-      max-height: 500px;
-      padding-bottom: 24px;
-    }
-
-    .faq-a p {
-      font-size: 14.5px;
-      color: var(--text-dim);
-      line-height: 1.7;
-    }
-
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    /* ===== Lineup：两个版本，同一个内核 ===== */
-    .lineup { padding: 120px 0 40px; }
-
-    .lineup-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
-      max-width: 1040px;
-      margin: 0 auto;
-    }
-
-    .lineup-card {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      padding: 34px 32px 30px;
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      background: var(--bg-elevated);
-      overflow: hidden;
-    }
-
-    .lineup-card.pro-zone {
-      border-color: var(--border-strong);
-      background:
-        radial-gradient(ellipse 90% 70% at 100% 0%, var(--accent-glow) 0%, transparent 62%),
-        var(--bg-elevated);
-      box-shadow: var(--shadow-window);
-    }
-
-    .lineup-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
-      font-size: 12px;
-      letter-spacing: 0.02em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-    }
-
-    .lineup-free {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: var(--accent-soft);
-      color: var(--text);
-      font-family: 'Inter', -apple-system, sans-serif;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0;
-      text-transform: none;
-    }
-
-    .lineup-free::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-    }
-
-    .lineup-card h3 {
-      font-size: 34px;
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      margin-top: 6px;
-    }
-
-    .lineup-tag {
-      font-size: 26px;
-      line-height: 1.1;
-      color: var(--accent);
-      margin-top: -8px;
-    }
-
-    .lineup-desc {
-      font-size: 15px;
-      color: var(--text-dim);
-      line-height: 1.6;
-    }
-
-    .lineup-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      list-style: none;
-      flex: 1;
-      align-content: flex-start;
-    }
-
-    .lineup-chips li {
-      display: inline-flex;
-      align-items: center;
-      height: 30px;
-      padding: 0 12px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: var(--bg-subtle);
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text);
-    }
-
-    .lineup-chips li.chip-base {
-      border-style: dashed;
-      border-color: var(--border-strong);
-      background: transparent;
-      color: var(--text-dim);
-    }
-
-    .lineup-foot {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding-top: 18px;
-      margin-top: 6px;
-      border-top: 1px solid var(--border);
-    }
-
-    .lineup-for {
-      font-size: 13px;
-      color: var(--text-dim);
-    }
-
-    .lineup-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      flex-shrink: 0;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--accent);
-    }
-
-    .lineup-link svg {
-      width: 14px;
-      height: 14px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      transition: transform 0.2s ease;
-    }
-
-    .lineup-link:hover svg { transform: translateY(2px); }
-
-    /* 「两个版本都有」标签：核心功能区的统一标注 */
-    .core-label {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 28px;
-    }
-
-    .core-label .eyebrow::before { display: none; }
-
-    .both-dots {
-      display: inline-flex;
-      gap: 3px;
-    }
-
-    .both-dots i {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--accent);
-    }
-
-    .both-dots i + i {
-      background: var(--text);
-    }
-
-    /* ===== Folio Pro ===== */
-    .pro {
-      padding: 128px 0 120px;
-      overflow: hidden;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      background:
-        radial-gradient(ellipse 80% 50% at 50% 0%, var(--bg-cream) 0%, transparent 70%),
-        var(--bg);
-    }
-
-    .pro::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 820px;
-      height: 360px;
-      background: radial-gradient(ellipse at center top, var(--accent-glow) 0%, transparent 70%);
-      filter: blur(50px);
-      opacity: 0.7;
-      pointer-events: none;
-    }
-
-    .pro > .container { position: relative; z-index: 1; }
-
-    .pro-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      height: 28px;
-      padding: 0 12px 0 6px;
-      margin-bottom: 20px;
-      border-radius: 999px;
-      border: 1px solid var(--border-strong);
-      background: var(--bg-elevated);
-      font-size: 13px;
-      font-weight: 600;
-    }
-
-    .pro-badge b {
-      display: inline-flex;
-      align-items: center;
-      height: 18px;
-      padding: 0 7px;
-      border-radius: 999px;
-      background: var(--accent);
-      color: var(--btn-accent-fg);
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
-      font-size: 10.5px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-    }
-
-    .lineup .section-head h2 .serif,
-    .pro .section-head h2 .serif {
-      display: block;
-      color: var(--accent);
-      margin-top: 4px;
-    }
-
-    /* 仿 Folio Pro 窗口：纯装饰，文件树 + Diff + 终端 */
-    .pro-window {
-      max-width: 1040px;
-      margin: 0 auto;
-      border-radius: 14px;
-      border: 1px solid var(--border-strong);
-      background: var(--bg-elevated);
-      box-shadow: var(--shadow-window), 0 40px 120px -40px var(--accent-glow);
-      overflow: hidden;
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
-      font-size: 12.5px;
-      line-height: 1.7;
-      color: var(--text);
-      text-align: left;
-    }
-
-    .pw-bar {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      height: 42px;
-      padding: 0 14px;
-      border-bottom: 1px solid var(--border);
-      background: var(--bg-subtle);
-    }
-
-    .pw-lights { display: flex; gap: 7px; flex-shrink: 0; }
-    .pw-lights i { width: 11px; height: 11px; border-radius: 50%; background: #FF5F57; }
-    .pw-lights i:nth-child(2) { background: #FEBC2E; }
-    .pw-lights i:nth-child(3) { background: #28C840; }
-
-    .pw-tabs { display: flex; gap: 4px; min-width: 0; overflow: hidden; }
-
-    .pw-tab {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      height: 28px;
-      padding: 0 12px;
-      border-radius: 7px;
-      font-size: 12px;
-      color: var(--text-mute);
-      white-space: nowrap;
-    }
-
-    .pw-tab.active {
-      background: var(--bg-hover);
-      color: var(--text);
-    }
-
-    .pw-tab .pw-live {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-soft);
-    }
-
-    .pw-body {
-      display: grid;
-      grid-template-columns: 210px 1fr;
-    }
-
-    .pw-side {
-      padding: 14px 10px;
-      border-right: 1px solid var(--border);
-      color: var(--text-dim);
-    }
-
-    .pw-repo {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 8px 10px;
-      margin-bottom: 6px;
-      border-bottom: 1px solid var(--border);
-      color: var(--text);
-      font-weight: 500;
-    }
-
-    .pw-branch { color: var(--text-mute); font-size: 11.5px; }
-
-    .pw-file {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1px 8px;
-      border-radius: 6px;
-      white-space: nowrap;
-    }
-
-    .pw-file.indent { padding-left: 22px; }
-    .pw-file.sel { background: var(--bg-hover); color: var(--text); }
-
-    .pw-git { font-size: 11px; font-weight: 500; }
-    .pw-git.m { color: #E8C170; }
-    .pw-git.a { color: #8BD9A4; }
-
-    .pw-main { min-width: 0; display: flex; flex-direction: column; }
-
-    .pw-diff {
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .pw-hunk {
-      padding: 0 18px 6px;
-      color: var(--text-mute);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .pw-line {
-      display: grid;
-      grid-template-columns: 44px 18px 1fr;
-      padding-right: 18px;
-      white-space: pre;
-      overflow: hidden;
-    }
-
-    .pw-line .n { color: var(--text-mute); text-align: right; padding-right: 12px; opacity: 0.7; }
-    .pw-line .s { color: var(--text-mute); }
-    .pw-line.add { background: rgba(80, 200, 120, 0.09); }
-    .pw-line.add .s, .pw-line.add .c { color: #8BD9A4; }
-    .pw-line.del { background: rgba(255, 95, 87, 0.09); }
-    .pw-line.del .s, .pw-line.del .c { color: #F2A39E; }
-    .pw-line .c { overflow: hidden; text-overflow: ellipsis; }
-
-    .pw-term {
-      flex: 1;
-      padding: 14px 18px 16px;
-      background: var(--bg);
-      color: var(--text-dim);
-    }
-
-    .pw-term p { white-space: pre; overflow: hidden; text-overflow: ellipsis; }
-    .pw-term .t-acc { color: var(--accent); }
-    .pw-term .t-txt { color: var(--text); }
-    .pw-term .t-ok { color: #8BD9A4; }
-
-    .pw-cursor {
-      display: inline-block;
-      width: 7px;
-      height: 14px;
-      margin-left: 2px;
-      vertical-align: -2px;
-      background: var(--accent);
-      animation: pwBlink 1.1s steps(1) infinite;
-    }
-
-    @keyframes pwBlink { 50% { opacity: 0; } }
-
-    .pw-status {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      height: 28px;
-      padding: 0 14px;
-      border-top: 1px solid var(--border);
-      background: var(--bg-subtle);
-      font-size: 11px;
-      color: var(--text-mute);
-      white-space: nowrap;
-      overflow: hidden;
-    }
-
-    .pw-status .ok { color: #8BD9A4; }
-
-    .pro-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-      max-width: 1040px;
-      margin: 56px auto 0;
-    }
-
-    .pro-card {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding: 22px 20px 24px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background: var(--bg-elevated);
-      transition: border-color 0.2s ease, transform 0.25s ease;
-    }
-
-    .pro-card:hover {
-      border-color: var(--accent);
-      transform: translateY(-3px);
-    }
-
-    .pro-card .feature-icon { margin-bottom: 6px; }
-
-    .pro-card h3 {
-      font-size: 15.5px;
-      font-weight: 600;
-      letter-spacing: -0.015em;
-    }
-
-    .pro-card p {
-      font-size: 13.5px;
-      color: var(--text-dim);
-      line-height: 1.6;
-    }
-
-    .pro-cta {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-      margin-top: 56px;
-    }
-
-    .pro-req {
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
-      font-size: 12px;
-      color: var(--text-dim);
-    }
-
-    /* ===== Compare ===== */
-    .compare { padding: 120px 0 112px; }
-
-    .compare-wrap {
-      max-width: 900px;
-      margin: 0 auto;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      background: var(--bg-elevated);
-      overflow: hidden;
-    }
-
-    .compare-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14.5px;
-    }
-
-    .compare-table col.ed { width: 190px; }
-    .compare-table col.ed-pro { background: var(--pro-col); }
-
-    .compare-table th,
-    .compare-table td {
-      padding: 13px 22px;
-      border-bottom: 1px solid var(--border);
-      text-align: left;
-      vertical-align: middle;
-      line-height: 1.45;
-    }
-
-    .compare-table tbody tr:last-child td,
-    .compare-table tbody tr:last-child th { border-bottom: none; }
-
-    .compare-table thead th {
-      padding: 26px 22px 20px;
-      vertical-align: bottom;
-      font-weight: 400;
-    }
-
-    .cmp-name {
-      display: block;
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: -0.025em;
-      color: var(--text);
-    }
-
-    .cmp-channel {
-      display: block;
-      margin-top: 4px;
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
-      font-size: 11.5px;
-      letter-spacing: 0.02em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-    }
-
-    .compare-table tbody th {
-      font-weight: 400;
-      color: var(--text);
-    }
-
-    .compare-table .cmp-group th {
-      padding: 10px 22px;
-      background: var(--bg-subtle);
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
-      font-size: 11.5px;
-      font-weight: 500;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-    }
-
-    .compare-table td { color: var(--text-dim); font-size: 13.5px; word-break: keep-all; }
-
-    .cmp-yes,
-    .cmp-no {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-    }
-
-    .cmp-yes {
-      background: var(--accent-soft);
-      color: var(--accent-strong);
-    }
-
-    .cmp-yes svg {
-      width: 13px;
-      height: 13px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 3;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .cmp-no::before {
-      content: '';
-      width: 10px;
-      height: 1.5px;
-      border-radius: 1px;
-      background: var(--text-mute);
-    }
-
-    .compare-cta {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      max-width: 900px;
-      margin: 20px auto 0;
-    }
-
-    .compare-notes {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px 24px;
-      max-width: 900px;
-      margin: 28px auto 0;
-      font-size: 13.5px;
-      color: var(--text-dim);
-      text-align: center;
-    }
-
-    .compare-notes span {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .compare-notes svg { width: 14px; height: 14px; flex-shrink: 0; }
-    .compare-notes strong { color: var(--text); font-weight: 600; }
-
-    /* ===== CTA ===== */
-    .cta-section {
-      padding: 120px 0;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-      border-top: 1px solid var(--border);
-      background:
-        radial-gradient(ellipse 60% 50% at 50% 0%, var(--bg-cream-soft) 0%, transparent 70%),
-        var(--bg);
-    }
-
-    html.dark .cta-section {
-      background:
-        radial-gradient(ellipse 60% 50% at 50% 0%, var(--bg-cream) 0%, transparent 70%),
-        var(--bg);
-    }
-
-    .cta-section::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 720px;
-      height: 340px;
-      background: radial-gradient(ellipse at center top, var(--accent-glow) 0%, transparent 70%);
-      filter: blur(40px);
-      z-index: 0;
-    }
-
-    .cta-section > .container { position: relative; z-index: 1; }
-
-    .cta-section h2 {
-      font-size: clamp(36px, 5vw, 60px);
-      margin-bottom: 18px;
-      letter-spacing: -0.035em;
-      line-height: 1.05;
-    }
-
-    .cta-section h2 .serif {
-      color: var(--accent);
-      display: block;
-      margin-top: 6px;
-    }
-
-    .cta-section > .container > p {
-      font-size: 17px;
-      color: var(--text-dim);
-      margin-bottom: 36px;
-      max-width: 520px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .cta-buttons {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .cta-section > .container > .cta-note {
-      max-width: none;
-      margin: 22px 0 0;
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
-      font-size: 12px;
-      color: var(--text-dim);
-    }
-
-    /* ===== Footer ===== */
-    footer {
-      padding: 56px 0 48px;
-      border-top: 1px solid var(--border);
-      background: var(--bg);
-    }
-
-    .footer-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 24px;
-      flex-wrap: wrap;
-    }
-
-    .footer-inner .brand { font-weight: 600; }
-
-    .footer-copy {
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
-      font-size: 12px;
-      color: var(--text-mute);
-    }
-
-    /* ===== Reveal ===== */
-    .reveal {
-      transition: opacity 0.7s ease, transform 0.7s ease;
-    }
-
-    html.js .reveal {
-      opacity: 0;
-      transform: translateY(18px);
-    }
-
-    html.js .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .reveal-d1 { transition-delay: 0.08s; }
-    .reveal-d2 { transition-delay: 0.16s; }
-    .reveal-d3 { transition-delay: 0.24s; }
-    .reveal-d4 { transition-delay: 0.32s; }
-
-    /* ===== Responsive ===== */
-    @media (max-width: 1024px) {
-      .split-inner,
-      .split.reverse .split-inner {
-        grid-template-columns: 1fr;
-        gap: 40px;
-      }
-      .split.reverse .split-text { order: 0; }
-      .pillars-grid { grid-template-columns: repeat(2, 1fr); }
-      .features-grid { grid-template-columns: repeat(2, 1fr); }
-      .lineup-grid { grid-template-columns: 1fr; max-width: 560px; }
-      .pro-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    @media (max-width: 768px) {
-      section { padding: 72px 0; }
-      .hero { padding: 120px 0 56px; }
-      .hero-window { margin-top: 40px; }
-      .nav-links { display: none; }
-      .nav-cta { display: none; }
-      .hero-editions { grid-template-columns: 1fr; max-width: 420px; }
-      .hero-meta { flex-wrap: wrap; justify-content: center; gap: 8px 14px; }
-      .hero-meta span, .hero-meta a { white-space: nowrap; }
-      .hero-meta { gap: 8px 18px; }
-      .hero-meta .sep { display: none; }   /* 换行时分隔点会孤悬在行尾，窄屏改用间距分隔 */
-      .cta-buttons.cta-choices,
-      .compare-cta { grid-template-columns: 1fr; max-width: 420px; }
-      .compare-cta { margin-left: auto; margin-right: auto; }
-      .lineup { padding-top: 88px; }
-      .pro { padding: 88px 0; }
-      .pw-body { grid-template-columns: 1fr; }
-      .pw-side { display: none; }
-      .pro-window { font-size: 11.5px; }
-      .pw-tab:not(.active) { display: none; }
-      .compare-table col.ed { width: 86px; }
-      .compare-table th,
-      .compare-table td { padding: 12px 12px; }
-      .compare-table thead th { padding: 20px 12px 16px; }
-      .cmp-name { font-size: 16px; }
-      .cmp-channel { display: none; }
-      .compare-table tbody th { font-size: 13.5px; }
-      .lang-trigger { padding: 0 8px; }
-      .mobile-toggle { display: flex; }
-      .pillars-grid { grid-template-columns: 1fr; padding: 0 20px; }
-      .features-grid { grid-template-columns: 1fr 1fr; }
-      .container, .container-wide { padding: 0 20px; }
-      .split-inner { padding: 0 20px; gap: 32px; }
-      .footer-inner { flex-direction: column; align-items: flex-start; gap: 16px; }
-      .hero-subtitle { font-size: 17px; }
-      .section-head { margin-bottom: 44px; }
-      .split { padding: 64px 0; }
-    }
-
-    @media (max-width: 480px) {
-      .hero h1 { font-size: 44px; }
-      .features-grid { grid-template-columns: 1fr; }
-      .lineup-card { padding: 26px 22px 24px; }
-      .lineup-foot { flex-direction: column; align-items: flex-start; gap: 10px; }
-      .pro-grid { grid-template-columns: 1fr; gap: 10px; }
-      .pro-card {
-        display: grid;
-        grid-template-columns: 32px 1fr;
-        column-gap: 14px;
-        row-gap: 2px;
-        padding: 16px 16px 18px;
-      }
-      .pro-card .feature-icon { grid-row: span 2; margin-bottom: 0; }
-      .compare-table td { font-size: 12.5px; }
-      .split-text h2 { font-size: 30px; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.001ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.001ms !important;
-      }
-      .halo { animation: none !important; }
-      .formats-track { animation: none !important; }
-      .pw-cursor { animation: none !important; }
-      .reveal { opacity: 1 !important; transform: none !important; }
-      .hero-content > * { opacity: 1 !important; transform: none !important; }
-    }
-
-    /* Chinese text flow */
-    html[lang^="zh"] p,
-    html[lang^="zh"] .faq-a p,
-    html[lang^="zh"] .feature p,
-    html[lang^="zh"] .pillar p,
-    html[lang^="zh"] .split-text p {
-      word-break: keep-all;
-      overflow-wrap: break-word;
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/site.css">
+  <link rel="modulepreload" href="assets/vendor/three/three.module.js">
+  <link rel="modulepreload" href="assets/vendor/three/three.core.js">
+  <link rel="preload" as="image" href="assets/screens/welcome.jpg">
+  <script type="importmap">
+    { "imports": { "three": "./assets/vendor/three/three.module.js", "three/addons/": "./assets/vendor/three/addons/" } }
+  </script>
 </head>
 <body class="loading">
+  <!-- 全屏 3D 舞台：整页共用一个 WebGL 画布，随滚动换镜头 -->
+  <canvas id="stage" aria-hidden="true"></canvas>
+
+  <!-- 悬停文件卡片时跟随光标的标签 / 打开文件后的提示 -->
+  <div class="tip" id="tip" aria-hidden="true"><b id="tipName"></b><span id="tipHint" data-i18n="tip.open">Click to open in Folio</span></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"><span class="toast-dot"></span><span><span data-i18n="toast.opened">Opened in Folio</span> · <b id="toastName"></b></span></div>
+
   <!-- Navigation -->
   <nav class="navbar" role="navigation">
     <div class="navbar-inner">
-      <a href="#" class="brand">
-        <img src="assets/app-icon.png" alt="Folio" width="26" height="26">
+      <a href="#top" class="brand">
+        <img src="assets/app-icon.png" alt="" width="26" height="26">
         Folio
       </a>
       <ul class="nav-links">
-        <li><a href="#features" data-i18n="nav.features">功能</a></li>
-        <li><a href="#showcase" data-i18n="nav.formats">所有格式</a></li>
+        <li><a href="#features" data-i18n="nav.features">Features</a></li>
+        <li><a href="#showcase" data-i18n="nav.formats">Formats</a></li>
         <li><a href="#pro">Folio Pro</a></li>
-        <li><a href="#editions" data-i18n="nav.compare">对比版本</a></li>
-        <li><a href="#faq" data-i18n="nav.faq">常见问题</a></li>
+        <li><a href="#editions" data-i18n="nav.compare">Compare</a></li>
+        <li><a href="#faq" data-i18n="nav.faq">FAQ</a></li>
       </ul>
       <div class="nav-right">
-        <!-- Language switcher -->
         <div class="lang-switch" id="langSwitch">
-          <button class="lang-trigger" type="button" aria-haspopup="menu" aria-expanded="false" onclick="toggleLangMenu(event)">
+          <button class="lang-trigger" type="button" aria-haspopup="menu" aria-expanded="false" id="langTrigger">
             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
-            <span id="langLabel">中文</span>
+            <span id="langLabel">English</span>
             <svg class="caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
           </button>
           <div class="lang-menu" role="menu" id="langMenu">
-            <button type="button" role="menuitemradio" data-lang="zh" onclick="setLang('zh')">
+            <button type="button" role="menuitemradio" data-lang="zh">
               <svg class="check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
               中文
             </button>
-            <button type="button" role="menuitemradio" data-lang="en" onclick="setLang('en')">
+            <button type="button" role="menuitemradio" data-lang="en">
               <svg class="check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
               English
             </button>
           </div>
         </div>
-
-        <button class="icon-btn" onclick="toggleTheme()" aria-label="Toggle theme">
-          <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21.752 15.002A9.718 9.718 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"/></svg>
-          <svg class="icon-sun" viewBox="0 0 24 24"><path d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM7.5 12a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0Zm11.394-5.834a.75.75 0 0 0-1.06-1.06l-1.591 1.59a.75.75 0 1 0 1.06 1.061l1.591-1.59Zm-1.06 11.668a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 1 0-1.061 1.06l1.59 1.591ZM12 18a.75.75 0 0 1 .75.75V21a.75.75 0 0 1-1.5 0v-2.25A.75.75 0 0 1 12 18Zm-7.834-5.16a.75.75 0 0 0 0-1.5H2.25a.75.75 0 0 0 0 1.5h1.916ZM6.343 17.834a.75.75 0 0 0-1.06-1.06l-1.591 1.59a.75.75 0 1 0 1.06 1.061l1.591-1.59ZM3.692 4.63a.75.75 0 0 0 0 1.06l1.59 1.591a.75.75 0 0 0 1.061-1.06L4.752 4.63a.75.75 0 0 0-1.06 0ZM18 12a.75.75 0 0 1 .75-.75h2.25a.75.75 0 0 1 0 1.5h-2.25A.75.75 0 0 1 18 12Z"/></svg>
-        </button>
-        <a href="#editions" class="nav-cta" data-i18n="nav.cta">下载 Folio</a>
-        <button class="mobile-toggle" onclick="toggleMobileMenu()" aria-label="Menu">
+        <a href="#editions" class="nav-cta" data-i18n="nav.cta">Get Folio</a>
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Menu" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
       </div>
     </div>
   </nav>
 
-  <!-- Mobile menu -->
   <div class="mobile-menu" id="mobileMenu">
-    <a href="#features" onclick="closeMobileMenu()" data-i18n="nav.features">功能</a>
-    <a href="#showcase" onclick="closeMobileMenu()" data-i18n="nav.formats">所有格式</a>
-    <a href="#pro" onclick="closeMobileMenu()">Folio Pro</a>
-    <a href="#editions" onclick="closeMobileMenu()" data-i18n="nav.compare">对比版本</a>
-    <a href="#faq" onclick="closeMobileMenu()" data-i18n="nav.faq">常见问题</a>
-    <a href="#editions" onclick="closeMobileMenu()" data-i18n="nav.cta">下载 Folio</a>
+    <a href="#features" data-i18n="nav.features">Features</a>
+    <a href="#showcase" data-i18n="nav.formats">Formats</a>
+    <a href="#pro">Folio Pro</a>
+    <a href="#editions" data-i18n="nav.compare">Compare</a>
+    <a href="#faq" data-i18n="nav.faq">FAQ</a>
+    <a href="#editions" data-i18n="nav.cta">Get Folio</a>
   </div>
 
-  <!-- Hero -->
-  <section class="hero">
-    <div class="hero-bg" aria-hidden="true">
-      <div class="halo halo-primary"></div>
-      <div class="halo halo-secondary"></div>
-      <div class="halo halo-tertiary"></div>
-    </div>
-    <div class="container">
-      <div class="hero-content" id="heroContent">
-        <img src="assets/app-icon.png" alt="Folio" class="hero-icon">
-        <div class="hero-badge">
-          <span class="dot"></span>
-          The universal viewer for Mac
-        </div>
-        <h1>One&nbsp;app.<br><span class="serif">See every file.</span></h1>
-        <p class="hero-subtitle" data-i18n="hero.subtitle">让你的 Mac 安静下来。把所有你常用的文件——文档、表格、演示稿、PDF、笔记、图片、音乐与视频——全部装进一个窗口。</p>
-        <div class="hero-editions" role="group" data-i18n-aria="hero.ed.aria" aria-label="选择版本">
-          <article class="hero-ed hero-ed-pro">
-            <header class="hero-ed-head">
-              <h2 class="hero-ed-name">Folio Pro</h2>
-              <span class="hero-ed-channel" data-i18n="channel.direct">直接下载</span>
-              <span class="hero-ed-flag" data-i18n="hero.ed.rec">推荐</span>
-            </header>
-            <ul class="hero-ed-list">
-              <li data-i18n="hero.pro.f1">包含 Folio 的全部功能</li>
-              <li data-i18n="hero.pro.f2">终端与 AI 智能体</li>
-              <li data-i18n="hero.pro.f3">完整 Git 与本地 AI</li>
-            </ul>
-            <a href="https://github.com/river-ranx/folio-web/releases/latest"
-               class="btn btn-accent hero-ed-btn" data-pro target="_blank" rel="noopener">
-              <span data-i18n="btn.pro">下载 Folio Pro</span>
+  <main>
+    <!-- ① Hero：漂浮的文件，光标就是光源 -->
+    <section class="hero" id="top" data-scene="hero">
+      <!-- 无 WebGL 时的静态兜底 -->
+      <img class="gl-fallback" src="assets/screens/welcome.jpg" alt="Folio welcome window" width="1024" height="683">
+      <div class="hero-inner container-wide">
+        <div class="hero-content" id="heroContent">
+          <div class="hero-badge"><span class="dot"></span>The universal viewer for Mac</div>
+          <h1>
+            <span class="line"><span>One&nbsp;app.</span></span>
+            <span class="line serif accent"><span>See every file.</span></span>
+          </h1>
+          <p class="hero-subtitle" data-i18n="hero.subtitle">Turn your Mac into one quiet, focused workspace.</p>
+          <div class="hero-cta">
+            <a href="https://github.com/river-ranx/folio-web/releases/latest" class="btn btn-accent btn-stack" data-pro target="_blank" rel="noopener">
+              <span class="btn-stack-text">
+                <span class="btn-title" data-i18n="btn.pro">Get Folio Pro</span>
+                <span class="btn-sub" data-i18n="btn.pro.sub">Terminal, Git &amp; on-device AI</span>
+              </span>
               <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
             </a>
-          </article>
-          <article class="hero-ed">
-            <header class="hero-ed-head">
-              <h2 class="hero-ed-name">Folio</h2>
-              <span class="hero-ed-channel" data-i18n="btn.store.sub">来自 Mac App Store</span>
-            </header>
-            <ul class="hero-ed-list">
-              <li data-i18n="hero.store.f1">阅读、编辑、搜索所有文件</li>
-              <li data-i18n="hero.store.f2">沙盒运行，自动更新</li>
-              <li class="is-off" data-i18n="hero.store.f3">没有终端与 Git</li>
-            </ul>
-            <a href="https://apps.apple.com/us/app/folio-universal-viewer/id6769624913?l=zh-Hans-CN&amp;mt=12"
-               class="btn btn-ghost hero-ed-btn" data-appstore target="_blank" rel="noopener">
-              <span data-i18n="btn.store.short">下载 Folio</span>
+            <a href="https://apps.apple.com/us/app/folio-universal-viewer/id6769624913?mt=12" class="btn btn-ghost btn-stack" data-appstore target="_blank" rel="noopener">
+              <span class="btn-stack-text">
+                <span class="btn-title" data-i18n="btn.store.short">Get Folio</span>
+                <span class="btn-sub" data-i18n="btn.store.sub">On the Mac App Store</span>
+              </span>
               <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
             </a>
-          </article>
-        </div>
-        <div class="hero-meta">
-          <span class="hero-meta-free" data-i18n="hero.meta.free">两个版本目前都免费</span>
-          <span class="sep"></span>
-          <span>macOS 15+</span>
-          <span class="sep"></span>
-          <a href="#editions" class="hero-meta-link" data-i18n="hero.compare">对比两个版本</a>
-          <span class="sep"></span>
-          <span data-i18n="hero.meta.soon">Windows、iPadOS、iOS 即将到来</span>
+          </div>
+          <div class="hero-meta">
+            <span class="hero-meta-free" data-i18n="hero.meta.free">Both editions free for now</span>
+            <span class="sep"></span>
+            <span>macOS 15+</span>
+            <span class="sep"></span>
+            <a href="#editions" class="hero-meta-link" data-i18n="hero.compare">Compare editions</a>
+            <span class="sep"></span>
+            <span data-i18n="hero.meta.soon">Windows, iPadOS &amp; iOS coming soon</span>
+          </div>
         </div>
       </div>
-    </div>
-
-    <div class="hero-window reveal">
-      <div class="hero-window-inner">
-        <img src="assets/welcome/folio-welcome.png" alt="Folio welcome window" loading="lazy">
+      <div class="hero-hints" aria-hidden="true">
+        <span class="hint-play" id="hintPlay"><i class="hint-ring"></i><span data-i18n="hint.play">Move your mouse. Click any file.</span></span>
+        <span class="hint-scroll"><span data-i18n="hint.scroll">Scroll</span><i></i></span>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <main>
+    <!-- ② 汇聚：所有文件被吸进同一个窗口（滚动驱动） -->
+    <section class="converge" id="converge" data-scene="converge">
+      <div class="sticky">
+        <div class="container-wide conv-inner">
+          <div class="conv-text">
+            <span class="eyebrow">universal viewer</span>
+            <h2 class="display"><span data-i18n="banner.h2.line1">One app,</span><span class="serif accent" data-i18n="banner.h2.serif">see every file.</span></h2>
+            <p data-i18n="banner.body">Stop jumping between a dozen apps.</p>
+          </div>
+        </div>
+        <div class="conv-formats">
+          <h3 class="eyebrow" data-i18n="formats.h3">14 file types, one window</h3>
+          <div class="formats-marquee" aria-hidden="true"><div class="formats-track" id="formatsTrack"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ③ 分章舞台：窗口随滚动换内容 -->
+    <section class="stage" id="showcase" data-scene="stage" style="--n:5">
+      <div class="sticky">
+        <div class="container-wide stage-inner">
+          <ol class="rail" id="rail" data-i18n-aria="stage.aria" aria-label="Chapters">
+            <li><button type="button" data-i="0">Code</button></li>
+            <li><button type="button" data-i="1">Image</button></li>
+            <li><button type="button" data-i="2">Markdown</button></li>
+            <li><button type="button" data-i="3">Office &amp; PDF</button></li>
+            <li><button type="button" data-i="4">Video</button></li>
+          </ol>
+          <div class="slides" id="slides">
+            <article class="slide" data-screen="code">
+              <span class="eyebrow">code reading</span>
+              <h2><span data-i18n="split.code.h2.line1">Elegant code reading,</span><span class="serif" data-i18n="split.code.h2.serif">fully yours.</span></h2>
+              <p data-i18n="split.code.body"></p>
+              <ul>
+                <li data-i18n="split.code.li1"></li>
+                <li data-i18n="split.code.li2"></li>
+                <li data-i18n="split.code.li3"></li>
+              </ul>
+              <img class="slide-fig" src="assets/screens/code.jpg" alt="Folio elegant code reading" loading="lazy">
+            </article>
+            <article class="slide" data-screen="image">
+              <span class="eyebrow">image viewer</span>
+              <h2><span data-i18n="split.image.h2.line1">All image formats,</span><span class="serif" data-i18n="split.image.h2.serif">just one viewer.</span></h2>
+              <p data-i18n="split.image.body"></p>
+              <ul>
+                <li data-i18n="split.image.li1"></li>
+                <li data-i18n="split.image.li2"></li>
+                <li data-i18n="split.image.li3"></li>
+              </ul>
+              <img class="slide-fig" src="assets/screens/image.jpg" alt="Folio image viewer" loading="lazy">
+            </article>
+            <article class="slide" data-screen="markdown">
+              <span class="eyebrow">markdown</span>
+              <h2><span data-i18n="split.md.h2.line1">Markdown that flows like</span><span class="serif" data-i18n="split.md.h2.serif">natural writing.</span></h2>
+              <p data-i18n="split.md.body"></p>
+              <ul>
+                <li data-i18n="split.md.li1"></li>
+                <li data-i18n="split.md.li2"></li>
+                <li data-i18n="split.md.li3"></li>
+              </ul>
+              <img class="slide-fig" src="assets/screens/markdown.jpg" alt="Folio markdown editor" loading="lazy">
+            </article>
+            <article class="slide" data-screen="office">
+              <span class="eyebrow">office &amp; pdf</span>
+              <h2><span data-i18n="split.office.h2.line1">Office docs and PDF,</span><span class="serif" data-i18n="split.office.h2.serif">open in one click.</span></h2>
+              <p data-i18n="split.office.body"></p>
+              <ul>
+                <li data-i18n="split.office.li1"></li>
+                <li data-i18n="split.office.li2"></li>
+                <li data-i18n="split.office.li3"></li>
+              </ul>
+              <img class="slide-fig" src="assets/screens/office.jpg" alt="Folio Office docs and PDF" loading="lazy">
+            </article>
+            <article class="slide" data-screen="video">
+              <span class="eyebrow">video player</span>
+              <h2><span data-i18n="split.video.h2.line1">Every video,</span><span class="serif" data-i18n="split.video.h2.serif">one smooth player.</span></h2>
+              <p data-i18n="split.video.body"></p>
+              <ul>
+                <li data-i18n="split.video.li1"></li>
+                <li data-i18n="split.video.li2"></li>
+                <li data-i18n="split.video.li3"></li>
+              </ul>
+              <img class="slide-fig" src="assets/screens/video.jpg" alt="Folio video player" loading="lazy">
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ④ 主题：点一个颜色，整个世界换色 -->
+    <section class="themes" id="themes" data-scene="stage" data-screen="theme-cream">
+      <div class="container-wide themes-inner">
+        <div class="slide is-static active">
+          <span class="eyebrow">themes</span>
+          <h2><span data-i18n="split.themes.h2.line1">Your Folio,</span><span class="serif" data-i18n="split.themes.h2.serif">your color, 15 themes.</span></h2>
+          <p data-i18n="split.themes.body"></p>
+          <ul>
+            <li data-i18n="split.themes.li1"></li>
+            <li data-i18n="split.themes.li2"></li>
+            <li data-i18n="split.themes.li3"></li>
+          </ul>
+          <div class="swatches" role="radiogroup" data-i18n-aria="themes.aria" aria-label="Pick a theme">
+            <button type="button" class="swatch" role="radio" aria-checked="true" data-theme="cream" style="--sw:#FF9A4A"><i></i><span data-i18n="theme.cream">Cream</span></button>
+            <button type="button" class="swatch" role="radio" aria-checked="false" data-theme="ink" style="--sw:#8E9BFF"><i></i><span data-i18n="theme.ink">Ink</span></button>
+            <button type="button" class="swatch" role="radio" aria-checked="false" data-theme="snow" style="--sw:#5BB2FF"><i></i><span data-i18n="theme.snow">Snow</span></button>
+            <button type="button" class="swatch" role="radio" aria-checked="false" data-theme="moss" style="--sw:#8ED36A"><i></i><span data-i18n="theme.moss">Moss</span></button>
+          </div>
+          <img class="slide-fig" src="assets/screens/theme-cream.jpg" alt="Folio themes" loading="lazy">
+        </div>
+      </div>
+    </section>
+
+    <!-- Pillars -->
+    <section class="pillars" id="features" data-scene="ambient">
+      <div class="core-label reveal">
+        <span class="eyebrow"><span class="both-dots" aria-hidden="true"><i></i><i></i></span><span data-i18n="core.label">两个版本都有</span></span>
+      </div>
+      <div class="pillars-grid">
+        <div class="pillar glass reveal reveal-d1">
+          <span class="pillar-num">1</span>
+          <h3 data-i18n="pillar.1.h">多工作空间</h3>
+          <p data-i18n="pillar.1.body">每个项目一个标签页。一键切换，回到上次离开的地方——文件夹、滚动位置、上次打开的文件，都还在那里。</p>
+        </div>
+        <div class="pillar glass reveal reveal-d2">
+          <span class="pillar-num">2</span>
+          <h3 data-i18n="pillar.2.h">全格式，一个 app</h3>
+          <p data-i18n="pillar.2.body">一个 app 顶替十几个。文档、表格、演示稿、PDF、笔记、图片、音乐、视频——直接打开就能看。</p>
+        </div>
+        <div class="pillar glass reveal reveal-d3">
+          <span class="pillar-num">3</span>
+          <h3 data-i18n="pillar.3.h">全文搜索</h3>
+          <p data-i18n="pillar.3.body">搜的不只是文件名。笔记里的一句话、表格里的一个数字都能直接命中——跨所有打开的工作空间。</p>
+        </div>
+        <div class="pillar glass reveal reveal-d4">
+          <span class="pillar-num">4</span>
+          <h3 data-i18n="pillar.4.h">Markdown 编辑器</h3>
+          <p data-i18n="pillar.4.body">像阅读发表后的文章一样写作。无需分屏预览，所写即所见。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- More features -->
+    <section class="features" data-scene="ambient">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow" data-i18n="more.eyebrow">还有更多</span>
+          <h2><span data-i18n="more.h2.line1">不只是看，更是</span><span class="serif accent" data-i18n="more.h2.serif">用得顺手。</span></h2>
+          <p data-i18n="more.body">每一个细节，都为了让你在文件之间穿梭得更安静、更专注。</p>
+        </div>
+        <div class="features-grid">
+          <div class="feature glass reveal">
+            <div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+            <h3 data-i18n="feat.tabs.h">访达式标签</h3>
+            <p data-i18n="feat.tabs.p">每个工作空间记得你的滚动位置和上次打开的文件。</p>
+          </div>
+          <div class="feature glass reveal">
+            <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+            <h3 data-i18n="feat.search.h">秒找任何东西</h3>
+            <p data-i18n="feat.search.p">按内容搜索，不止文件名。笔记里的一句话也能瞬间命中。</p>
+          </div>
+          <div class="feature glass reveal">
+            <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
+            <h3 data-i18n="feat.folders.h">多文件夹并列</h3>
+            <p data-i18n="feat.folders.p">几个项目同时挂着，左边一棵清晰的文件树。</p>
+          </div>
+          <div class="feature glass reveal">
+            <div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div>
+            <h3 data-i18n="feat.glass.h">细腻玻璃质感</h3>
+            <p data-i18n="feat.glass.p">与系统美学一脉相承的优雅界面。</p>
+          </div>
+          <div class="feature glass reveal">
+            <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <h3 data-i18n="feat.3d.h">3D 模型与字体预览</h3>
+            <p data-i18n="feat.3d.p">三维模型可以转着看，字体可以一目了然地试。</p>
+          </div>
+          <div class="feature glass reveal">
+            <div class="feature-icon"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg></div>
+            <h3 data-i18n="feat.tables.h">表格与数据</h3>
+            <p data-i18n="feat.tables.p">电子表格与数据表直接查看、排序、筛选。</p>
+          </div>
+          <div class="feature glass reveal">
+            <div class="feature-icon"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+            <h3 data-i18n="feat.code.h">代码语法着色</h3>
+            <p data-i18n="feat.code.p">几乎你能想到的编程语言都已经准备好。</p>
+          </div>
+          <div class="feature glass reveal">
+            <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+            <h3 data-i18n="feat.translate.h">Markdown 翻译</h3>
+            <p data-i18n="feat.translate.p">一键把笔记切换成另一种语言，离线快速。</p>
+          </div>
+          <div class="feature glass reveal">
+            <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+            <h3 data-i18n="feat.focus.h">无干扰阅读</h3>
+            <p data-i18n="feat.focus.p">透明标题栏、阅读宽度可调，让文字成为主角。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Lineup: two editions, one core -->
-    <section class="lineup" id="lineup">
+    <section class="lineup" id="lineup" data-scene="ambient">
       <div class="container">
         <div class="section-head reveal">
           <span class="eyebrow" data-i18n="line.eyebrow">两个版本，同一个内核</span>
@@ -2266,7 +338,7 @@
         </div>
 
         <div class="lineup-grid">
-          <article class="lineup-card reveal reveal-d1">
+          <article class="lineup-card glass reveal reveal-d1">
             <div class="lineup-top">
               <span>Mac App Store</span>
               <span class="lineup-free" data-i18n="free">目前免费</span>
@@ -2289,7 +361,7 @@
             </div>
           </article>
 
-          <article class="lineup-card pro-zone reveal reveal-d2">
+          <article class="lineup-card glass is-pro reveal reveal-d2">
             <div class="lineup-top">
               <span data-i18n="channel.direct">直接下载</span>
               <span class="lineup-free" data-i18n="free">目前免费</span>
@@ -2318,234 +390,8 @@
       </div>
     </section>
 
-    <!-- Pillars -->
-    <section class="pillars" id="features">
-      <div class="core-label reveal">
-        <span class="eyebrow"><span class="both-dots" aria-hidden="true"><i></i><i></i></span><span data-i18n="core.label">两个版本都有</span></span>
-      </div>
-      <div class="pillars-grid">
-        <div class="pillar reveal reveal-d1">
-          <span class="pillar-num">1</span>
-          <h3 data-i18n="pillar.1.h">多工作空间</h3>
-          <p data-i18n="pillar.1.body">每个项目一个标签页。一键切换，回到上次离开的地方——文件夹、滚动位置、上次打开的文件，都还在那里。</p>
-        </div>
-        <div class="pillar reveal reveal-d2">
-          <span class="pillar-num">2</span>
-          <h3 data-i18n="pillar.2.h">全格式，一个 app</h3>
-          <p data-i18n="pillar.2.body">一个 app 顶替十几个。文档、表格、演示稿、PDF、笔记、图片、音乐、视频——直接打开就能看。</p>
-        </div>
-        <div class="pillar reveal reveal-d3">
-          <span class="pillar-num">3</span>
-          <h3 data-i18n="pillar.3.h">全文搜索</h3>
-          <p data-i18n="pillar.3.body">搜的不只是文件名。笔记里的一句话、表格里的一个数字都能直接命中——跨所有打开的工作空间。</p>
-        </div>
-        <div class="pillar reveal reveal-d4">
-          <span class="pillar-num">4</span>
-          <h3 data-i18n="pillar.4.h">Markdown 编辑器</h3>
-          <p data-i18n="pillar.4.body">像阅读发表后的文章一样写作。无需分屏预览，所写即所见。</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Showcase banner -->
-    <section class="showcase-banner" id="showcase">
-      <div class="section-head reveal" style="margin-bottom:48px;">
-        <span class="eyebrow">universal viewer</span>
-        <h2><span data-i18n="banner.h2.line1">一个 app，</span><span class="serif accent" data-i18n="banner.h2.serif">看见每个文件。</span></h2>
-        <p data-i18n="banner.body">不再在十几个应用之间反复切换。Folio 用一个窗口承接你所有的文件。</p>
-      </div>
-      <div class="banner-card reveal reveal-d1">
-        <img src="assets/landings/01-hero.png" alt="Folio — One app. See every file." loading="lazy">
-      </div>
-    </section>
-
-    <!-- Split 1: Code Reading -->
-    <section class="split reveal">
-      <div class="split-inner">
-        <div class="split-text">
-          <span class="eyebrow">code reading</span>
-          <h2><span data-i18n="split.code.h2.line1">优雅的代码阅读</span><span class="serif" data-i18n="split.code.h2.serif">fully yours.</span></h2>
-          <p data-i18n="split.code.body">主流编程语言一应俱全。语法着色清爽、缩进对齐整齐——让代码读起来像读散文一样舒服。</p>
-          <ul>
-            <li data-i18n="split.code.li1">主流编程语言全覆盖</li>
-            <li data-i18n="split.code.li2">舒服的字号、行距与配色，长时间阅读不累</li>
-            <li data-i18n="split.code.li3">文件夹并排浏览，需要时随时切换</li>
-          </ul>
-        </div>
-        <div class="split-image">
-          <img src="assets/landings/02-code-reading.png" alt="Folio elegant code reading" loading="lazy">
-        </div>
-      </div>
-    </section>
-
-    <!-- Split 2: Image Viewer -->
-    <section class="split reverse reveal">
-      <div class="split-inner">
-        <div class="split-image">
-          <img src="assets/landings/03-image-viewer.png" alt="Folio image viewer" loading="lazy">
-        </div>
-        <div class="split-text">
-          <span class="eyebrow">image viewer</span>
-          <h2><span data-i18n="split.image.h2.line1">所有图片格式</span><span class="serif" data-i18n="split.image.h2.serif">just one viewer.</span></h2>
-          <p data-i18n="split.image.body">再大的图也是秒开。手机照片、相机原图、网络图片、动图、矢量图——一键打开，可缩放、查看拍摄信息、在文件夹里前后翻页。</p>
-          <ul>
-            <li data-i18n="split.image.li1">从手机随手拍到相机原片，常见格式都能看</li>
-            <li data-i18n="split.image.li2">超大图秒开，无需等待</li>
-            <li data-i18n="split.image.li3">方向键翻页，空格键快速预览</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- Split 3: Markdown -->
-    <section class="split reveal">
-      <div class="split-inner">
-        <div class="split-text">
-          <span class="eyebrow">markdown</span>
-          <h2><span data-i18n="split.md.h2.line1">Markdown 像</span><span class="serif" data-i18n="split.md.h2.serif">natural writing.</span></h2>
-          <p data-i18n="split.md.body">边写边见。标题、列表、表格、代码块立刻自动美化，没有分屏预览的割裂。内置离线翻译，写作的同时切换语言。</p>
-          <ul>
-            <li data-i18n="split.md.li1">所写即所见，整洁清爽</li>
-            <li data-i18n="split.md.li2">数学公式、流程图、代码块自动美化</li>
-            <li data-i18n="split.md.li3">多语言翻译，离线就能用</li>
-          </ul>
-        </div>
-        <div class="split-image">
-          <img src="assets/landings/04-markdown.png" alt="Folio markdown editor" loading="lazy">
-        </div>
-      </div>
-    </section>
-
-    <!-- Split 4: Office & PDF -->
-    <section class="split reverse reveal">
-      <div class="split-inner">
-        <div class="split-image">
-          <img src="assets/landings/05-office-pdf.png" alt="Folio Office docs and PDF" loading="lazy">
-        </div>
-        <div class="split-text">
-          <span class="eyebrow">office &amp; pdf</span>
-          <h2><span data-i18n="split.office.h2.line1">Office 与 PDF</span><span class="serif" data-i18n="split.office.h2.serif">open in one click.</span></h2>
-          <p data-i18n="split.office.body">不用等 Office 启动。Word、Excel、PowerPoint、Pages、Numbers、Keynote 和 PDF——双击就能看，干干净净。</p>
-          <ul>
-            <li data-i18n="split.office.li1">支持 Word、Excel、PowerPoint、Pages、Numbers、Keynote</li>
-            <li data-i18n="split.office.li2">PDF 内文搜索、目录跳转、关键词高亮</li>
-            <li data-i18n="split.office.li3">长文档秒开，滚动顺滑</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- Split 5: Video -->
-    <section class="split reveal">
-      <div class="split-inner">
-        <div class="split-text">
-          <span class="eyebrow">video player</span>
-          <h2><span data-i18n="split.video.h2.line1">每段视频</span><span class="serif" data-i18n="split.video.h2.serif">one smooth player.</span></h2>
-          <p data-i18n="split.video.body">主流视频格式直接播放，不用等转码。键盘快捷键、字幕、画中画一应俱全，省电不发烫。</p>
-          <ul>
-            <li data-i18n="split.video.li1">省电流畅，不烫手不卡顿</li>
-            <li data-i18n="split.video.li2">字幕文件一拖即用</li>
-            <li data-i18n="split.video.li3">音频文件也能看到声音波形</li>
-          </ul>
-        </div>
-        <div class="split-image">
-          <img src="assets/landings/06-video.png" alt="Folio video player" loading="lazy">
-        </div>
-      </div>
-    </section>
-
-    <!-- Formats marquee -->
-    <section class="formats-strip">
-      <div class="container reveal">
-        <span class="eyebrow">supported formats</span>
-        <h3 data-i18n="formats.h3">14 种格式，一个窗口看完</h3>
-      </div>
-      <div class="formats-marquee" aria-hidden="true">
-        <div class="formats-track" id="formatsTrack">
-          <!-- Filled by JS to support both languages -->
-        </div>
-      </div>
-    </section>
-
-    <!-- Themes -->
-    <section class="split reverse reveal" id="themes" style="padding-top:96px;">
-      <div class="split-inner">
-        <div class="split-image">
-          <img src="assets/landings/07-themes.png" alt="Folio themes" loading="lazy">
-        </div>
-        <div class="split-text">
-          <span class="eyebrow">themes</span>
-          <h2><span data-i18n="split.themes.h2.line1">你的 Folio</span><span class="serif" data-i18n="split.themes.h2.serif">your color, 15 themes.</span></h2>
-          <p data-i18n="split.themes.body">细腻的界面质感，搭配 15 套精心调校的主题。从奶油米到午夜黑、从苔藓绿到墨水蓝——每个文件都有最合适的阅读色温。</p>
-          <ul>
-            <li data-i18n="split.themes.li1">15 套精心调校的主题</li>
-            <li data-i18n="split.themes.li2">深浅自动跟随系统</li>
-            <li data-i18n="split.themes.li3">字体、行高、阅读宽度都能自己调</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- More features -->
-    <section class="features">
-      <div class="container">
-        <div class="section-head reveal">
-          <span class="eyebrow" data-i18n="more.eyebrow">还有更多</span>
-          <h2><span data-i18n="more.h2.line1">不只是看，更是</span><span class="serif accent" data-i18n="more.h2.serif">用得顺手。</span></h2>
-          <p data-i18n="more.body">每一个细节，都为了让你在文件之间穿梭得更安静、更专注。</p>
-        </div>
-        <div class="features-grid">
-          <div class="feature reveal">
-            <div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
-            <h3 data-i18n="feat.tabs.h">访达式标签</h3>
-            <p data-i18n="feat.tabs.p">每个工作空间记得你的滚动位置和上次打开的文件。</p>
-          </div>
-          <div class="feature reveal">
-            <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
-            <h3 data-i18n="feat.search.h">秒找任何东西</h3>
-            <p data-i18n="feat.search.p">按内容搜索，不止文件名。笔记里的一句话也能瞬间命中。</p>
-          </div>
-          <div class="feature reveal">
-            <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
-            <h3 data-i18n="feat.folders.h">多文件夹并列</h3>
-            <p data-i18n="feat.folders.p">几个项目同时挂着，左边一棵清晰的文件树。</p>
-          </div>
-          <div class="feature reveal">
-            <div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div>
-            <h3 data-i18n="feat.glass.h">细腻玻璃质感</h3>
-            <p data-i18n="feat.glass.p">与系统美学一脉相承的优雅界面。</p>
-          </div>
-          <div class="feature reveal">
-            <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-            <h3 data-i18n="feat.3d.h">3D 模型与字体预览</h3>
-            <p data-i18n="feat.3d.p">三维模型可以转着看，字体可以一目了然地试。</p>
-          </div>
-          <div class="feature reveal">
-            <div class="feature-icon"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg></div>
-            <h3 data-i18n="feat.tables.h">表格与数据</h3>
-            <p data-i18n="feat.tables.p">电子表格与数据表直接查看、排序、筛选。</p>
-          </div>
-          <div class="feature reveal">
-            <div class="feature-icon"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
-            <h3 data-i18n="feat.code.h">代码语法着色</h3>
-            <p data-i18n="feat.code.p">几乎你能想到的编程语言都已经准备好。</p>
-          </div>
-          <div class="feature reveal">
-            <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-            <h3 data-i18n="feat.translate.h">Markdown 翻译</h3>
-            <p data-i18n="feat.translate.p">一键把笔记切换成另一种语言，离线快速。</p>
-          </div>
-          <div class="feature reveal">
-            <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
-            <h3 data-i18n="feat.focus.h">无干扰阅读</h3>
-            <p data-i18n="feat.focus.p">透明标题栏、阅读宽度可调，让文字成为主角。</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- Folio Pro -->
-    <section class="pro pro-zone" id="pro">
+    <section class="pro" id="pro" data-scene="ambient">
       <div class="container">
         <div class="section-head reveal">
           <span class="pro-badge"><b>PRO</b><span data-i18n="pro.badge">Folio 的全部，再多一点</span></span>
@@ -2604,42 +450,42 @@
         </div>
 
         <div class="pro-grid">
-          <div class="pro-card reveal">
+          <div class="pro-card glass reveal">
             <div class="feature-icon"><svg viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div>
             <h3 data-i18n="pro.term.h">终端与 AI 标签页</h3>
             <p data-i18n="pro.term.p">在要修改的文件旁边，直接运行 Claude Code、Codex 等命令行工具。</p>
           </div>
-          <div class="pro-card reveal">
+          <div class="pro-card glass reveal">
             <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="9" r="2.5"/><path d="M6 8.5v7M18 11.5c0 3-3 3.5-9.5 5"/></svg></div>
             <h3 data-i18n="pro.git.h">完整 Git</h3>
             <p data-i18n="pro.git.p">打开的每个仓库都能看提交历史、Diff 与 Blame。</p>
           </div>
-          <div class="pro-card reveal">
+          <div class="pro-card glass reveal">
             <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/></svg></div>
             <h3 data-i18n="pro.ask.h">提问与总结</h3>
             <p data-i18n="pro.ask.p">在侧栏里提问，任何文档都能一键总结。</p>
           </div>
-          <div class="pro-card reveal">
+          <div class="pro-card glass reveal">
             <div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg></div>
             <h3 data-i18n="pro.local.h">本地模型</h3>
             <p data-i18n="pro.local.p">语义搜索、离线翻译与 OCR，在你的 Mac 上运行。</p>
           </div>
-          <div class="pro-card reveal">
+          <div class="pro-card glass reveal">
             <div class="feature-icon"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
             <h3 data-i18n="pro.lsp.h">语言服务</h3>
             <p data-i18n="pro.lsp.p">通过 LSP 为 Go、Rust、Python、TS/JS、Java 提供代码智能。</p>
           </div>
-          <div class="pro-card reveal">
+          <div class="pro-card glass reveal">
             <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
             <h3 data-i18n="pro.tasks.h">任务与日历</h3>
             <p data-i18n="pro.tasks.p">任务放在工作旁边，与菜单栏日历联动。</p>
           </div>
-          <div class="pro-card reveal">
+          <div class="pro-card glass reveal">
             <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/></svg></div>
             <h3 data-i18n="pro.pdf.h">PDF 进阶</h3>
             <p data-i18n="pro.pdf.p">PDF 转成 Markdown，或保留排版直接翻译。</p>
           </div>
-          <div class="pro-card reveal">
+          <div class="pro-card glass reveal">
             <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M17.5 19a4.5 4.5 0 1 0-1.4-8.8A6 6 0 0 0 4.5 12 3.5 3.5 0 0 0 6 19z"/></svg></div>
             <h3 data-i18n="pro.sync.h">iCloud 同步</h3>
             <p data-i18n="pro.sync.p">支持 iCloud 同步，以及更多翻译引擎。</p>
@@ -2658,7 +504,7 @@
     </section>
 
     <!-- Compare editions（保留 #editions 锚点，兼容旧链接） -->
-    <section class="compare" id="editions">
+    <section class="compare" id="editions" data-scene="ambient">
       <div class="container">
         <div class="section-head reveal">
           <span class="eyebrow" data-i18n="cmp.eyebrow">对比版本</span>
@@ -2733,7 +579,7 @@
     </section>
 
     <!-- FAQ -->
-    <section class="faq" id="faq">
+    <section class="faq" id="faq" data-scene="ambient">
       <div class="container">
         <div class="section-head reveal">
           <span class="eyebrow" data-i18n="faq.eyebrow">常见问题</span>
@@ -2741,7 +587,7 @@
         </div>
         <div class="faq-list">
           <div class="faq-item reveal">
-            <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+            <button class="faq-q" aria-expanded="false">
               <span data-i18n="faq.q1">Folio 是什么？</span>
               <span class="faq-icon"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
             </button>
@@ -2750,7 +596,7 @@
             </div>
           </div>
           <div class="faq-item reveal">
-            <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+            <button class="faq-q" aria-expanded="false">
               <span data-i18n="faq.q2">和「预览.app」/ Quick Look 有什么不同？</span>
               <span class="faq-icon"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
             </button>
@@ -2759,7 +605,7 @@
             </div>
           </div>
           <div class="faq-item reveal">
-            <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+            <button class="faq-q" aria-expanded="false">
               <span data-i18n="faq.q3">我可以用它编辑文件吗？</span>
               <span class="faq-icon"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
             </button>
@@ -2768,7 +614,7 @@
             </div>
           </div>
           <div class="faq-item reveal">
-            <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+            <button class="faq-q" aria-expanded="false">
               <span data-i18n="faq.q4">支持哪些 macOS 版本？</span>
               <span class="faq-icon"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
             </button>
@@ -2777,7 +623,7 @@
             </div>
           </div>
           <div class="faq-item reveal">
-            <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+            <button class="faq-q" aria-expanded="false">
               <span data-i18n="faq.q5">搜索一万个文件的文件夹会不会很慢？</span>
               <span class="faq-icon"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
             </button>
@@ -2786,7 +632,7 @@
             </div>
           </div>
           <div class="faq-item reveal">
-            <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+            <button class="faq-q" aria-expanded="false">
               <span data-i18n="faq.q6">我的数据安全吗？</span>
               <span class="faq-icon"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
             </button>
@@ -2795,7 +641,7 @@
             </div>
           </div>
           <div class="faq-item reveal">
-            <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+            <button class="faq-q" aria-expanded="false">
               <span data-i18n="faq.q7">是否免费？</span>
               <span class="faq-icon"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
             </button>
@@ -2804,7 +650,7 @@
             </div>
           </div>
           <div class="faq-item reveal">
-            <button class="faq-q" onclick="toggleFaq(this)" aria-expanded="false">
+            <button class="faq-q" aria-expanded="false">
               <span data-i18n="faq.q8">Folio 和 Folio Pro 有什么区别？</span>
               <span class="faq-icon"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
             </button>
@@ -2817,7 +663,7 @@
     </section>
 
     <!-- Final CTA -->
-    <section class="cta-section" id="download">
+    <section class="cta-section" id="download" data-scene="cta">
       <div class="container">
         <span class="eyebrow reveal" style="margin-bottom:20px;" data-i18n="cta.eyebrow">准备好了吗？</span>
         <h2 class="reveal">One app.<span class="serif">See every file.</span></h2>
@@ -2858,618 +704,6 @@
     </div>
   </footer>
 
-  <script>
-    // ===== i18n dictionary =====
-    const I18N = {
-      zh: {
-        'document.title': 'Folio — 一个应用，看见每个文件',
-        'document.description': 'Folio 让你的 Mac 安静下来。把所有你常用的文件——文档、表格、演示稿、PDF、笔记、图片、音乐与视频——全部装进一个窗口。',
-
-        'nav.formats': '所有格式',
-        'nav.features': '功能',
-        'nav.faq': '常见问题',
-        'nav.cta': '下载 Folio',
-
-        'btn.pro.sub': '终端、Git 与本地 AI',
-        'btn.store.sub': '来自 Mac App Store',
-        'hero.ed.aria': '选择版本',
-        'hero.ed.rec': '推荐',
-        'hero.store.f1': '阅读、编辑、搜索所有文件',
-        'hero.store.f2': '沙盒运行，自动更新',
-        'hero.store.f3': '没有终端与 Git',
-        'hero.pro.f1': '包含 Folio 的全部功能',
-        'hero.pro.f2': '终端与 AI 智能体',
-        'hero.pro.f3': '完整 Git 与本地 AI',
-        'nav.compare': '对比版本',
-        'hero.compare': '对比两个版本',
-        'hero.meta.free': '两个版本目前都免费',
-        'hero.meta.soon': 'Windows、iPadOS、iOS 即将到来',
-        'free': '目前免费',
-        'soon': '即将到来',
-        'channel.direct': '直接下载',
-        'cta.note': '两个版本目前都免费 · Windows 即将到来',
-
-        'line.eyebrow': '两个版本，同一个内核',
-        'line.h2.line1': '同一个 Folio，',
-        'line.h2.serif': '走多远由你定。',
-        'line.sub': '两个版本用同一套方式阅读、编辑和搜索每个文件。Folio Pro 再加上那些必须走出 App Store 沙盒才能做到的工具。',
-        'line.store.tag': '看见每个文件。',
-        'line.store.desc': '所有格式一个窗口打开，Markdown、代码与笔记可编辑，全文搜索，15 套主题。沙盒运行，由 App Store 自动更新。',
-        'line.store.c1': '全格式阅读',
-        'line.store.c2': '编辑',
-        'line.store.c3': '全文搜索',
-        'line.store.c4': '15 套主题',
-        'line.store.for': '适合阅读、写作与日常文件',
-        'line.store.link': '看看核心功能',
-        'line.pro.tag': '看见之后，直接动手。',
-        'line.pro.desc': '包含 Folio 的全部能力，外加能跑 AI 智能体的终端、完整 Git、本地模型与语言服务。',
-        'line.pro.c0': 'Folio 的全部 +',
-        'line.pro.c1': '终端与 AI',
-        'line.pro.c2': '本地模型',
-        'line.pro.c3': '任务',
-        'line.pro.c4': 'iCloud 同步',
-        'line.pro.for': '适合开发者、研究者与重度用户',
-        'line.pro.link': '看看 Folio Pro',
-        'core.label': '两个版本都有',
-
-        'pro.badge': 'Folio 的全部，再多一点',
-        'pro.h2.line1': '看见每个文件，',
-        'pro.h2.serif': '然后直接动手。',
-        'pro.sub': 'Folio Pro 包含 Folio 的全部，再加上只有走出 App Store 沙盒才能做到的事：能跑 AI 智能体的终端、真正的 Git，以及在你 Mac 上运行的本地模型。',
-        'pro.window.aria': 'Folio Pro 窗口：左侧是带 Git 状态的文件树，右上是代码 Diff，右下是运行 Claude Code 的终端',
-        'pro.term.h': '终端与 AI 标签页',
-        'pro.term.p': '在要修改的文件旁边，直接运行 Claude Code、Codex 等命令行工具。',
-        'pro.git.h': '完整 Git',
-        'pro.git.p': '打开的每个仓库都能看提交历史、Diff 与 Blame。',
-        'pro.ask.h': '提问与总结',
-        'pro.ask.p': '在侧栏里提问，任何文档都能一键总结。',
-        'pro.local.h': '本地模型',
-        'pro.local.p': '语义搜索、离线翻译与 OCR，在你的 Mac 上运行。',
-        'pro.lsp.h': '语言服务',
-        'pro.lsp.p': '通过 LSP 为 Go、Rust、Python、TS/JS、Java 提供代码智能。',
-        'pro.tasks.h': '任务与日历',
-        'pro.tasks.p': '任务放在工作旁边，与菜单栏日历联动。',
-        'pro.pdf.h': 'PDF 进阶',
-        'pro.pdf.p': 'PDF 转成 Markdown，或保留排版直接翻译。',
-        'pro.sync.h': 'iCloud 同步',
-        'pro.sync.p': '支持 iCloud 同步，以及更多翻译引擎。',
-        'pro.req': 'macOS 15+ · 仅 Apple 芯片（M 系列）· 目前免费',
-
-        'cmp.eyebrow': '对比版本',
-        'cmp.h2.line1': '选一个',
-        'cmp.sub': '要终端、Git 与本地 AI，选 Folio Pro；只想日常查看和编辑，选 App Store 版 Folio。两个版本目前都免费。',
-        'cmp.caption': 'Folio 与 Folio Pro 功能对比',
-        'cmp.yes': '包含',
-        'cmp.no': '不包含',
-        'cmp.g.core': '核心能力',
-        'cmp.g.pro': 'Pro 工具',
-        'cmp.g.get': '获取方式',
-        'cmp.r1': '打开所有格式：文档、表格、演示稿、PDF、图片、音乐与视频',
-        'cmp.r2': 'Markdown、代码与笔记编辑',
-        'cmp.r3': 'PDF 工具箱',
-        'cmp.r4': '跨工作空间全文搜索',
-        'cmp.r5': '自动备份与历史版本',
-        'cmp.r6': '15 套主题，深浅自动',
-        'cmp.r7': '翻译',
-        'cmp.r7.a': 'Apple 系统翻译',
-        'cmp.r7.b': '+ 本地模型与更多引擎',
-        'cmp.r8': '终端与 AI 标签页（Claude Code、Codex…）',
-        'cmp.r9': 'Git：提交历史、Diff、Blame',
-        'cmp.r10': '侧栏提问与文档总结',
-        'cmp.r11': '本地模型：语义搜索、OCR',
-        'cmp.r12': '语言服务（LSP）',
-        'cmp.r13': '任务，与菜单栏日历联动',
-        'cmp.r14': 'PDF 转 Markdown、保留排版的 PDF 翻译',
-        'cmp.r15': 'iCloud 同步',
-        'cmp.r16': '分发',
-        'cmp.r16.a': 'App Store · 沙盒',
-        'cmp.r16.b': '直接下载',
-        'cmp.r17': '系统要求',
-        'cmp.r17.b': 'macOS\u00a015+ · Apple\u00a0芯片',
-        'cmp.r18': '价格',
-        'cmp.one': '同一台 Mac 上请只安装其中一个——两者注册相同的 Quick Look 与 Safari 扩展。',
-        'btn.pro': '下载 Folio Pro',
-        'btn.store.short': '下载 Folio',
-
-        'hero.subtitle': '让你的 Mac 安静下来。把所有你常用的文件——文档、表格、演示稿、PDF、笔记、图片、音乐与视频——全部装进一个窗口。',
-
-        'pillar.1.h': '多工作空间',
-        'pillar.2.h': '全格式，一个 app',
-        'pillar.3.h': '全文搜索',
-        'pillar.4.h': 'Markdown 编辑器',
-        'pillar.1.body': '每个项目一个标签页。一键切换，回到上次离开的地方——文件夹、滚动位置、上次打开的文件，都还在那里。',
-        'pillar.2.body': '一个 app 顶替十几个。文档、表格、演示稿、PDF、笔记、图片、音乐、视频——直接打开就能看。',
-        'pillar.3.body': '搜的不只是文件名。笔记里的一句话、表格里的一个数字都能直接命中——跨所有打开的工作空间。',
-        'pillar.4.body': '像阅读发表后的文章一样写作。无需分屏预览，所写即所见。',
-
-        'banner.h2.line1': '一个 app，',
-        'banner.h2.serif': '看见每个文件。',
-        'banner.body': '不再在十几个应用之间反复切换。Folio 用一个窗口承接你所有的文件。',
-
-        'split.code.h2.line1': '优雅的代码阅读',
-        'split.code.h2.serif': 'fully yours.',
-        'split.code.body': '主流编程语言一应俱全。语法着色清爽、缩进对齐整齐——让代码读起来像读散文一样舒服。',
-        'split.code.li1': '主流编程语言全覆盖',
-        'split.code.li2': '舒服的字号、行距与配色，长时间阅读不累',
-        'split.code.li3': '文件夹并排浏览，需要时随时切换',
-
-        'split.image.h2.line1': '所有图片格式',
-        'split.image.h2.serif': 'just one viewer.',
-        'split.image.body': '再大的图也是秒开。手机照片、相机原图、网络图片、动图、矢量图——一键打开，可缩放、查看拍摄信息、在文件夹里前后翻页。',
-        'split.image.li1': '从手机随手拍到相机原片，常见格式都能看',
-        'split.image.li2': '超大图秒开，无需等待',
-        'split.image.li3': '方向键翻页，空格键快速预览',
-
-        'split.md.h2.line1': 'Markdown 像',
-        'split.md.h2.serif': 'natural writing.',
-        'split.md.body': '边写边见。标题、列表、表格、代码块立刻自动美化，没有分屏预览的割裂。内置离线翻译，写作的同时切换语言。',
-        'split.md.li1': '所写即所见，整洁清爽',
-        'split.md.li2': '数学公式、流程图、代码块自动美化',
-        'split.md.li3': '多语言翻译，离线就能用',
-
-        'split.office.h2.line1': 'Office 与 PDF',
-        'split.office.h2.serif': 'open in one click.',
-        'split.office.body': '不用等 Office 启动。Word、Excel、PowerPoint、Pages、Numbers、Keynote 和 PDF——双击就能看，干干净净。',
-        'split.office.li1': '支持 Word、Excel、PowerPoint、Pages、Numbers、Keynote',
-        'split.office.li2': 'PDF 内文搜索、目录跳转、关键词高亮',
-        'split.office.li3': '长文档秒开，滚动顺滑',
-
-        'split.video.h2.line1': '每段视频',
-        'split.video.h2.serif': 'one smooth player.',
-        'split.video.body': '主流视频格式直接播放，不用等转码。键盘快捷键、字幕、画中画一应俱全，省电不发烫。',
-        'split.video.li1': '省电流畅，不烫手不卡顿',
-        'split.video.li2': '字幕文件一拖即用',
-        'split.video.li3': '音频文件也能看到声音波形',
-
-        'formats.h3': '14 种格式，一个窗口看完',
-
-        'split.themes.h2.line1': '你的 Folio',
-        'split.themes.h2.serif': 'your color, 15 themes.',
-        'split.themes.body': '细腻的界面质感，搭配 15 套精心调校的主题。从奶油米到午夜黑、从苔藓绿到墨水蓝——每个文件都有最合适的阅读色温。',
-        'split.themes.li1': '15 套精心调校的主题',
-        'split.themes.li2': '深浅自动跟随系统',
-        'split.themes.li3': '字体、行高、阅读宽度都能自己调',
-
-        'more.eyebrow': '还有更多',
-        'more.h2.line1': '不只是看，更是',
-        'more.h2.serif': '用得顺手。',
-        'more.body': '每一个细节，都为了让你在文件之间穿梭得更安静、更专注。',
-
-        'feat.tabs.h':      '访达式标签',
-        'feat.tabs.p':      '每个工作空间记得你的滚动位置和上次打开的文件。',
-        'feat.search.h':    '秒找任何东西',
-        'feat.search.p':    '按内容搜索，不止文件名。笔记里的一句话也能瞬间命中。',
-        'feat.folders.h':   '多文件夹并列',
-        'feat.folders.p':   '几个项目同时挂着，左边一棵清晰的文件树。',
-        'feat.glass.h':     '细腻玻璃质感',
-        'feat.glass.p':     '与系统美学一脉相承的优雅界面。',
-        'feat.3d.h':        '3D 模型与字体预览',
-        'feat.3d.p':        '三维模型可以转着看，字体可以一目了然地试。',
-        'feat.tables.h':    '表格与数据',
-        'feat.tables.p':    '电子表格与数据表直接查看、排序、筛选。',
-        'feat.code.h':      '代码语法着色',
-        'feat.code.p':      '几乎你能想到的编程语言都已经准备好。',
-        'feat.translate.h': 'Markdown 翻译',
-        'feat.translate.p': '一键把笔记切换成另一种语言，离线快速。',
-        'feat.focus.h':     '无干扰阅读',
-        'feat.focus.p':     '透明标题栏、阅读宽度可调，让文字成为主角。',
-
-        'faq.eyebrow': '常见问题',
-        'faq.h2': '仍有疑问？',
-        'faq.q1': 'Folio 是什么？',
-        'faq.a1': 'Folio 是一款 Mac 文件浏览器。一个应用里就能打开文档、表格、演示稿、PDF、笔记、代码、图片、音乐和视频——把你日常要切换的十几个 app 收纳进一个安静、专注的窗口。',
-        'faq.q2': '和「预览.app」/ Quick Look 有什么不同？',
-        'faq.a2': '系统自带的预览只能「看一眼就关」。Folio 是为长时间停留打造的工作空间：多标签、跨文件搜索、双向编辑笔记、15 套阅读主题——把「打开一下就走」变成「打开就能开始工作」。',
-        'faq.q3': '我可以用它编辑文件吗？',
-        'faq.a3': '可以。笔记和代码完全可编辑。Office 文档与 PDF 目前是高保真预览，下一版本会开放标注与表单填写。',
-        'faq.q4': '支持哪些 macOS 版本？',
-        'faq.a4': 'Folio 支持 macOS 15 及以上版本。Folio Pro 内置本地模型，需要 Apple 芯片（M 系列）的 Mac。',
-        'faq.q5': '搜索一万个文件的文件夹会不会很慢？',
-        'faq.a5': 'Folio 在你打开文件夹时就悄悄准备好，之后只在文件变化时跟进。一万个文件的大文件夹，输入即可命中——你不会感觉到它在工作。',
-        'faq.q6': '我的数据安全吗？',
-        'faq.a6': '所有处理都在你的电脑上完成。Folio 不会把你的文件内容上传到任何地方——这是默认行为，没有「关闭云同步」的开关。',
-        'faq.q7': '是否免费？',
-        'faq.a7': 'Folio 与 Folio Pro 目前都完全免费。将来如果调整定价，会提前公布，早期用户会获得忠诚度优惠。',
-        'faq.q8': 'Folio 和 Folio Pro 有什么区别？',
-        'faq.a8': 'Folio 来自 Mac App Store，运行在沙盒里，专注日常的文件查看与编辑。Folio Pro 是直接下载的版本，不受沙盒限制，因此多了内置终端与 AI 标签页、完整 Git、本地模型、语言服务、任务和 iCloud 同步。两者共用同一套文件阅读体验；它们会注册相同的 Quick Look 与 Safari 扩展，同一台 Mac 上请只安装其中一个。',
-
-        'cta.eyebrow': '准备好了吗？',
-        'cta.body': '让你的 Mac 安静下来。一个窗口，看完所有文件。',
-
-        'footer.copy': '© 2026 Folio · 为 macOS 而生',
-
-        'lang.label': '中文',
-        'formats.list': ['PDF','Word','Excel','PowerPoint','Pages','Numbers','Keynote','Markdown','代码','图片','音频','视频','3D 模型','数据表','CSV','字体','压缩包']
-      },
-
-      en: {
-        'document.title': 'Folio — One app. See every file.',
-        'document.description': 'Folio turns your Mac into one quiet, focused workspace. Documents, spreadsheets, slides, PDFs, notes, images, audio and video — all in a single window.',
-
-        'nav.formats': 'Formats',
-        'nav.features': 'Features',
-        'nav.faq': 'FAQ',
-        'nav.cta': 'Get Folio',
-
-        'btn.pro.sub': 'Terminal, Git & on-device AI',
-        'btn.store.sub': 'On the Mac App Store',
-        'hero.ed.aria': 'Choose an edition',
-        'hero.ed.rec': 'Recommended',
-        'hero.store.f1': 'Read, edit & search every file',
-        'hero.store.f2': 'Sandboxed, auto-updated',
-        'hero.store.f3': 'No terminal or Git',
-        'hero.pro.f1': 'Everything in Folio',
-        'hero.pro.f2': 'Terminal & AI agents',
-        'hero.pro.f3': 'Full Git & on-device AI',
-        'nav.compare': 'Compare',
-        'hero.compare': 'Compare editions',
-        'hero.meta.free': 'Both editions free for now',
-        'hero.meta.soon': 'Windows, iPadOS & iOS coming soon',
-        'free': 'Free for now',
-        'soon': 'coming soon',
-        'channel.direct': 'Direct download',
-        'cta.note': 'Both editions are free for now · Windows coming soon',
-
-        'line.eyebrow': 'two editions, one core',
-        'line.h2.line1': 'Same Folio.',
-        'line.h2.serif': 'Go as far as you need.',
-        'line.sub': 'Both editions read, edit and search every file the same way. Folio Pro adds the tools that need to live outside the App Store sandbox.',
-        'line.store.tag': 'See every file.',
-        'line.store.desc': 'Every format in one window, with Markdown, code and note editing, full-text search and 15 themes. Sandboxed, and kept up to date by the App Store.',
-        'line.store.c1': 'Every format',
-        'line.store.c2': 'Editing',
-        'line.store.c3': 'Full-text search',
-        'line.store.c4': '15 themes',
-        'line.store.for': 'For reading, writing and everyday files',
-        'line.store.link': 'Explore the core',
-        'line.pro.tag': 'Then get to work.',
-        'line.pro.desc': 'Everything in Folio, plus a terminal for your AI agents, a full Git client, on-device models and language servers.',
-        'line.pro.c0': 'Everything in Folio +',
-        'line.pro.c1': 'Terminal & AI',
-        'line.pro.c2': 'On-device models',
-        'line.pro.c3': 'Tasks',
-        'line.pro.c4': 'iCloud sync',
-        'line.pro.for': 'For developers, researchers and power users',
-        'line.pro.link': 'Explore Folio Pro',
-        'core.label': 'in both editions',
-
-        'pro.badge': 'Everything in Folio, and then some',
-        'pro.h2.line1': 'See every file.',
-        'pro.h2.serif': 'Then get to work.',
-        'pro.sub': 'Folio Pro is everything in Folio, plus what only works outside the App Store sandbox — a terminal for your AI agents, real Git, and models that run on your Mac.',
-        'pro.window.aria': 'Folio Pro window: a file tree with Git status on the left, a code diff at the top right, and a terminal running Claude Code below it',
-        'pro.term.h': 'Terminal & AI tab',
-        'pro.term.p': 'Run Claude Code, Codex and other CLIs right next to the files they change.',
-        'pro.git.h': 'Full Git client',
-        'pro.git.p': 'History, diff and blame for every repository you open.',
-        'pro.ask.h': 'Ask & summarize',
-        'pro.ask.p': 'Ask questions in the side panel and summarize any document.',
-        'pro.local.h': 'On-device models',
-        'pro.local.p': 'Semantic search, offline translation and OCR, running on your Mac.',
-        'pro.lsp.h': 'Language servers',
-        'pro.lsp.p': 'Code intelligence for Go, Rust, Python, TS/JS and Java via LSP.',
-        'pro.tasks.h': 'Tasks & calendar',
-        'pro.tasks.p': 'Keep tasks next to your work, linked to the menu-bar calendar.',
-        'pro.pdf.h': 'PDF, further',
-        'pro.pdf.p': 'Turn PDFs into Markdown, or translate them with the layout intact.',
-        'pro.sync.h': 'iCloud sync',
-        'pro.sync.p': 'Sync with iCloud, plus more translation engines to choose from.',
-        'pro.req': 'macOS 15+ · Apple Silicon (M-series) · Free for now',
-
-        'cmp.eyebrow': 'compare',
-        'cmp.h2.line1': 'Pick your',
-        'cmp.sub': 'Pick Folio Pro for terminal, Git and on-device AI. Pick Folio from the App Store for everyday viewing and editing. Both are free for now.',
-        'cmp.caption': 'Folio and Folio Pro feature comparison',
-        'cmp.yes': 'Included',
-        'cmp.no': 'Not included',
-        'cmp.g.core': 'The core',
-        'cmp.g.pro': 'Pro tools',
-        'cmp.g.get': 'Getting it',
-        'cmp.r1': 'Open every format — documents, sheets, slides, PDF, images, audio, video',
-        'cmp.r2': 'Markdown, code and note editing',
-        'cmp.r3': 'PDF toolkit',
-        'cmp.r4': 'Full-text search across workspaces',
-        'cmp.r5': 'Automatic backups and version history',
-        'cmp.r6': '15 themes, light and dark',
-        'cmp.r7': 'Translation',
-        'cmp.r7.a': 'Apple system translation',
-        'cmp.r7.b': '+ on-device models & more engines',
-        'cmp.r8': 'Terminal & AI tab (Claude Code, Codex…)',
-        'cmp.r9': 'Git: history, diff, blame',
-        'cmp.r10': 'Side-panel Ask and summaries',
-        'cmp.r11': 'On-device semantic search and OCR',
-        'cmp.r12': 'Language servers (LSP)',
-        'cmp.r13': 'Tasks, linked to the menu-bar calendar',
-        'cmp.r14': 'PDF to Markdown, layout-preserving PDF translation',
-        'cmp.r15': 'iCloud sync',
-        'cmp.r16': 'Distribution',
-        'cmp.r16.a': 'App Store · sandboxed',
-        'cmp.r16.b': 'Direct download',
-        'cmp.r17': 'Requires',
-        'cmp.r17.b': 'macOS\u00a015+ · Apple\u00a0Silicon',
-        'cmp.r18': 'Price',
-        'cmp.one': 'Install only one on a given Mac — both register the same Quick Look and Safari extensions.',
-        'btn.pro': 'Get Folio Pro',
-        'btn.store.short': 'Get Folio',
-
-        'hero.subtitle': 'Turn your Mac into one quiet, focused workspace. Documents, spreadsheets, slides, PDFs, notes, images, music and video — all in a single window.',
-
-        'pillar.1.h': 'Multi-Workspace',
-        'pillar.2.h': 'All Formats, One App',
-        'pillar.3.h': 'Full-Text Search',
-        'pillar.4.h': 'Markdown Editor',
-        'pillar.1.body': 'Every project gets its own tab. One click switches — your work is always where you left it: folder, scroll position, last opened file, all preserved.',
-        'pillar.2.body': 'One app replaces a dozen. Documents, spreadsheets, slides, PDFs, notes, images, music, video — open and read instantly.',
-        'pillar.3.body': 'Search reaches inside files, not just filenames. A single line in your notes or a number in a spreadsheet — found instantly, across every open workspace.',
-        'pillar.4.body': 'Read like a published page. Write without a preview pane — what you write is what you see.',
-
-        'banner.h2.line1': 'One app,',
-        'banner.h2.serif': 'see every file.',
-        'banner.body': 'Stop jumping between a dozen apps. Folio holds everything in one window.',
-
-        'split.code.h2.line1': 'Elegant code reading,',
-        'split.code.h2.serif': 'fully yours.',
-        'split.code.body': 'Every popular programming language is ready. Crisp syntax colors, tidy indentation — code reads like prose, not a wall of text.',
-        'split.code.li1': 'Covers every popular programming language',
-        'split.code.li2': 'Comfortable sizing and spacing for long reading',
-        'split.code.li3': 'Browse multiple folders side by side',
-
-        'split.image.h2.line1': 'All image formats,',
-        'split.image.h2.serif': 'just one viewer.',
-        'split.image.body': 'Even huge files open instantly. Phone shots, camera raw, web images, GIFs, vector files — open, zoom, read details, and flip through a folder.',
-        'split.image.li1': 'From phone shots to camera raw, all common formats',
-        'split.image.li2': 'Huge files open in a blink',
-        'split.image.li3': 'Arrow keys browse, space for quick look',
-
-        'split.md.h2.line1': 'Markdown that flows like',
-        'split.md.h2.serif': 'natural writing.',
-        'split.md.body': 'Write naturally, see results instantly. Headers, lists, tables, code blocks render as you type — no preview pane required. Offline translation built in.',
-        'split.md.li1': 'What you write is what you see',
-        'split.md.li2': 'Math, diagrams, code blocks rendered beautifully',
-        'split.md.li3': 'Translate locally — no internet required',
-
-        'split.office.h2.line1': 'Office docs and PDF,',
-        'split.office.h2.serif': 'open in one click.',
-        'split.office.body': "No waiting for Office to launch. Word, Excel, PowerPoint, Pages, Numbers, Keynote and PDFs — double-click and read, clean and clear.",
-        'split.office.li1': 'Word, Excel, PowerPoint, Pages, Numbers, Keynote',
-        'split.office.li2': 'Search inside PDFs, jump by outline, highlight matches',
-        'split.office.li3': 'Long documents open instantly, scroll smoothly',
-
-        'split.video.h2.line1': 'Every video,',
-        'split.video.h2.serif': 'one smooth player.',
-        'split.video.body': 'All major formats play instantly — no conversion needed. Keyboard shortcuts, subtitles, picture-in-picture, and easy on the battery.',
-        'split.video.li1': 'Smooth playback, easy on the battery',
-        'split.video.li2': 'Drop in a subtitle file and go',
-        'split.video.li3': 'Audio files show their waveform',
-
-        'formats.h3': '14 file types, one window',
-
-        'split.themes.h2.line1': 'Your Folio,',
-        'split.themes.h2.serif': 'your color, 15 themes.',
-        'split.themes.body': 'A delicate interface paired with 15 thoughtfully tuned themes — from cream and midnight to moss and ink. Every file finds its own light.',
-        'split.themes.li1': '15 carefully tuned themes',
-        'split.themes.li2': 'Auto-switch with system appearance',
-        'split.themes.li3': 'Customize font, line height, reading width',
-
-        'more.eyebrow': 'more',
-        'more.h2.line1': 'Not just to view,',
-        'more.h2.serif': 'but to use.',
-        'more.body': 'Every detail is tuned so moving between files feels quiet and focused.',
-
-        'feat.tabs.h':      'Finder-style tabs',
-        'feat.tabs.p':      'Each workspace remembers your scroll position and last opened file.',
-        'feat.search.h':    'Find anything in seconds',
-        'feat.search.p':    'Search by content, not just filenames. Even a single line in your notes.',
-        'feat.folders.h':   'Side-by-side folders',
-        'feat.folders.p':   'Mount several projects at once with a clean, clear file tree.',
-        'feat.glass.h':     'Crystalline interface',
-        'feat.glass.p':     'An elegant interface aligned with system aesthetics.',
-        'feat.3d.h':        '3D models & fonts',
-        'feat.3d.p':        'Rotate 3D models, preview fonts at a glance.',
-        'feat.tables.h':    'Tables & data',
-        'feat.tables.p':    'View, sort and filter spreadsheets and data tables.',
-        'feat.code.h':      'Syntax-colored code',
-        'feat.code.p':      'Just about every programming language is ready out of the box.',
-        'feat.translate.h': 'Markdown translation',
-        'feat.translate.p': 'Translate notes with one tap — fast, and fully offline.',
-        'feat.focus.h':     'Distraction-free reading',
-        'feat.focus.p':     'Transparent titlebar, adjustable width — your content is the star.',
-
-        'faq.eyebrow': 'FAQ',
-        'faq.h2': 'Still curious?',
-        'faq.q1': 'What is Folio?',
-        'faq.a1': 'Folio is a universal file viewer for Mac. One app opens documents, spreadsheets, slides, PDFs, notes, code, images, music and video — replacing the dozen apps you usually juggle, in one quiet, focused window.',
-        'faq.q2': 'How is it different from Preview / Quick Look?',
-        'faq.a2': 'macOS Preview is built for a quick glance. Folio is built to stay: tabs, cross-file search, two-way editing for notes, and 15 reading themes — turning "peek and close" into "open and work".',
-        'faq.q3': 'Can I edit files in it?',
-        'faq.a3': 'Yes. Notes and code are fully editable. Office files and PDFs are high-fidelity preview today; annotation and form filling are coming next.',
-        'faq.q4': 'Which macOS versions are supported?',
-        'faq.a4': 'Folio supports macOS 15 and above. Folio Pro bundles on-device models, so it needs an Apple Silicon (M-series) Mac.',
-        'faq.q5': 'Will searching a folder of 10,000 files be slow?',
-        'faq.a5': "Folio quietly prepares when you open a folder, then only catches up on changes. Even folders with 10,000 files respond as you type — you won't notice it working.",
-        'faq.q6': 'Is my data safe?',
-        'faq.a6': 'Everything happens on your Mac. Folio never uploads your files anywhere — it is the default, with no cloud toggle to switch off.',
-        'faq.q7': 'Is it free?',
-        'faq.a7': 'Both Folio and Folio Pro are free for now. If pricing changes, it will be announced in advance, and early users get a loyalty discount.',
-        'faq.q8': 'What is the difference between Folio and Folio Pro?',
-        'faq.a8': 'Folio comes from the Mac App Store and runs in the sandbox, focused on everyday viewing and editing. Folio Pro is the direct-download edition, free of the sandbox, so it adds a built-in terminal and AI tab, full Git, on-device models, language servers, tasks and iCloud sync. Both share the same file-reading experience; they register the same Quick Look and Safari extensions, so install only one on a given Mac.',
-
-        'cta.eyebrow': 'ready?',
-        'cta.body': 'Make your Mac quiet. One window for every file.',
-
-        'footer.copy': '© 2026 Folio · Made for macOS',
-
-        'lang.label': 'English',
-        'formats.list': ['PDF','Word','Excel','PowerPoint','Pages','Numbers','Keynote','Markdown','Code','Images','Audio','Video','3D Models','Databases','CSV','Fonts','Archives']
-      }
-    };
-
-    function detectInitialLang() {
-      // 默认英文；用户手动切换后记在 localStorage
-      const saved = localStorage.getItem('lang');
-      if (saved && I18N[saved]) return saved;
-      return 'en';
-    }
-
-    function applyI18n(lang) {
-      const dict = I18N[lang] || I18N.en;
-      document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
-      document.title = dict['document.title'];
-
-      const descMeta = document.querySelector('meta[name="description"]');
-      if (descMeta) descMeta.setAttribute('content', dict['document.description']);
-      const ogTitle = document.querySelector('meta[property="og:title"]');
-      if (ogTitle) ogTitle.setAttribute('content', dict['document.title']);
-      const ogDesc = document.querySelector('meta[property="og:description"]');
-      if (ogDesc) ogDesc.setAttribute('content', dict['document.description']);
-
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        const val = dict[key];
-        if (typeof val === 'string') el.textContent = val;
-      });
-      document.querySelectorAll('[data-i18n-aria]').forEach(el => {
-        const val = dict[el.getAttribute('data-i18n-aria')];
-        if (typeof val === 'string') el.setAttribute('aria-label', val);
-      });
-
-      // Folio Pro 直装包：GitHub Release 最新版的固定文件名资产，发新版时保持资产名 Folio-Pro.zip 即可，无需改此处
-      const PRO_URL = 'https://github.com/river-ranx/folio-web/releases/latest/download/Folio-Pro.zip';
-      document.querySelectorAll('a[data-pro]').forEach(a => { a.href = PRO_URL; });
-
-      // App Store 落地页语言跟随站点语言
-      const storeUrl = 'https://apps.apple.com/us/app/folio-universal-viewer/id6769624913?mt=12';
-      document.querySelectorAll('a[data-appstore]').forEach(a => {
-        a.href = lang === 'zh' ? storeUrl + '&l=zh-Hans-CN' : storeUrl;
-      });
-
-      // Formats marquee
-      const track = document.getElementById('formatsTrack');
-      if (track) {
-        const list = dict['formats.list'] || [];
-        // Duplicate for seamless loop
-        const html = [...list, ...list].map(name =>
-          `<span class="format-chip"><span class="dot"></span>${name}</span>`
-        ).join('');
-        track.innerHTML = html;
-      }
-
-      // Language switcher label & active state
-      const label = document.getElementById('langLabel');
-      if (label) label.textContent = dict['lang.label'];
-      document.querySelectorAll('#langMenu button[data-lang]').forEach(btn => {
-        btn.setAttribute('aria-current', btn.dataset.lang === lang ? 'true' : 'false');
-      });
-    }
-
-    function setLang(lang) {
-      if (!I18N[lang]) return;
-      localStorage.setItem('lang', lang);
-      applyI18n(lang);
-      closeLangMenu();
-    }
-
-    function toggleLangMenu(e) {
-      e.stopPropagation();
-      const el = document.getElementById('langSwitch');
-      const trigger = el.querySelector('.lang-trigger');
-      const isOpen = el.classList.toggle('open');
-      trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-    }
-
-    function closeLangMenu() {
-      const el = document.getElementById('langSwitch');
-      if (!el) return;
-      el.classList.remove('open');
-      const trigger = el.querySelector('.lang-trigger');
-      if (trigger) trigger.setAttribute('aria-expanded', 'false');
-    }
-
-    document.addEventListener('click', (e) => {
-      const sw = document.getElementById('langSwitch');
-      if (sw && !sw.contains(e.target)) closeLangMenu();
-    });
-
-    // ===== Loading transitions =====
-    window.addEventListener('load', () => {
-      requestAnimationFrame(() => {
-        document.body.classList.remove('loading');
-        setTimeout(() => {
-          document.getElementById('heroContent').classList.add('loaded');
-        }, 80);
-      });
-    });
-
-    // ===== Theme =====
-    function updateThemeColor(isDark) {
-      document.querySelectorAll('meta[name="theme-color"]').forEach(m => m.remove());
-      const meta = document.createElement('meta');
-      meta.name = 'theme-color';
-      meta.content = isDark ? '#0B0907' : '#FBF6EE';
-      document.head.appendChild(meta);
-    }
-
-    (function bootstrap() {
-      // Theme
-      // 默认深色；仅当用户手动切到浅色并记在 localStorage 时才用浅色（不再跟随系统）
-      const isDark = localStorage.getItem('theme') !== 'light';
-      if (isDark) document.documentElement.classList.add('dark');
-      updateThemeColor(isDark);
-
-      // Language (apply before paint)
-      applyI18n(detectInitialLang());
-    })();
-
-    function toggleTheme() {
-      document.documentElement.classList.toggle('dark');
-      const isDark = document.documentElement.classList.contains('dark');
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-      updateThemeColor(isDark);
-    }
-
-    // ===== Navbar scrolled =====
-    const navbar = document.querySelector('.navbar');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 12) navbar.classList.add('scrolled');
-      else navbar.classList.remove('scrolled');
-    }, { passive: true });
-
-    // ===== Mobile menu =====
-    function toggleMobileMenu() {
-      document.querySelector('.mobile-toggle').classList.toggle('open');
-      document.getElementById('mobileMenu').classList.toggle('open');
-    }
-
-    function closeMobileMenu() {
-      document.querySelector('.mobile-toggle').classList.remove('open');
-      document.getElementById('mobileMenu').classList.remove('open');
-    }
-
-    // ===== Scroll reveal =====
-    const revealObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          revealObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-
-    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-
-    // ===== FAQ accordion =====
-    function toggleFaq(button) {
-      const item = button.parentElement;
-      const wasOpen = item.classList.contains('open');
-      document.querySelectorAll('.faq-item.open').forEach(el => {
-        el.classList.remove('open');
-        el.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
-      });
-      if (!wasOpen) {
-        item.classList.add('open');
-        button.setAttribute('aria-expanded', 'true');
-      }
-    }
-  </script>
+  <script type="module" src="assets/js/main.js"></script>
 </body>
 </html>
