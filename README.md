@@ -1,15 +1,8 @@
-# Folio — One app. See every file.
+# Folio — Every file your AI writes. Read it and edit it right where it is.
 
-The marketing website for **Folio**, a universal file viewer for Mac.
+The marketing website for **Folio Pro**, a Mac app for the files your AI agents write: run Claude Code, ChatGPT and Gemini side by side, read and edit Markdown and Office files in place, and undo any bad edit with version history. Windows is coming.
 
-Two editions, both free for now:
-
-| Edition | Channel | Download button points to |
-| --- | --- | --- |
-| **Folio** | Mac App Store (sandboxed) | the App Store listing |
-| **Folio Pro** | Direct download (Developer ID, Apple Silicon) | `releases/latest/download/Folio-Pro.zip` (latest GitHub Release asset) |
-
-The Folio Pro URL lives in one place: the `PRO_URL` constant in `index.html`'s `applyI18n`.
+Folio Pro is the only edition on the site, and every download button points to `releases/latest/download/Folio-Pro.zip` (the latest GitHub Release asset). The URL lives in one place: the `PRO_URL` constant in `index.html`'s `applyI18n`.
 
 🌐 **Live**: [https://river-ranx.github.io/folio-web/](https://river-ranx.github.io/folio-web/)
 
@@ -41,8 +34,8 @@ Pushing to `main` is the deploy. GitHub Pages serves the repo root.
 index.html              # Single-file site (HTML + CSS + JS + i18n dictionary)
 assets/
   app-icon.png          # Folio app icon
-  landings/             # 7 hero landing images (one per feature section)
-  welcome/              # Welcome-window screenshot used below the hero
+  landings/             # Feature-section screenshots (Markdown, Word, PDF, EPUB, history, themes, Pro agent shots…)
+  welcome/              # Home-window screenshot used below the hero
 ```
 
 
