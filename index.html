@@ -188,6 +188,10 @@
     }
 
     /* ===== Typography ===== */
+    /* 换行：标题均衡分行，正文避免孤字/孤词；两个属性都是渐进增强，不支持时回到默认换行 */
+    h1, h2, h3, h4 { text-wrap: balance; }
+    p, li, figcaption, .faq-a { text-wrap: pretty; }
+    .faq-q { text-wrap: balance; }
     h1, h2, h3, h4 {
       color: var(--text);
       font-weight: 600;
@@ -726,7 +730,7 @@
       align-items: center;
       gap: 8px;
       height: 28px;
-      padding: 0 14px 0 10px;
+      padding: 0 14px;
       border-radius: 999px;
       background: var(--accent-soft);
       border: 1px solid var(--accent-soft);
@@ -737,14 +741,6 @@
       margin-bottom: 28px;
     }
 
-    .hero-badge .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-glow);
-    }
-
     .hero h1 {
       font-size: clamp(36px, 5.8vw, 76px);
       line-height: 1.08;
@@ -752,8 +748,12 @@
       max-width: 15em;
     }
 
-    /* 英文标语更长：缩小字号并收窄宽度，让第二行换行，避免压到两侧插画 */
+    /* 英文标语更长：缩小字号；宽屏下两行各占一行（衬线行约 707px，仍落在两侧插画之间），窄屏再收窄换行 */
     html[lang="en"] .hero h1 { font-size: clamp(32px, 4.2vw, 56px); max-width: 11.5em; }
+    @media (min-width: 560px) {
+      html[lang="en"] .hero h1 { max-width: none; }
+      html[lang="en"] .hero h1 .serif { white-space: nowrap; }
+    }
 
     .hero h1 .serif {
       color: var(--accent);
@@ -781,14 +781,6 @@
       gap: 7px;
       color: var(--text);
       font-weight: 500;
-    }
-
-    .hero-meta-free::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
     }
 
     .hero-meta {
@@ -827,27 +819,6 @@
     }
 
     .hero-window-inner img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
-
-    /* ===== Showcase banner ===== */
-    .showcase-banner {
-      padding: 32px 0 96px;
-    }
-
-    .banner-card {
-      max-width: 1160px;
-      margin: 0 auto;
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: var(--shadow-window);
-      border: 1px solid var(--border);
-      position: relative;
-    }
-
-    .banner-card img {
       width: 100%;
       height: auto;
       display: block;
@@ -959,35 +930,30 @@
     }
 
     .pillar {
-      padding: 28px 24px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background: var(--bg-elevated);
-      transition: border-color 0.2s ease, transform 0.25s ease, background 0.2s ease, box-shadow 0.25s ease;
+      --t: 236, 176, 48;               /* 每张卡一个色调，渐变、线条、阴影都从它派生 */
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      padding: 10px 26px 28px;
+      border-radius: 22px;
+      background: linear-gradient(160deg, rgba(var(--t), .26), rgba(var(--t), .10));
+      box-shadow:
+        inset 0 0 0 1px rgba(var(--t), .26),
+        inset 0 1px 0 rgba(255, 255, 255, .5),
+        0 14px 30px -16px rgba(60, 40, 20, .30);
+      transition: transform .25s ease, box-shadow .25s ease;
     }
-
-    .pillar:hover {
-      border-color: var(--accent);
-      transform: translateY(-3px);
-      box-shadow: 0 12px 30px -12px var(--accent-glow);
+    html.dark .pillar {
+      background: linear-gradient(160deg, rgba(var(--t), .24), rgba(var(--t), .08));
+      box-shadow:
+        inset 0 0 0 1px rgba(var(--t), .30),
+        inset 0 1px 0 rgba(255, 255, 255, .06),
+        0 14px 30px -16px rgba(0, 0, 0, .6);
     }
-
-    .pillar-num {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #FFFFFF;
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
-      font-size: 12px;
-      font-weight: 700;
-    }
+    .pillar:hover { transform: translateY(-3px); }
+    .pillar.t-butter { --t: 236, 176, 48; }
+    .pillar.t-sage   { --t: 96, 160, 112; }
+    .pillar.t-sky    { --t: 84, 152, 196; }
+    .pillar.t-blush  { --t: 226, 128, 106; }
 
     .pillar h3 {
       font-size: 17px;
@@ -996,10 +962,86 @@
     }
 
     .pillar p {
+      margin-top: 8px;
       font-size: 13.5px;
       color: var(--text-dim);
       line-height: 1.6;
     }
+
+    /* 卡内插画：全部用 em 画，尺度只由 .pillar-art 的字号一处决定 */
+    .pillar-art {
+      font-size: 16px;
+      height: 10em;
+      margin-bottom: 6px;
+      display: grid;
+      place-items: center;
+    }
+    .pi { position: relative; width: 11.4em; height: 7.6em; }
+    .pi > * { position: absolute; }
+    .pi-sheet {
+      border-radius: .85em;
+      padding: .75em .7em;
+      background: linear-gradient(180deg, #FFFFFF, #F4F2EE);
+      box-shadow: 0 .1em .2em rgba(var(--t), .25), 0 .7em 1.5em rgba(var(--t), .34), inset 0 .08em 0 #FFF;
+    }
+    html.dark .pi-sheet { background: linear-gradient(180deg, #F2EFE9, #DEDAD2); }
+    .pi-sheet i {
+      display: block;
+      height: .42em;
+      margin-bottom: .5em;
+      border-radius: .21em;
+      background: rgba(var(--t), .40);
+    }
+    .pi-tile {
+      display: grid;
+      place-items: center;
+      width: 4.7em;
+      height: 4.7em;
+      border-radius: 1.15em;
+      color: #FFF;
+      font-weight: 700;
+      background: linear-gradient(160deg, rgba(var(--c), .78), rgb(var(--c)));
+      box-shadow: 0 .6em 1.3em rgba(var(--c), .40), inset 0 .09em 0 rgba(255, 255, 255, .55), inset 0 0 0 .06em rgba(255, 255, 255, .18);
+    }
+    .pi-tile span { font-size: 2.3em; line-height: 1; letter-spacing: -.03em; }
+
+    /* Agent：三个并行的小会话 */
+    .pi.agents .pi-sheet { width: 6.4em; height: 4.5em; }
+    .pi.agents .pi-sheet:nth-child(1) { left: 0; top: 2.3em; transform: rotate(-8deg); }
+    .pi.agents .pi-sheet:nth-child(2) { left: 2.5em; top: .2em; }
+    .pi.agents .pi-sheet:nth-child(3) { left: 5em; top: 2.6em; transform: rotate(7deg); }
+    .pi-who { display: flex; align-items: center; gap: .45em; margin-bottom: .6em; }
+    .pi-who::before { content: ""; width: .85em; height: .85em; border-radius: 50%; background: rgb(var(--c)); }
+    .pi-who::after { content: ""; width: 2.3em; height: .42em; border-radius: .21em; background: rgba(40, 40, 60, .40); }
+    .pi.agents .pi-sheet i:last-child { width: 45%; background: rgb(var(--c)); animation: pi-pulse 1.5s ease-in-out infinite; animation-delay: var(--dl, 0s); }
+    @keyframes pi-pulse { 0%, 100% { opacity: .4; } 50% { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { .pi.agents .pi-sheet i:last-child { animation: none; } }
+
+    /* Markdown：# 变成排好版的页面 */
+    .pi.mdown .pi-tile { left: .5em; top: 1.9em; transform: rotate(-10deg); font-family: 'JetBrains Mono', ui-monospace, monospace; }
+    .pi.mdown .pi-sheet { left: 4.6em; top: 0; width: 6em; height: 7.4em; transform: rotate(4deg); }
+    .pi.mdown .pi-sheet .hd { height: .8em; width: 68%; margin-bottom: .7em; background: rgba(var(--t), .85); }
+    .pi-li { display: flex; align-items: center; gap: .4em; margin-bottom: .5em; }
+    .pi-li::before { content: ""; flex: none; width: .6em; height: .6em; border-radius: .18em; background: rgba(var(--t), .75); }
+    .pi-li i { flex: 1; margin: 0; }
+
+    /* Office：W / X / P */
+    .pi.office .pi-tile:nth-child(1) { left: .3em; top: 1.9em; transform: rotate(-12deg); }
+    .pi.office .pi-tile:nth-child(2) { left: 3.35em; top: .5em; }
+    .pi.office .pi-tile:nth-child(3) { left: 6.4em; top: 2.2em; transform: rotate(11deg); }
+
+    /* 版本历史：一叠旧版本 + 回退徽标 */
+    .pi.hist .pi-sheet { width: 5.6em; height: 7em; top: .2em; }
+    .pi.hist .pi-sheet:nth-child(1) { left: 1.1em; transform: rotate(-13deg); opacity: .5; }
+    .pi.hist .pi-sheet:nth-child(2) { left: 2.4em; transform: rotate(-6deg); opacity: .78; }
+    .pi.hist .pi-sheet:nth-child(3) { left: 3.9em; transform: rotate(2deg); }
+    .pi.hist .back {
+      left: 7.4em; top: 4.1em; width: 3.5em; height: 3.5em; border-radius: 50%;
+      display: grid; place-items: center; color: #FFF;
+      background: linear-gradient(160deg, rgba(var(--t), .8), rgb(var(--t)));
+      box-shadow: 0 .5em 1.1em rgba(var(--t), .45), inset 0 .09em 0 rgba(255, 255, 255, .5), 0 0 0 .22em rgba(255, 255, 255, .85);
+    }
+    .pi.hist .back svg { width: 2em; height: 2em; }
 
     /* ===== Features ===== */
     .features {
@@ -1118,13 +1160,6 @@
     .format-chip:hover {
       border-color: var(--accent);
       color: var(--accent);
-    }
-
-    .format-chip .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent);
     }
 
     @keyframes marquee {
@@ -1290,21 +1325,17 @@
     /* 真实截图：Agent 终端 + Ask AI 浮层 */
     .pro-shots {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 32px;
-      max-width: 1040px;
+      grid-template-columns: 1fr;
+      max-width: 960px;
       margin: 56px auto 0;
     }
     .pro-shot { margin: 0; }
     .pro-shot-frame { margin-bottom: 4px; }
     .pro-shot-frame img { width: 100%; height: auto; display: block; }
-    .pro-shot figcaption { padding: 22px 4px 0; text-align: left; }
-    .pro-shot figcaption h3 { font-size: 18px; margin-bottom: 6px; }
-    .pro-shot figcaption p { font-size: 14.5px; line-height: 1.6; color: var(--text-dim); }
 
     .pro-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 14px;
       max-width: 1040px;
       margin: 56px auto 0;
@@ -1381,7 +1412,7 @@
 
     .cta-section h2 {
       font-size: clamp(36px, 5vw, 60px);
-      margin-bottom: 18px;
+      margin-bottom: 36px;
       letter-spacing: -0.035em;
       line-height: 1.05;
     }
@@ -1532,12 +1563,7 @@
 
     /* 卡片：细边 + 柔和投影，不用黑描边 */
     
-    .pillar {
-      border: 1px solid var(--border-strong);
-      box-shadow: var(--shadow-pop);
-    }
-
-    .banner-card, .split-image { border: 0; box-shadow: var(--shadow-window); }
+    .split-image { border: 0; box-shadow: var(--shadow-window); }
     /* 带透明圆角的窗口截图：不套外框，沿窗口自身轮廓投影 */
     .hero-window-inner.is-window, .split-image.is-window, .split-image.is-window:hover {
       border: 0;
@@ -1549,9 +1575,11 @@
     .is-window img, .pro-shot-frame img {
       filter: drop-shadow(0 22px 34px rgba(60, 40, 20, 0.22)) drop-shadow(0 4px 10px rgba(60, 40, 20, 0.10));
     }
+    /* 主题扇面：窗口之间的投影已画进图里，外层不再叠加整体投影 */
+    .is-fan img { filter: none; }
 
-    .split-image, .pillar { transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease; }
-    .split-image:hover, .pillar:hover { transform: translateY(-3px); }
+    .split-image { transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease; }
+    .split-image:hover { transform: translateY(-3px); }
 
     .hero-icon { border: 0; box-shadow: 0 12px 28px -10px rgba(43, 32, 24, 0.4); }
 
@@ -1561,23 +1589,11 @@
       color: var(--ill-line);
       box-shadow: 0 2px 8px -2px rgba(43, 32, 24, 0.22);
     }
-    .hero-badge .dot { background: var(--ill-tomato); box-shadow: none; border: 0; width: 8px; height: 8px; }
 
     /* 按钮：沿用基础样式的细边，只补圆角与悬停底色 */
     .btn { border-radius: 12px; }
     .btn-ghost { background: var(--bg-elevated); }
     .btn-ghost:hover { background: var(--ill-butter-soft); }
-
-    /* 四张支柱卡各一个色块，编号徽章同色系 */
-    .pillar:nth-child(1) { background: var(--ill-butter-soft); }
-    .pillar:nth-child(2) { background: var(--ill-sage-soft); }
-    .pillar:nth-child(3) { background: var(--ill-sky-soft); }
-    .pillar:nth-child(4) { background: var(--ill-blush-soft); }
-    .pillar-num { color: var(--ill-line); border: 0; }
-    .pillar:nth-child(1) .pillar-num { background: var(--ill-butter); }
-    .pillar:nth-child(2) .pillar-num { background: var(--ill-sage); }
-    .pillar:nth-child(3) .pillar-num { background: var(--ill-sky); }
-    .pillar:nth-child(4) .pillar-num { background: var(--ill-blush); }
 
     /* 功能区：色带 + 手绘波浪边，格子换成描边小卡 */
     .features { position: relative; border: 0; background: var(--ill-sage-soft); }
@@ -1676,10 +1692,10 @@
       box-shadow: inset 0 1px 0 var(--nav-rim), 0 18px 40px -14px var(--nav-drop);
     }
 
-    /* --- 首屏：内缩圆角画框 --- */
+    /* --- 首屏：背景铺满整个窗口，不留间隙 --- */
     .hero {
-      margin: 12px 12px 0;
-      border-radius: 36px;
+      margin: 0;
+      border-radius: 0;
       background: var(--hero-sky);
       isolation: isolate;
     }
@@ -1778,7 +1794,7 @@
       .navbar { top: 10px; padding: 0 12px; }
       .navbar-inner { padding: 0 8px 0 14px; height: 52px; }
       .mobile-menu { top: 72px; left: 12px; right: 12px; }
-      .hero, .pro, .cta-section { margin-left: 8px; margin-right: 8px; border-radius: 28px; }
+      .pro, .cta-section { margin-left: 8px; margin-right: 8px; border-radius: 28px; }
       .split-inner { width: calc(100% - 24px); padding: 32px 22px; gap: 28px; border-radius: 26px; }
     }
 
@@ -1806,18 +1822,31 @@
     html[lang^="zh"] .faq-a p,
     html[lang^="zh"] .feature p,
     html[lang^="zh"] .pillar p,
-    html[lang^="zh"] .split-text p {
+    html[lang^="zh"] .split-text p,
+    html[lang^="zh"] .split-text li,
+    html[lang^="zh"] .pro-card p,
+    html[lang^="zh"] .hero-subtitle {
       word-break: keep-all;
       overflow-wrap: break-word;
     }
 
     /* 首屏下载：唯一一个按钮 */
     .hero-download { margin-bottom: 28px; }
-    .hero-download .btn { height: 56px; padding: 0 36px; font-size: 16px; border-radius: 14px; }
+    .hero-download .btn {
+      height: 60px; padding: 0 12px 0 32px; gap: 16px;
+      font-size: 17px; font-weight: 700; letter-spacing: -0.01em; border-radius: 18px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .28), 0 16px 30px -12px rgba(196, 81, 11, .65), 0 3px 6px rgba(196, 81, 11, .18);
+      transition: transform .2s ease, box-shadow .2s ease, background .18s ease;
+    }
+    /* 箭头放进一枚半透明圆片里，悬停时下沉，提示"下载" */
+    .hero-download .btn svg {
+      box-sizing: content-box; width: 16px; height: 16px; padding: 8px; border-radius: 50%;
+      background: rgba(255, 255, 255, .22); transition: transform .2s ease, background .2s ease;
+    }
+    .hero-download .btn:hover { transform: translateY(-2px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .32), 0 20px 36px -12px rgba(196, 81, 11, .75), 0 3px 6px rgba(196, 81, 11, .2); }
+    .hero-download .btn:hover svg { transform: translateY(2px); background: rgba(255, 255, 255, .32); }
+    .hero-download .btn:active { transform: translateY(0); }
 
-    /* 「还有更多」：卖点之后的格式补充，只有一个小标题 */
-    .also { padding: 72px 0 16px; }
-    .also .section-head { margin-bottom: 0; }
     </style>
 </head>
 <body class="loading">
@@ -1860,7 +1889,7 @@
       <ul class="nav-links">
         <li><a href="#features" data-i18n="nav.features">功能</a></li>
         <li><a href="#pro" data-i18n="nav.agent">Agent</a></li>
-        <li><a href="#showcase" data-i18n="nav.formats">所有格式</a></li>
+        <li><a href="#formats" data-i18n="nav.formats">所有格式</a></li>
         <li><a href="#faq" data-i18n="nav.faq">常见问题</a></li>
       </ul>
       <div class="nav-right">
@@ -1899,7 +1928,7 @@
   <div class="mobile-menu" id="mobileMenu">
     <a href="#features" onclick="closeMobileMenu()" data-i18n="nav.features">功能</a>
     <a href="#pro" onclick="closeMobileMenu()" data-i18n="nav.agent">Agent</a>
-    <a href="#showcase" onclick="closeMobileMenu()" data-i18n="nav.formats">所有格式</a>
+    <a href="#formats" onclick="closeMobileMenu()" data-i18n="nav.formats">所有格式</a>
     <a href="#faq" onclick="closeMobileMenu()" data-i18n="nav.faq">常见问题</a>
     <a href="https://github.com/river-ranx/folio-web/releases/latest" onclick="closeMobileMenu()" data-pro data-i18n="nav.cta">下载 Folio Pro</a>
   </div>
@@ -1990,11 +2019,10 @@
       <div class="hero-content" id="heroContent">
         <img src="assets/app-icon.png" alt="Folio" class="hero-icon">
         <div class="hero-badge">
-          <span class="dot"></span>
           <span data-i18n="hero.badge">Folio Pro for Mac</span>
         </div>
         <h1><span data-i18n="hero.h1.a">Every file your AI writes.</span><br><span class="serif" data-i18n="hero.h1.b">Read it and edit it right where it is.</span></h1>
-        <p class="hero-subtitle" data-i18n="hero.subtitle">让你的 Mac 安静下来。把所有你常用的文件——文档、表格、演示稿、PDF、笔记、图片、音乐与视频——全部装进一个窗口。</p>
+        <p class="hero-subtitle" data-i18n="hero.subtitle">PDF、Office、Markdown、代码、电子书⁠——打开就能看。</p>
         <div class="hero-download">
           <a href="https://github.com/river-ranx/folio-web/releases/latest"
              class="btn btn-accent" data-pro target="_blank" rel="noopener">
@@ -2044,42 +2072,103 @@
     <!-- Pillars：四个卖点 -->
     <section class="pillars" id="features">
       <div class="pillars-grid">
-        <div class="pillar reveal reveal-d1">
-          <span class="pillar-num">1</span>
-          <h3 data-i18n="pillar.1.h">Agent 并行</h3>
-          <p data-i18n="pillar.1.body">多个项目忙不过来？Claude Code、ChatGPT、Gemini 并行启动！</p>
-        </div>
-        <div class="pillar reveal reveal-d2">
-          <span class="pillar-num">2</span>
-          <h3 data-i18n="pillar.2.h">Markdown 编辑</h3>
-          <p data-i18n="pillar.2.body">精美、好用的 Markdown 编辑器，不用再记语法。</p>
-        </div>
-        <div class="pillar reveal reveal-d3">
-          <span class="pillar-num">3</span>
+        <div class="pillar t-sky reveal reveal-d1">
+          <div class="pillar-art" aria-hidden="true"><div class="pi office">
+            <div class="pi-tile" style="--c:58,112,204"><span>W</span></div>
+            <div class="pi-tile" style="--c:52,150,96"><span>X</span></div>
+            <div class="pi-tile" style="--c:226,112,58"><span>P</span></div>
+          </div></div>
           <h3 data-i18n="pillar.3.h">Office 编辑</h3>
           <p data-i18n="pillar.3.body">直接打开编辑微软 Office 系列文件。</p>
         </div>
-        <div class="pillar reveal reveal-d4">
-          <span class="pillar-num">4</span>
+        <div class="pillar t-sage reveal reveal-d2">
+          <div class="pillar-art" aria-hidden="true"><div class="pi mdown">
+            <div class="pi-tile" style="--c:96,160,112"><span>#</span></div>
+            <div class="pi-sheet"><i class="hd"></i><i></i><i style="width:80%"></i><span class="pi-li"><i></i></span><span class="pi-li"><i style="flex:.7"></i></span><i style="width:60%"></i></div>
+          </div></div>
+          <h3 data-i18n="pillar.2.h">Markdown 编辑</h3>
+          <p data-i18n="pillar.2.body">精美、好用的 Markdown 编辑器，不用再记语法。</p>
+        </div>
+        <div class="pillar t-butter reveal reveal-d3">
+          <div class="pillar-art" aria-hidden="true"><div class="pi agents">
+            <div class="pi-sheet" style="--c:224,122,62"><span class="pi-who"></span><i></i><i></i></div>
+            <div class="pi-sheet" style="--c:62,154,110;--dl:.3s"><span class="pi-who"></span><i></i><i></i></div>
+            <div class="pi-sheet" style="--c:72,128,232;--dl:.6s"><span class="pi-who"></span><i></i><i></i></div>
+          </div></div>
+          <h3 data-i18n="pillar.1.h">Agent 并行</h3>
+          <p data-i18n="pillar.1.body">多个项目忙不过来？Claude Code、ChatGPT、Gemini 并行启动！</p>
+        </div>
+        <div class="pillar t-blush reveal reveal-d4">
+          <div class="pillar-art" aria-hidden="true"><div class="pi hist">
+            <div class="pi-sheet"></div>
+            <div class="pi-sheet"></div>
+            <div class="pi-sheet"><i style="width:60%;height:.6em"></i><i></i><i style="width:84%"></i><i></i><i style="width:50%"></i></div>
+            <div class="back"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.2 10a5.8 5.8 0 1 0 1.9-4.3"/><path d="M3.6 3.4v3h3"/><path d="M10 7v3.2l2 1.3"/></svg></div>
+          </div></div>
           <h3 data-i18n="pillar.4.h">版本历史</h3>
           <p data-i18n="pillar.4.body">改错了，误删了文件，没关系，有后悔药。</p>
         </div>
       </div>
     </section>
 
-    <!-- Showcase banner -->
-    <section class="showcase-banner" id="showcase">
-      <div class="section-head reveal" style="margin-bottom:48px;">
-        <span class="eyebrow" data-i18n="banner.eyebrow">every file your AI writes</span>
-        <h2><span data-i18n="banner.h2.line1">AI 写的文件，</span><span class="serif accent" data-i18n="banner.h2.serif">全在一个窗口里。</span></h2>
-        <p data-i18n="banner.body">不再在十几个应用之间反复切换。Folio 用一个窗口承接你所有的文件。</p>
-      </div>
-      <div class="banner-card reveal reveal-d1">
-        <img src="assets/landings/01-hero.png" alt="Folio opening a Word document, a PDF, an EPUB and a Markdown note in four windows" data-i18n-alt="banner.alt" loading="lazy">
+    <!-- Office -->
+    <section class="split tone-blush reveal">
+      <div class="split-inner">
+        <div class="split-text">
+          <span class="eyebrow">office</span>
+          <h2><span data-i18n="split.office.h2.line1">直接打开编辑</span><span class="serif" data-i18n="split.office.h2.serif">微软 Office 系列文件</span></h2>
+          <p data-i18n="split.office.body">样式、行距、分页，都在右侧面板。</p>
+          <ul>
+            <li data-i18n="split.office.li1">格式、插入、审阅、视图、文档，五个面板各管一件事</li>
+            <li data-i18n="split.office.li2">段落样式、行距、缩进、分页控制一应俱全</li>
+            <li data-i18n="split.office.li3">Excel、PowerPoint、Pages、Numbers、Keynote 同样一键打开</li>
+          </ul>
+        </div>
+        <div class="split-image is-window">
+          <img src="assets/landings/05-word.png" alt="Folio editing a Word document, with the paragraph style panel on the right" data-i18n-alt="split.office.alt" loading="lazy">
+        </div>
       </div>
     </section>
 
-    <!-- Folio Pro -->
+    <!-- PDF -->
+    <section class="split tone-sky reverse reveal">
+      <div class="split-inner">
+        <div class="split-image is-window">
+          <img src="assets/landings/05-pdf.png" alt="Folio PDF toolbox: merge, split, crop, watermark, compare and compress, with page thumbnails" data-i18n-alt="split.pdf.alt" loading="lazy">
+        </div>
+        <div class="split-text">
+          <span class="eyebrow">pdf toolbox</span>
+          <h2><span data-i18n="split.pdf.h2.line1">PDF 工具箱，</span><span class="serif" data-i18n="split.pdf.h2.serif">都在本机完成</span></h2>
+          <p data-i18n="split.pdf.body">合并、拆分、压缩、文字识别、加密，文件不用上传。</p>
+          <ul>
+            <li data-i18n="split.pdf.li1">页面缩略图一览，整理页面一步到位</li>
+            <li data-i18n="split.pdf.li2">合并、拆分、裁剪、对比、修复、压缩、加密</li>
+            <li data-i18n="split.pdf.li3">默认都在本机完成，只有标注「在线」的功能才会联网</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Markdown -->
+    <section class="split tone-sage reveal">
+      <div class="split-inner">
+        <div class="split-text">
+          <span class="eyebrow">markdown</span>
+          <h2><span data-i18n="split.md.h2.line1">精美，好用的</span><span class="serif" data-i18n="split.md.h2.serif">Markdown 编辑器</span></h2>
+          <p data-i18n="split.md.body">不用再记语法，标题、表格、引用随手插入。</p>
+          <ul>
+            <li data-i18n="split.md.li1">所写即所见，整洁清爽</li>
+            <li data-i18n="split.md.li2">数学公式、流程图、代码块自动美化</li>
+            <li data-i18n="split.md.li3">多语言翻译，离线就能用</li>
+          </ul>
+        </div>
+        <div class="split-image is-window">
+          <img src="assets/landings/04-markdown.png" alt="Folio Markdown editor with the Format panel: headings, display modes, text format and colors" data-i18n-alt="split.md.alt" loading="lazy">
+        </div>
+      </div>
+    </section>
+
+    <!-- Agents（Folio Pro） -->
     <section class="pro pro-zone" id="pro">
     <svg class="pro-sky" viewBox="0 0 1440 320" aria-hidden="true" focusable="false">
       <g transform="translate(1196 112)"><g class="il-bob d2">
@@ -2096,9 +2185,9 @@
     </svg>
           <div class="container">
         <div class="section-head reveal">
-          <span class="pro-badge"><b>AGENTS</b><span data-i18n="pro.badge">Claude Code · ChatGPT · Gemini</span></span>
-          <h2><span data-i18n="pro.h2.line1">多个项目忙不过来？</span><span class="serif" data-i18n="pro.h2.serif">Agent 并行启动！</span></h2>
-          <p data-i18n="pro.sub">Claude Code、ChatGPT、Gemini 并行启动，每个文件夹一组 Agent。它们写出的文件就在旁边，直接看、直接改，再配上真正的 Git 与本地模型。</p>
+          <span class="pro-badge"><b>AGENTS</b></span>
+          <h2><span data-i18n="pro.h2.line1">多个项目忙不过来？</span><span class="serif" data-i18n="pro.h2.serif">Claude Code、ChatGPT、Gemini 并行启动！</span></h2>
+          <p data-i18n="pro.sub">命令行智能体按文件夹归类，直接在你的资料里开工。</p>
         </div>
 
         <div class="pro-shots">
@@ -2106,19 +2195,6 @@
             <div class="pro-shot-frame">
               <img src="assets/landings/10-agent-terminal.png" alt="Folio's AI tab running Antigravity CLI, with agent sessions listed per folder in the sidebar" data-i18n-alt="pro.shot1.alt" loading="lazy">
             </div>
-            <figcaption>
-              <h3 data-i18n="pro.shot1.h">每个文件夹，一组 Agent</h3>
-              <p data-i18n="pro.shot1.p">Claude Code、Antigravity CLI 等命令行 Agent 作为标签页运行，会话按文件夹归档，随时接着聊。</p>
-            </figcaption>
-          </figure>
-          <figure class="pro-shot reveal">
-            <div class="pro-shot-frame">
-              <img src="assets/landings/11-ask-ai.png" alt="The Ask AI panel floating over a Markdown document, with a translation request typed in" data-i18n-alt="pro.shot2.alt" loading="lazy">
-            </div>
-            <figcaption>
-              <h3 data-i18n="pro.shot2.h">在文档上直接问 AI</h3>
-              <p data-i18n="pro.shot2.p">右下角唤出 Ask AI，当前文件自动带上。总结这一段、提炼结论，或者让它翻译成法语。</p>
-            </figcaption>
           </figure>
         </div>
 
@@ -2134,11 +2210,6 @@
             <p data-i18n="pro.git.p">打开的每个仓库都能看提交历史、Diff 与 Blame。</p>
           </div>
           <div class="pro-card reveal">
-            <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/></svg></div>
-            <h3 data-i18n="pro.ask.h">提问与总结</h3>
-            <p data-i18n="pro.ask.p">在侧栏里提问，任何文档都能一键总结。</p>
-          </div>
-          <div class="pro-card reveal">
             <div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg></div>
             <h3 data-i18n="pro.local.h">本地模型</h3>
             <p data-i18n="pro.local.p">语义搜索、离线翻译与 OCR，在你的 Mac 上运行。</p>
@@ -2152,11 +2223,6 @@
             <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
             <h3 data-i18n="pro.tasks.h">任务与日历</h3>
             <p data-i18n="pro.tasks.p">任务放在工作旁边，与菜单栏日历联动。</p>
-          </div>
-          <div class="pro-card reveal">
-            <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/></svg></div>
-            <h3 data-i18n="pro.pdf.h">PDF 进阶</h3>
-            <p data-i18n="pro.pdf.p">PDF 转成 Markdown，或保留排版直接翻译。</p>
           </div>
           <div class="pro-card reveal">
             <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M17.5 19a4.5 4.5 0 1 0-1.4-8.8A6 6 0 0 0 4.5 12 3.5 3.5 0 0 0 6 19z"/></svg></div>
@@ -2176,174 +2242,68 @@
       </div>
     </section>
 
-    <!-- Split 3: Markdown -->
-    <section class="split tone-sage reveal">
-      <div class="split-inner">
-        <div class="split-text">
-          <span class="eyebrow">markdown</span>
-          <h2><span data-i18n="split.md.h2.line1">Markdown 像</span><span class="serif" data-i18n="split.md.h2.serif">natural writing.</span></h2>
-          <p data-i18n="split.md.body">边写边见。标题、列表、表格、代码块立刻自动美化，没有分屏预览的割裂。内置离线翻译，写作的同时切换语言。</p>
-          <ul>
-            <li data-i18n="split.md.li1">所写即所见，整洁清爽</li>
-            <li data-i18n="split.md.li2">数学公式、流程图、代码块自动美化</li>
-            <li data-i18n="split.md.li3">多语言翻译，离线就能用</li>
-          </ul>
-        </div>
-        <div class="split-image is-window">
-          <img src="assets/landings/04-markdown.png" alt="Folio Markdown editor with the Format panel: headings, display modes, text format and colors" data-i18n-alt="split.md.alt" loading="lazy">
-        </div>
-      </div>
-    </section>
-
-    <!-- Split 4: Word -->
-    <section class="split tone-blush reverse reveal">
+    <!-- Ask AI -->
+    <section class="split tone-butter reverse reveal">
       <div class="split-inner">
         <div class="split-image is-window">
-          <img src="assets/landings/05-word.png" alt="Folio editing a Word document, with the paragraph style panel on the right" data-i18n-alt="split.office.alt" loading="lazy">
+          <img src="assets/landings/11-ask-ai.png" alt="The Ask AI panel floating over a Markdown document, with a translation request typed in" data-i18n-alt="split.ask.alt" loading="lazy">
         </div>
         <div class="split-text">
-          <span class="eyebrow">office</span>
-          <h2><span data-i18n="split.office.h2.line1">Word 文档</span><span class="serif" data-i18n="split.office.h2.serif">edit it right there.</span></h2>
-          <p data-i18n="split.office.body">不用等 Word 启动。双击打开，直接在页面上改——样式、对齐、行距、缩进和分页控制，都收在右侧面板里。</p>
+          <span class="eyebrow">ask ai</span>
+          <h2><span data-i18n="split.ask.h2.line1">在文档里，</span><span class="serif" data-i18n="split.ask.h2.serif">随时问 AI</span></h2>
+          <p data-i18n="split.ask.body">总结、翻译、找结论，就在当前文档里完成。</p>
           <ul>
-            <li data-i18n="split.office.li1">格式、插入、审阅、视图、文档，五个面板各管一件事</li>
-            <li data-i18n="split.office.li2">段落样式、行距、缩进、分页控制一应俱全</li>
-            <li data-i18n="split.office.li3">Excel、PowerPoint、Pages、Numbers、Keynote 同样一键打开</li>
+            <li data-i18n="split.ask.li1">右下角一键唤出，当前文件自动带上</li>
+            <li data-i18n="split.ask.li2">总结这一段、提炼结论</li>
+            <li data-i18n="split.ask.li3">也可以让它翻译成其他语言</li>
           </ul>
         </div>
       </div>
     </section>
 
-    <!-- Split 6: Version history -->
-    <section class="split tone-butter reveal">
-      <div class="split-inner">
-        <div class="split-image is-window">
-          <img src="assets/landings/09-history.png" alt="Folio version history: a list of versions on the left and a side-by-side comparison on the right" data-i18n-alt="split.history.alt" loading="lazy">
-        </div>
-        <div class="split-text">
-          <span class="eyebrow">version history</span>
-          <h2><span data-i18n="split.history.h2.line1">历史版本</span><span class="serif" data-i18n="split.history.h2.serif">every change, kept.</span></h2>
-          <p data-i18n="split.history.body">自动备份整个文件夹。每次改动都记成一个版本，随时并排对比，看清这个文件改过什么、删掉了什么。</p>
-          <ul>
-            <li data-i18n="split.history.li1">自动备份，也可以随时手动保存版本</li>
-            <li data-i18n="split.history.li2">并排对比任意两个版本，增删一目了然</li>
-            <li data-i18n="split.history.li3">每个版本都写明改了哪些文件</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- 其余格式 -->
-    <section class="also">
-      <div class="container">
-        <div class="section-head reveal">
-          <span class="eyebrow" data-i18n="also.eyebrow">and more</span>
-          <h2><span data-i18n="also.h2.line1">Agent 写什么，</span><span class="serif accent" data-i18n="also.h2.serif">都能直接打开。</span></h2>
-          <p data-i18n="also.body">PDF、电子书、代码、图片、视频……各种格式，一样在这个窗口里看完。</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Split 4b: PDF -->
-    <section class="split tone-sky reverse reveal">
-      <div class="split-inner">
-        <div class="split-text">
-          <span class="eyebrow">pdf toolbox</span>
-          <h2><span data-i18n="split.pdf.h2.line1">PDF 工具箱</span><span class="serif" data-i18n="split.pdf.h2.serif">all on your Mac.</span></h2>
-          <p data-i18n="split.pdf.body">阅读、标注、整理页面，一个面板搞定。合并、拆分、裁剪、水印、页码、文字识别、文件对比、压缩与加密，都不用再另找工具。</p>
-          <ul>
-            <li data-i18n="split.pdf.li1">页面缩略图一览，整理页面一步到位</li>
-            <li data-i18n="split.pdf.li2">合并、拆分、裁剪、对比、修复、压缩、加密</li>
-            <li data-i18n="split.pdf.li3">默认都在本机完成，只有标注「在线」的功能才会联网</li>
-          </ul>
-        </div>
-        <div class="split-image is-window">
-          <img src="assets/landings/05-pdf.png" alt="Folio PDF toolbox: merge, split, crop, watermark, compare and compress, with page thumbnails" data-i18n-alt="split.pdf.alt" loading="lazy">
-        </div>
-      </div>
-    </section>
-
-    <!-- Split 4c: EPUB -->
+    <!-- EPUB -->
     <section class="split tone-peri reveal">
       <div class="split-inner">
-        <div class="split-image is-window">
-          <img src="assets/landings/08-epub.png" alt="Folio reading an EPUB, with layout, font size, column width, typeface and background controls" data-i18n-alt="split.epub.alt" loading="lazy">
-        </div>
         <div class="split-text">
-          <span class="eyebrow">e-books</span>
-          <h2><span data-i18n="split.epub.h2.line1">电子书</span><span class="serif" data-i18n="split.epub.h2.serif">read like a real book.</span></h2>
-          <p data-i18n="split.epub.body">EPUB 直接打开，和文档放在同一个文件夹里。滚动或翻页阅读，字号、栏宽、字体和背景都由你定，读起来就像一本真正的书。</p>
+          <span class="eyebrow">e‑books</span>
+          <h2><span data-i18n="split.epub.h2.line1">电子书，</span><span class="serif" data-i18n="split.epub.h2.serif">像在纸上读</span></h2>
+          <p data-i18n="split.epub.body">字号、栏宽、字体、背景，随心调整。</p>
           <ul>
             <li data-i18n="split.epub.li1">滚动与分页两种阅读方式</li>
             <li data-i18n="split.epub.li2">字号、栏宽、字体、背景自由调节</li>
             <li data-i18n="split.epub.li3">目录一键跳章</li>
           </ul>
         </div>
+        <div class="split-image is-window">
+          <img src="assets/landings/08-epub.png" alt="Folio reading an EPUB, with layout, font size, column width, typeface and background controls" data-i18n-alt="split.epub.alt" loading="lazy">
+        </div>
       </div>
     </section>
 
-    <!-- Split 1: Code Reading -->
+    <!-- 代码阅读（沿用旧图，待更新） -->
     <section class="split tone-sage reverse reveal">
       <div class="split-inner">
+        <div class="split-image is-window">
+          <img src="assets/landings/02-code-reading.png" alt="Folio reading a SQL file: syntax colors, line numbers and indent guides, with the project folder tree on the left" loading="lazy">
+        </div>
         <div class="split-text">
           <span class="eyebrow">code reading</span>
-          <h2><span data-i18n="split.code.h2.line1">优雅的代码阅读</span><span class="serif" data-i18n="split.code.h2.serif">fully yours.</span></h2>
-          <p data-i18n="split.code.body">主流编程语言一应俱全。语法着色清爽、缩进对齐整齐——让代码读起来像读散文一样舒服。</p>
+          <h2><span data-i18n="split.code.h2.line1">优雅的代码阅读</span><span class="serif" data-i18n="split.code.h2.serif">清爽，不累眼</span></h2>
+          <p data-i18n="split.code.body">主流编程语言一应俱全。语法着色清爽、缩进对齐整齐，让代码读起来像读散文一样舒服。</p>
           <ul>
             <li data-i18n="split.code.li1">主流编程语言全覆盖</li>
             <li data-i18n="split.code.li2">舒服的字号、行距与配色，长时间阅读不累</li>
             <li data-i18n="split.code.li3">文件夹并排浏览，需要时随时切换</li>
           </ul>
         </div>
-        <div class="split-image">
-          <img src="assets/landings/02-code-reading.png" alt="Folio elegant code reading" loading="lazy">
-        </div>
-      </div>
-    </section>
-
-    <!-- Split 2: Image Viewer -->
-    <section class="split tone-blush reveal">
-      <div class="split-inner">
-        <div class="split-image">
-          <img src="assets/landings/03-image-viewer.png" alt="Folio image viewer" loading="lazy">
-        </div>
-        <div class="split-text">
-          <span class="eyebrow">image viewer</span>
-          <h2><span data-i18n="split.image.h2.line1">所有图片格式</span><span class="serif" data-i18n="split.image.h2.serif">just one viewer.</span></h2>
-          <p data-i18n="split.image.body">再大的图也是秒开。手机照片、相机原图、网络图片、动图、矢量图——一键打开，可缩放、查看拍摄信息、在文件夹里前后翻页。</p>
-          <ul>
-            <li data-i18n="split.image.li1">从手机随手拍到相机原片，常见格式都能看</li>
-            <li data-i18n="split.image.li2">超大图秒开，无需等待</li>
-            <li data-i18n="split.image.li3">方向键翻页，空格键快速预览</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- Split 5: Video -->
-    <section class="split tone-butter reverse reveal">
-      <div class="split-inner">
-        <div class="split-text">
-          <span class="eyebrow">video player</span>
-          <h2><span data-i18n="split.video.h2.line1">每段视频</span><span class="serif" data-i18n="split.video.h2.serif">one smooth player.</span></h2>
-          <p data-i18n="split.video.body">主流视频格式直接播放，不用等转码。键盘快捷键、字幕、画中画一应俱全，省电不发烫。</p>
-          <ul>
-            <li data-i18n="split.video.li1">省电流畅，不烫手不卡顿</li>
-            <li data-i18n="split.video.li2">字幕文件一拖即用</li>
-            <li data-i18n="split.video.li3">音频文件也能看到声音波形</li>
-          </ul>
-        </div>
-        <div class="split-image">
-          <img src="assets/landings/06-video.png" alt="Folio video player" loading="lazy">
-        </div>
       </div>
     </section>
 
     <!-- Formats marquee -->
-    <section class="formats-strip">
+    <section class="formats-strip" id="formats">
       <div class="container reveal">
         <span class="eyebrow">supported formats</span>
-        <h3 data-i18n="formats.h3">14 种格式，一个窗口看完</h3>
+        <h3 data-i18n="formats.h3">常见格式，都能直接打开</h3>
       </div>
       <div class="formats-marquee" aria-hidden="true">
         <div class="formats-track" id="formatsTrack">
@@ -2353,19 +2313,38 @@
     </section>
 
     <!-- Themes -->
-    <section class="split tone-sage reverse reveal" id="themes" style="padding-top:96px;">
+    <section class="split tone-blush reveal" id="themes" style="padding-top:96px;">
       <div class="split-inner">
-        <div class="split-image">
-          <img src="assets/landings/07-themes.png" alt="Five Folio color themes — graphite, purple, yellow, green and blue — stacked as windows" data-i18n-alt="split.themes.alt" loading="lazy">
-        </div>
         <div class="split-text">
           <span class="eyebrow">themes</span>
-          <h2><span data-i18n="split.themes.h2.line1">你的 Folio</span><span class="serif" data-i18n="split.themes.h2.serif">your color, 15 themes.</span></h2>
-          <p data-i18n="split.themes.body">细腻的界面质感，搭配 15 套精心调校的主题。从奶油米到午夜黑、从苔藓绿到墨水蓝——每个文件都有最合适的阅读色温。</p>
+          <h2><span data-i18n="split.themes.h2.line1">五种主题色，</span><span class="serif" data-i18n="split.themes.h2.serif">换个心情</span></h2>
+          <p data-i18n="split.themes.body">石墨、蓝、绿、紫、黄任选，侧栏、标签栏与面板整体换色。</p>
           <ul>
-            <li data-i18n="split.themes.li1">15 套精心调校的主题</li>
+            <li data-i18n="split.themes.li1">五种主题色，一键切换</li>
             <li data-i18n="split.themes.li2">深浅自动跟随系统</li>
             <li data-i18n="split.themes.li3">字体、行高、阅读宽度都能自己调</li>
+          </ul>
+        </div>
+        <div class="split-image is-window is-fan">
+          <img src="assets/landings/07-themes.png" alt="Five Folio color themes — graphite, purple, yellow, green and blue — stacked as windows" data-i18n-alt="split.themes.alt" loading="lazy">
+        </div>
+      </div>
+    </section>
+
+    <!-- Version history -->
+    <section class="split tone-butter reverse reveal">
+      <div class="split-inner">
+        <div class="split-image is-window">
+          <img src="assets/landings/09-history.png" alt="Folio version history: a list of versions on the left and a side-by-side comparison on the right" data-i18n-alt="split.history.alt" loading="lazy">
+        </div>
+        <div class="split-text">
+          <span class="eyebrow">version history</span>
+          <h2><span data-i18n="split.history.h2.line1">改错了，误删了文件，</span><span class="serif" data-i18n="split.history.h2.serif">没关系，有后悔药</span></h2>
+          <p data-i18n="split.history.body">自动保存每个版本，随时找回。</p>
+          <ul>
+            <li data-i18n="split.history.li1">自动备份，也可以随时手动保存版本</li>
+            <li data-i18n="split.history.li2">并排对比任意两个版本，增删一目了然</li>
+            <li data-i18n="split.history.li3">每个版本都写明改了哪些文件</li>
           </ul>
         </div>
       </div>
@@ -2396,11 +2375,6 @@
             <p data-i18n="feat.folders.p">几个项目同时挂着，左边一棵清晰的文件树。</p>
           </div>
           <div class="feature reveal">
-            <div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div>
-            <h3 data-i18n="feat.glass.h">细腻玻璃质感</h3>
-            <p data-i18n="feat.glass.p">与系统美学一脉相承的优雅界面。</p>
-          </div>
-          <div class="feature reveal">
             <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
             <h3 data-i18n="feat.3d.h">3D 模型与字体预览</h3>
             <p data-i18n="feat.3d.p">三维模型可以转着看，字体可以一目了然地试。</p>
@@ -2409,16 +2383,6 @@
             <div class="feature-icon"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg></div>
             <h3 data-i18n="feat.tables.h">表格与数据</h3>
             <p data-i18n="feat.tables.p">电子表格与数据表直接查看、排序、筛选。</p>
-          </div>
-          <div class="feature reveal">
-            <div class="feature-icon"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
-            <h3 data-i18n="feat.code.h">代码语法着色</h3>
-            <p data-i18n="feat.code.p">几乎你能想到的编程语言都已经准备好。</p>
-          </div>
-          <div class="feature reveal">
-            <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
-            <h3 data-i18n="feat.translate.h">Markdown 翻译</h3>
-            <p data-i18n="feat.translate.p">一键把笔记切换成另一种语言，离线快速。</p>
           </div>
           <div class="feature reveal">
             <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
@@ -2443,7 +2407,7 @@
               <span class="faq-icon"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
             </button>
             <div class="faq-a" role="region">
-              <p data-i18n="faq.a1">Folio 是一款 Mac 文件浏览器。一个应用里就能打开文档、表格、演示稿、PDF、笔记、代码、图片、音乐和视频——把你日常要切换的十几个 app 收纳进一个安静、专注的窗口。</p>
+              <p data-i18n="faq.a1">Folio 是一款 Mac 应用，专为 AI 写出的各种文件而做：Claude Code、ChatGPT、Gemini 并行启动，它们生成的 Markdown、Word、PDF 等文件就在旁边打开，直接看、直接改；改错了，还有版本历史当后悔药。</p>
             </div>
           </div>
           <div class="faq-item reveal">
@@ -2452,7 +2416,7 @@
               <span class="faq-icon"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
             </button>
             <div class="faq-a" role="region">
-              <p data-i18n="faq.a2">系统自带的预览只能「看一眼就关」。Folio 是为长时间停留打造的工作空间：多标签、跨文件搜索、双向编辑笔记、15 套阅读主题——把「打开一下就走」变成「打开就能开始工作」。</p>
+              <p data-i18n="faq.a2">系统自带的预览只能「看一眼就关」。Folio 是为长时间停留打造的工作空间：多标签、跨文件搜索、双向编辑笔记、五种主题色，把「打开一下就走」变成「打开就能开始工作」。</p>
             </div>
           </div>
           <div class="faq-item reveal">
@@ -2479,7 +2443,7 @@
               <span class="faq-icon"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
             </button>
             <div class="faq-a" role="region">
-              <p data-i18n="faq.a5">Folio 在你打开文件夹时就悄悄准备好，之后只在文件变化时跟进。一万个文件的大文件夹，输入即可命中——你不会感觉到它在工作。</p>
+              <p data-i18n="faq.a5">Folio 在你打开文件夹时就悄悄准备好，之后只在文件变化时跟进。一万个文件的大文件夹，输入即可命中，你不会感觉到它在工作。</p>
             </div>
           </div>
           <div class="faq-item reveal">
@@ -2488,7 +2452,7 @@
               <span class="faq-icon"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
             </button>
             <div class="faq-a" role="region">
-              <p data-i18n="faq.a6">所有处理都在你的电脑上完成。Folio 不会把你的文件内容上传到任何地方——这是默认行为，没有「关闭云同步」的开关。</p>
+              <p data-i18n="faq.a6">所有处理都在你的电脑上完成。Folio 不会把你的文件内容上传到任何地方，这是默认行为，没有「关闭云同步」的开关。</p>
             </div>
           </div>
           <div class="faq-item reveal">
@@ -2510,7 +2474,6 @@
       <div class="container">
         <span class="eyebrow reveal" style="margin-bottom:20px;" data-i18n="cta.eyebrow">准备好了吗？</span>
         <h2 class="reveal"><span data-i18n="cta.h2.a">Every file your AI writes.</span><span class="serif" data-i18n="cta.h2.b">Read it and edit it right where it is.</span></h2>
-        <p class="reveal" data-i18n="cta.body">Claude Code、ChatGPT、Gemini 并行启动，文件就在旁边。</p>
         <div class="cta-buttons reveal">
           <a href="https://github.com/river-ranx/folio-web/releases/latest"
              class="btn btn-accent" data-pro target="_blank" rel="noopener">
@@ -2540,18 +2503,13 @@
     // ===== i18n dictionary =====
     const I18N = {
       zh: {
-        'document.title': 'Folio — AI 写的各种文件，直接看、直接改。',
-        'document.description': 'Folio 让 AI 写的各种文件，在一个窗口里直接看、直接改。Claude Code、ChatGPT、Gemini 并行启动，Markdown 与 Office 文件直接编辑，改错了还有后悔药。',
+        'document.title': 'Folio — AI 写的各种文件，直接看、直接改。',
+        'document.description': 'Folio 让 AI 写的各种文件，直接看、直接改。Claude Code、ChatGPT、Gemini 并行启动，Markdown 与 Office 文件直接编辑，改错了还有后悔药。',
         'nav.agent': 'Agent',
         'hero.badge': 'Folio Pro · 为 Mac 而生',
         'hero.h1.a': 'AI 写的各种文件，',
         'hero.h1.b': '直接看、直接改。',
         'hero.meta.silicon': 'Apple 芯片（M 系列）',
-        'banner.eyebrow': 'every file your AI writes',
-        'also.eyebrow': 'and more',
-        'also.h2.line1': 'Agent 写什么，',
-        'also.h2.serif': '都能打开。',
-        'also.body': 'PDF、电子书、代码、图片、视频……各种格式，一样在这个窗口里看完。',
         'cta.h2.a': 'AI 写的各种文件，',
         'cta.h2.b': '直接看、直接改。',
 
@@ -2563,39 +2521,27 @@
         'hero.meta.free': '目前免费',
         'hero.meta.soon': 'Windows 版即将到来',
         'cta.note': 'Folio Pro 目前免费 · Windows 版即将到来',
-
-
-        'pro.badge': 'Claude Code · ChatGPT · Gemini',
         'pro.h2.line1': '多个项目忙不过来？',
-        'pro.h2.serif': 'Agent 并行启动！',
-        'pro.sub': 'Claude Code、ChatGPT、Gemini 并行启动，每个文件夹一组 Agent。它们写出的文件就在旁边，直接看、直接改，再配上真正的 Git 与本地模型。',
+        'pro.h2.serif': 'Claude Code、ChatGPT、Gemini 并行启动！',
+        'pro.sub': '命令行智能体按文件夹归类，直接在你的资料里开工。',
         'pro.term.h': '终端与 AI 标签页',
         'pro.term.p': '在要修改的文件旁边，直接运行 Claude Code、Codex 等命令行工具。',
         'pro.git.h': '完整 Git',
         'pro.git.p': '打开的每个仓库都能看提交历史、Diff 与 Blame。',
-        'pro.ask.h': '提问与总结',
-        'pro.ask.p': '在文档右下角唤出 Ask AI，任何文档都能一键总结、提问或翻译。',
-        'pro.shot1.h': '每个文件夹，一组 Agent',
-        'pro.shot1.p': 'Claude Code、Antigravity CLI 等命令行 Agent 作为标签页运行，会话按文件夹归档，随时接着聊。',
         'pro.shot1.alt': 'Folio 的 AI 标签页正在运行 Antigravity CLI，侧栏按文件夹列出 Agent 会话',
-        'pro.shot2.h': '在文档上直接问 AI',
-        'pro.shot2.p': '右下角唤出 Ask AI，当前文件自动带上。总结这一段、提炼结论，或者让它翻译成法语。',
-        'pro.shot2.alt': 'Ask AI 面板浮在 Markdown 文档上，输入框里是一条翻译请求',
         'pro.local.h': '本地模型',
         'pro.local.p': '语义搜索、离线翻译与 OCR，在你的 Mac 上运行。',
         'pro.lsp.h': '语言服务',
         'pro.lsp.p': '通过 LSP 为 Go、Rust、Python、TS/JS、Java 提供代码智能。',
         'pro.tasks.h': '任务与日历',
         'pro.tasks.p': '任务放在工作旁边，与菜单栏日历联动。',
-        'pro.pdf.h': 'PDF 进阶',
-        'pro.pdf.p': 'PDF 转成 Markdown，或保留排版直接翻译。',
         'pro.sync.h': 'iCloud 同步',
         'pro.sync.p': '支持 iCloud 同步，以及更多翻译引擎。',
         'pro.req': 'macOS 15+ · 仅 Apple 芯片（M 系列）· 目前免费 · Windows 版即将到来',
 
         'btn.pro': '下载 Folio Pro',
 
-        'hero.subtitle': 'Claude Code、ChatGPT、Gemini 并行启动，它们写出的 Markdown、Word、PDF……就在旁边，直接看、直接改。改错了，还有后悔药。',
+        'hero.subtitle': 'PDF、Office、Markdown、代码、电子书⁠——打开就能看。',
         'hero.shot.alt': 'Folio 主页：一个工作空间，带 Agent 提问框、最近文件与格式概览',
 
         'pillar.1.h': 'Agent 并行',
@@ -2607,79 +2553,74 @@
         'pillar.3.body': '直接打开编辑微软 Office 系列文件。',
         'pillar.4.body': '改错了，误删了文件，没关系，有后悔药。',
 
-        'banner.h2.line1': 'AI 写的文件，',
-        'banner.h2.serif': '都在一个窗口。',
-        'banner.body': 'Markdown、Word、PDF、电子书……Agent 写出来的各种文件，不用再来回切换应用，打开就能看，要改就直接改。',
-        'banner.alt': 'Folio 在四个窗口里分别打开 Word 文档、PDF、EPUB 与 Markdown 笔记',
-
         'split.code.h2.line1': '优雅的代码阅读',
-        'split.code.h2.serif': 'fully yours.',
-        'split.code.body': '主流编程语言一应俱全。语法着色清爽、缩进对齐整齐——让代码读起来像读散文一样舒服。',
+        'split.code.h2.serif': '清爽，不累眼',
+        'split.code.body': '主流编程语言一应俱全。语法着色清爽、缩进对齐整齐，让代码读起来像读散文一样舒服。',
         'split.code.li1': '主流编程语言全覆盖',
         'split.code.li2': '舒服的字号、行距与配色，长时间阅读不累',
         'split.code.li3': '文件夹并排浏览，需要时随时切换',
 
-        'split.image.h2.line1': '所有图片格式',
-        'split.image.h2.serif': 'just one viewer.',
-        'split.image.body': '再大的图也是秒开。手机照片、相机原图、网络图片、动图、矢量图——一键打开，可缩放、查看拍摄信息、在文件夹里前后翻页。',
-        'split.image.li1': '从手机随手拍到相机原片，常见格式都能看',
-        'split.image.li2': '超大图秒开，无需等待',
-        'split.image.li3': '方向键翻页，空格键快速预览',
-
-        'split.md.h2.line1': 'Markdown 编辑器，',
-        'split.md.h2.serif': 'no syntax to memorize.',
-        'split.md.body': '精美、好用，不用再记语法。标题、列表、表格、提示块边写边自动美化，没有分屏预览的割裂；右侧面板一点即用：标题层级、文字格式、颜色、阅读版式，想看源码一键切换。',
+        'split.md.h2.line1': '精美，好用的',
+        'split.md.h2.serif': 'Markdown 编辑器',
+        'split.md.body': '不用再记语法，标题、表格、引用随手插入。',
         'split.md.li1': '所写即所见，整洁清爽',
         'split.md.li2': '预览、源码、查找，三种视图一键切换',
         'split.md.li3': '系统、学术、阅读三种版式，缩放随心',
         'split.md.alt': 'Folio 的 Markdown 编辑器与右侧「格式」面板：标题、显示模式、文字格式与颜色',
 
-        'split.office.h2.line1': 'Office 文件，',
-        'split.office.h2.serif': 'open and edit directly.',
-        'split.office.body': '直接打开编辑微软 Office 系列文件，不用等 Word 启动。样式、对齐、行距、缩进和分页控制，都收在右侧面板里。',
+        'split.office.h2.line1': '直接打开编辑',
+        'split.office.h2.serif': '微软 Office 系列文件',
+        'split.office.body': '样式、行距、分页，都在右侧面板。',
         'split.office.li1': '格式、插入、审阅、视图、文档，五个面板各管一件事',
         'split.office.li2': '段落样式、行距、缩进、分页控制一应俱全',
         'split.office.li3': 'Word、Excel、PowerPoint 直接编辑，Pages、Numbers、Keynote 也能一键打开',
         'split.office.alt': 'Folio 编辑 Word 文档，右侧是段落样式面板',
 
-        'split.pdf.h2.line1': 'PDF 工具箱',
-        'split.pdf.h2.serif': 'all on your Mac.',
-        'split.pdf.body': '阅读、标注、整理页面，一个面板搞定。合并、拆分、裁剪、水印、页码、文字识别、文件对比、压缩与加密，都不用再另找工具。',
+        'split.pdf.h2.line1': 'PDF 工具箱，',
+        'split.pdf.h2.serif': '都在本机完成',
+        'split.pdf.body': '合并、拆分、压缩、文字识别、加密，文件不用上传。',
         'split.pdf.li1': '页面缩略图一览，整理页面一步到位',
         'split.pdf.li2': '合并、拆分、裁剪、对比、修复、压缩、加密',
         'split.pdf.li3': '默认都在本机完成，只有标注「在线」的功能才会联网',
         'split.pdf.alt': 'Folio 的 PDF 工具箱：合并、拆分、裁剪、水印、对比、压缩，以及页面缩略图',
 
-        'split.epub.h2.line1': '电子书',
-        'split.epub.h2.serif': 'read like a real book.',
-        'split.epub.body': 'EPUB 直接打开，和文档放在同一个文件夹里。滚动或翻页阅读，字号、栏宽、字体和背景都由你定，读起来就像一本真正的书。',
+        'split.ask.h2.line1': '在文档里，',
+
+        'split.ask.h2.serif': '随时问 AI',
+
+        'split.ask.body': '总结、翻译、找结论，就在当前文档里完成。',
+
+        'split.ask.li1': '右下角一键唤出，当前文件自动带上',
+
+        'split.ask.li2': '总结这一段、提炼结论',
+
+        'split.ask.li3': '也可以让它翻译成其他语言',
+
+        'split.ask.alt': 'Ask AI 面板浮在 Markdown 文档上，输入框里是一条翻译请求',
+
+        'split.epub.h2.line1': '电子书，',
+        'split.epub.h2.serif': '像在纸上读',
+        'split.epub.body': '字号、栏宽、字体、背景，随心调整。',
         'split.epub.li1': '滚动与分页两种阅读方式',
         'split.epub.li2': '字号、栏宽、字体、背景自由调节',
         'split.epub.li3': '目录一键跳章',
         'split.epub.alt': 'Folio 阅读 EPUB，右侧是布局、字号、栏宽、字体与背景设置',
 
-        'split.history.h2.line1': '后悔药，',
-        'split.history.h2.serif': 'always within reach.',
-        'split.history.body': '改错了，误删了文件，没关系。自动备份整个文件夹，每次改动记成一个版本，随时并排对比，看清改了什么、删了什么。',
+        'split.history.h2.line1': '改错了，误删了文件，',
+        'split.history.h2.serif': '没关系，有后悔药',
+        'split.history.body': '自动保存每个版本，随时找回。',
         'split.history.li1': '自动备份，也可以随时手动保存版本',
         'split.history.li2': '并排对比任意两个版本，增删一目了然',
         'split.history.li3': '每个版本都写明改了哪些文件',
         'split.history.alt': 'Folio 的历史版本：左侧是版本列表，右侧是并排对比',
 
-        'split.video.h2.line1': '每段视频',
-        'split.video.h2.serif': 'one smooth player.',
-        'split.video.body': '主流视频格式直接播放，不用等转码。键盘快捷键、字幕、画中画一应俱全，省电不发烫。',
-        'split.video.li1': '省电流畅，不烫手不卡顿',
-        'split.video.li2': '字幕文件一拖即用',
-        'split.video.li3': '音频文件也能看到声音波形',
+        'formats.h3': '常见格式，都能直接打开',
 
-        'formats.h3': '一个窗口，看完所有格式',
-
-        'split.themes.h2.line1': '你的 Folio',
-        'split.themes.h2.serif': 'your color, 15 themes.',
-        'split.themes.body': '细腻的界面质感，搭配 15 套精心调校的主题。石墨、蓝、绿、紫、黄……侧栏、标签栏与面板整体换色，每个文件都有最合适的阅读色温。',
-        'split.themes.alt': '五套 Folio 配色——石墨、紫、黄、绿、蓝——以层叠窗口展示',
-        'split.themes.li1': '15 套精心调校的主题',
+        'split.themes.h2.line1': '五种主题色，',
+        'split.themes.h2.serif': '换个心情',
+        'split.themes.body': '石墨、蓝、绿、紫、黄任选，侧栏、标签栏与面板整体换色。',
+        'split.themes.alt': '五套 Folio 配色⁠——石墨、紫、黄、绿、蓝⁠——以层叠窗口展示',
+        'split.themes.li1': '一键切换，立即生效',
         'split.themes.li2': '深浅自动跟随系统',
         'split.themes.li3': '字体、行高、阅读宽度都能自己调',
 
@@ -2694,16 +2635,10 @@
         'feat.search.p':    '按内容搜索，不止文件名。笔记里的一句话也能瞬间命中。',
         'feat.folders.h':   '多文件夹并列',
         'feat.folders.p':   '几个项目同时挂着，左边一棵清晰的文件树。',
-        'feat.glass.h':     '细腻玻璃质感',
-        'feat.glass.p':     '与系统美学一脉相承的优雅界面。',
         'feat.3d.h':        '3D 模型与字体预览',
         'feat.3d.p':        '三维模型可以转着看，字体可以一目了然地试。',
         'feat.tables.h':    '表格与数据',
         'feat.tables.p':    '电子表格与数据表直接查看、排序、筛选。',
-        'feat.code.h':      '代码语法着色',
-        'feat.code.p':      '几乎你能想到的编程语言都已经准备好。',
-        'feat.translate.h': 'Markdown 翻译',
-        'feat.translate.p': '一键把笔记切换成另一种语言，离线快速。',
         'feat.focus.h':     '无干扰阅读',
         'feat.focus.p':     '透明标题栏、阅读宽度可调，让文字成为主角。',
 
@@ -2712,40 +2647,34 @@
         'faq.q1': 'Folio 是什么？',
         'faq.a1': 'Folio 是一款 Mac 应用，专为 AI 写出的各种文件而做：Claude Code、ChatGPT、Gemini 并行启动，它们生成的 Markdown、Word、PDF 等文件就在旁边打开，直接看、直接改；改错了，还有版本历史当后悔药。',
         'faq.q2': '和「预览.app」/ Quick Look 有什么不同？',
-        'faq.a2': '系统自带的预览只能「看一眼就关」。Folio 是为长时间停留打造的工作空间：多标签、跨文件搜索、双向编辑笔记、15 套阅读主题——把「打开一下就走」变成「打开就能开始工作」。',
+        'faq.a2': '系统自带的预览只能「看一眼就关」。Folio 是为长时间停留打造的工作空间：多标签、跨文件搜索、双向编辑笔记、五种主题色，把「打开一下就走」变成「打开就能开始工作」。',
         'faq.q3': '我可以用它编辑文件吗？',
         'faq.a3': '可以。Markdown、代码、笔记和微软 Office 文件都能直接编辑；PDF 可以标注，也能合并、拆分、裁剪页面。',
         'faq.q4': '支持哪些 macOS 版本？',
         'faq.a4': 'Folio 需要 macOS 15 或更高版本，并且是 Apple 芯片（M 系列）的 Mac，因为内置了本地模型。Windows 版即将到来。',
         'faq.q5': '搜索一万个文件的文件夹会不会很慢？',
-        'faq.a5': 'Folio 在你打开文件夹时就悄悄准备好，之后只在文件变化时跟进。一万个文件的大文件夹，输入即可命中——你不会感觉到它在工作。',
+        'faq.a5': 'Folio 在你打开文件夹时就悄悄准备好，之后只在文件变化时跟进。一万个文件的大文件夹，输入即可命中，你不会感觉到它在工作。',
         'faq.q6': '我的数据安全吗？',
-        'faq.a6': 'Folio 本身不会把你的文件内容上传到任何地方——这是默认行为，没有「关闭云同步」的开关。你启动的 Agent 则按它们各自的服务条款与设置运行。',
+        'faq.a6': 'Folio 本身不会把你的文件内容上传到任何地方，这是默认行为，没有「关闭云同步」的开关。你启动的 Agent 则按它们各自的服务条款与设置运行。',
         'faq.q7': '是否免费？',
         'faq.a7': 'Folio Pro 目前完全免费。将来如果调整定价，会提前公布，早期用户会获得忠诚度优惠。',
 
         'cta.eyebrow': '准备好了吗？',
-        'cta.body': 'Claude Code、ChatGPT、Gemini 并行启动，文件就在旁边。',
 
         'footer.copy': '© 2026 Folio · 为 macOS 而生',
 
         'lang.label': '中文',
-        'formats.list': ['PDF','Word','Excel','PowerPoint','Pages','Numbers','Keynote','Markdown','代码','图片','音频','视频','3D 模型','数据表','CSV','电子书','漫画','Notebook','字体','压缩包']
+        'formats.list': ['PDF','Word','Excel','PowerPoint','Pages','Numbers','Keynote','Markdown','代码','音频','3D 模型','数据表','CSV','电子书','漫画','Notebook','字体','压缩包']
       },
 
       en: {
-        'document.title': 'Folio — Every file your AI writes. Read it and edit it right where it is.',
+        'document.title': 'Folio — Every file your AI writes. Read it and edit it right where it is.',
         'document.description': 'Folio: every file your AI writes, read and edited right where it is. Run Claude Code, ChatGPT and Gemini side by side, edit Markdown and Office files directly, and undo any bad edit.',
         'nav.agent': 'Agents',
         'hero.badge': 'Folio Pro for Mac',
         'hero.h1.a': 'Every file your AI writes.',
         'hero.h1.b': 'Read it and edit it right where it is.',
         'hero.meta.silicon': 'Apple Silicon (M-series)',
-        'banner.eyebrow': 'every file your AI writes',
-        'also.eyebrow': 'and more',
-        'also.h2.line1': 'Whatever agents write,',
-        'also.h2.serif': 'it opens.',
-        'also.body': 'PDFs, e-books, code, images, video… every other format opens in the same window.',
         'cta.h2.a': 'Every file your AI writes.',
         'cta.h2.b': 'Read it and edit it right where it is.',
 
@@ -2757,39 +2686,27 @@
         'hero.meta.free': 'Free for now',
         'hero.meta.soon': 'Windows is coming',
         'cta.note': 'Folio Pro is free for now · Windows is coming',
-
-
-        'pro.badge': 'Claude Code · ChatGPT · Gemini',
         'pro.h2.line1': 'Too many projects at once?',
-        'pro.h2.serif': 'Run agents side by side.',
-        'pro.sub': 'Run Claude Code, ChatGPT and Gemini side by side, with a set of agents for every folder. The files they write are right there to read and edit — plus real Git and on-device models.',
+        'pro.h2.serif': 'Run Claude Code, ChatGPT and Gemini side by side.',
+        'pro.sub': 'CLI agents organized by folder, working right inside your files.',
         'pro.term.h': 'Terminal & AI tab',
         'pro.term.p': 'Run Claude Code, Codex and other CLIs right next to the files they change.',
         'pro.git.h': 'Full Git client',
         'pro.git.p': 'History, diff and blame for every repository you open.',
-        'pro.ask.h': 'Ask & summarize',
-        'pro.ask.p': 'Summon Ask AI at the corner of any document to summarize, ask or translate.',
-        'pro.shot1.h': 'A set of agents for every folder',
-        'pro.shot1.p': 'Command-line agents like Claude Code and Antigravity CLI run as tabs, with sessions filed under each folder so you can pick up where you left off.',
         'pro.shot1.alt': "Folio's AI tab running Antigravity CLI, with agent sessions listed per folder in the sidebar",
-        'pro.shot2.h': 'Ask AI right on the document',
-        'pro.shot2.p': 'Open Ask AI from the corner and the current file comes along. Summarize a section, pull out the conclusions, or have it translate into French.',
-        'pro.shot2.alt': 'The Ask AI panel floating over a Markdown document, with a translation request typed in',
         'pro.local.h': 'On-device models',
         'pro.local.p': 'Semantic search, offline translation and OCR, running on your Mac.',
         'pro.lsp.h': 'Language servers',
         'pro.lsp.p': 'Code intelligence for Go, Rust, Python, TS/JS and Java via LSP.',
         'pro.tasks.h': 'Tasks & calendar',
         'pro.tasks.p': 'Keep tasks next to your work, linked to the menu-bar calendar.',
-        'pro.pdf.h': 'PDF, further',
-        'pro.pdf.p': 'Turn PDFs into Markdown, or translate them with the layout intact.',
         'pro.sync.h': 'iCloud sync',
         'pro.sync.p': 'Sync with iCloud, plus more translation engines to choose from.',
         'pro.req': 'macOS 15+ · Apple Silicon (M-series) · Free for now · Windows is coming',
 
         'btn.pro': 'Get Folio Pro',
 
-        'hero.subtitle': 'Run Claude Code, ChatGPT and Gemini side by side. The Markdown, Word and PDF files they write sit right next to them — read, edit, and undo if it goes wrong.',
+        'hero.subtitle': 'PDF, Office, Markdown, code and e‑books — just open and read.',
         'hero.shot.alt': 'Folio home: a workspace with an Ask box for agents, recent files and a format overview',
 
         'pillar.1.h': 'Agents side by side',
@@ -2801,79 +2718,74 @@
         'pillar.3.body': 'Open and edit Microsoft Office files directly.',
         'pillar.4.body': 'Bad edit? Deleted the wrong file? There\'s an undo for that.',
 
-        'banner.h2.line1': 'Every file your AI writes,',
-        'banner.h2.serif': 'in one window.',
-        'banner.body': 'Markdown, Word, PDF, e-books… whatever your agents write, open it, read it and edit it without switching apps.',
-        'banner.alt': 'Folio opening a Word document, a PDF, an EPUB and a Markdown note in four windows',
-
         'split.code.h2.line1': 'Elegant code reading,',
-        'split.code.h2.serif': 'fully yours.',
-        'split.code.body': 'Every popular programming language is ready. Crisp syntax colors, tidy indentation — code reads like prose, not a wall of text.',
+        'split.code.h2.serif': 'easy on the eyes.',
+        'split.code.body': 'Every popular programming language is ready. Crisp syntax colors, tidy indentation — code reads like prose, not a wall of text.',
         'split.code.li1': 'Covers every popular programming language',
         'split.code.li2': 'Comfortable sizing and spacing for long reading',
         'split.code.li3': 'Browse multiple folders side by side',
 
-        'split.image.h2.line1': 'All image formats,',
-        'split.image.h2.serif': 'just one viewer.',
-        'split.image.body': 'Even huge files open instantly. Phone shots, camera raw, web images, GIFs, vector files — open, zoom, read details, and flip through a folder.',
-        'split.image.li1': 'From phone shots to camera raw, all common formats',
-        'split.image.li2': 'Huge files open in a blink',
-        'split.image.li3': 'Arrow keys browse, space for quick look',
-
-        'split.md.h2.line1': 'A clean Markdown editor,',
-        'split.md.h2.serif': 'no syntax to memorize.',
-        'split.md.body': 'Headings, lists, tables and callouts render as you type — no preview pane, nothing to memorize. The side panel puts heading levels, text format, color and reading style one click away, and source view is a tap off.',
+        'split.md.h2.line1': 'A clean',
+        'split.md.h2.serif': 'Markdown editor',
+        'split.md.body': 'No syntax to memorize. Headings, tables and callouts in a click.',
         'split.md.li1': 'What you write is what you see',
-        'split.md.li2': 'Preview, Source and Find — switch in one click',
+        'split.md.li2': 'Preview, Source and Find — switch in one click',
         'split.md.li3': 'System, Academic and Reading styles, with zoom',
         'split.md.alt': 'Folio Markdown editor with the Format panel: headings, display modes, text format and colors',
 
-        'split.office.h2.line1': 'Office files,',
-        'split.office.h2.serif': 'open and edit directly.',
-        'split.office.body': 'Open and edit Microsoft Office files directly, with no waiting for Word to launch. Styles, alignment, line spacing, indents and pagination controls all live in the side panel.',
-        'split.office.li1': 'Format, Insert, Review, View and Document — five panels, one job each',
+        'split.office.h2.line1': 'Open and edit',
+        'split.office.h2.serif': 'Microsoft Office files directly',
+        'split.office.body': 'Styles, spacing and pagination in one side panel.',
+        'split.office.li1': 'Format, Insert, Review, View and Document — five panels, one job each',
         'split.office.li2': 'Paragraph styles, spacing, indents and pagination controls',
         'split.office.li3': 'Edit Word, Excel and PowerPoint in place; Pages, Numbers and Keynote open in one click',
         'split.office.alt': 'Folio editing a Word document, with the paragraph style panel on the right',
 
-        'split.pdf.h2.line1': 'A PDF toolbox,',
-        'split.pdf.h2.serif': 'all on your Mac.',
-        'split.pdf.body': 'Read, mark up and reorganize pages from one panel. Merge, split, crop, watermark, number pages, recognize text, compare files, compress and password-protect — without hunting for another app.',
+        'split.pdf.h2.line1': 'A full PDF toolkit,',
+        'split.pdf.h2.serif': 'on your Mac',
+        'split.pdf.body': 'Merge, split, compress, OCR and protect — without uploading a thing.',
         'split.pdf.li1': 'Page thumbnails at a glance, reorganizing in one step',
         'split.pdf.li2': 'Merge, split, crop, compare, repair, compress, encrypt',
-        'split.pdf.li3': 'Runs on your Mac by default — only features marked "Online" use the network',
+        'split.pdf.li3': 'Runs on your Mac by default — only features marked "Online" use the network',
         'split.pdf.alt': 'Folio PDF toolbox: merge, split, crop, watermark, compare and compress, with page thumbnails',
 
-        'split.epub.h2.line1': 'E-books,',
-        'split.epub.h2.serif': 'read like a real book.',
-        'split.epub.body': 'Open an EPUB right next to your documents. Scroll or page through it, and set the font size, column width, typeface and background yourself — it reads like a real book.',
+        'split.ask.h2.line1': 'Ask AI',
+
+        'split.ask.h2.serif': 'without leaving the page',
+
+        'split.ask.body': 'Summarize, translate and find answers inside the document you are reading.',
+
+        'split.ask.li1': 'Open it from the corner — the current file comes along',
+
+        'split.ask.li2': 'Summarize a passage or pull out the takeaway',
+
+        'split.ask.li3': 'Or have it translate into another language',
+
+        'split.ask.alt': 'The Ask AI panel floating over a Markdown document, with a translation request typed in',
+
+        'split.epub.h2.line1': 'E‑books that read',
+        'split.epub.h2.serif': 'like paper',
+        'split.epub.body': 'Tune size, column width, typeface and background, then just read.',
         'split.epub.li1': 'Scroll or paginate, your call',
         'split.epub.li2': 'Font size, column width, typeface and background',
         'split.epub.li3': 'Jump to any chapter from the contents',
         'split.epub.alt': 'Folio reading an EPUB, with layout, font size, column width, typeface and background controls',
 
-        'split.history.h2.line1': 'Bad edit?',
-        'split.history.h2.serif': 'There\'s an undo for that.',
-        'split.history.body': 'Deleted the wrong file? No problem. Your whole folder is backed up automatically, and every change becomes a version you can compare side by side.',
+        'split.history.h2.line1': 'Bad edit? Deleted the wrong file?',
+        'split.history.h2.serif': 'There’s an undo for that.',
+        'split.history.body': 'Every version saves automatically, so nothing is ever truly lost.',
         'split.history.li1': 'Automatic backups, plus saving a version by hand any time',
-        'split.history.li2': 'Compare any two versions side by side — additions and deletions at a glance',
+        'split.history.li2': 'Compare any two versions side by side — additions and deletions at a glance',
         'split.history.li3': 'Each version says which files changed',
         'split.history.alt': 'Folio version history: a list of versions on the left and a side-by-side comparison on the right',
 
-        'split.video.h2.line1': 'Every video,',
-        'split.video.h2.serif': 'one smooth player.',
-        'split.video.body': 'All major formats play instantly — no conversion needed. Keyboard shortcuts, subtitles, picture-in-picture, and easy on the battery.',
-        'split.video.li1': 'Smooth playback, easy on the battery',
-        'split.video.li2': 'Drop in a subtitle file and go',
-        'split.video.li3': 'Audio files show their waveform',
+        'formats.h3': 'Common formats, all open right away',
 
-        'formats.h3': 'Every format, one window',
-
-        'split.themes.h2.line1': 'Your Folio,',
-        'split.themes.h2.serif': 'your color, 15 themes.',
-        'split.themes.body': 'A delicate interface paired with 15 thoughtfully tuned themes. Graphite, blue, green, purple, yellow… the sidebar, tab bar and panels all change together, so every file finds its own light.',
-        'split.themes.alt': 'Five Folio color themes — graphite, purple, yellow, green and blue — stacked as windows',
-        'split.themes.li1': '15 carefully tuned themes',
+        'split.themes.h2.line1': 'Five accent colors.',
+        'split.themes.h2.serif': 'Make it yours.',
+        'split.themes.body': 'Graphite, blue, green, purple, yellow — the sidebar, tab bar and panels all change with it.',
+        'split.themes.alt': 'Five Folio color themes — graphite, purple, yellow, green and blue — stacked as windows',
+        'split.themes.li1': 'One click, applied instantly',
         'split.themes.li2': 'Auto-switch with system appearance',
         'split.themes.li3': 'Customize font, line height, reading width',
 
@@ -2888,43 +2800,36 @@
         'feat.search.p':    'Search by content, not just filenames. Even a single line in your notes.',
         'feat.folders.h':   'Side-by-side folders',
         'feat.folders.p':   'Mount several projects at once with a clean, clear file tree.',
-        'feat.glass.h':     'Crystalline interface',
-        'feat.glass.p':     'An elegant interface aligned with system aesthetics.',
         'feat.3d.h':        '3D models & fonts',
         'feat.3d.p':        'Rotate 3D models, preview fonts at a glance.',
         'feat.tables.h':    'Tables & data',
         'feat.tables.p':    'View, sort and filter spreadsheets and data tables.',
-        'feat.code.h':      'Syntax-colored code',
-        'feat.code.p':      'Just about every programming language is ready out of the box.',
-        'feat.translate.h': 'Markdown translation',
-        'feat.translate.p': 'Translate notes with one tap — fast, and fully offline.',
         'feat.focus.h':     'Distraction-free reading',
-        'feat.focus.p':     'Transparent titlebar, adjustable width — your content is the star.',
+        'feat.focus.p':     'Transparent titlebar, adjustable width — your content is the star.',
 
         'faq.eyebrow': 'FAQ',
         'faq.h2': 'Still curious?',
         'faq.q1': 'What is Folio?',
-        'faq.a1': 'Folio is a Mac app for every file your AI writes. Run Claude Code, ChatGPT and Gemini side by side, open the Markdown, Word and PDF files they produce right next to them, read and edit in place — and rely on version history if an edit goes wrong.',
+        'faq.a1': 'Folio is a Mac app for every file your AI writes. Run Claude Code, ChatGPT and Gemini side by side, open the Markdown, Word and PDF files they produce right next to them, read and edit in place — and rely on version history if an edit goes wrong.',
         'faq.q2': 'How is it different from Preview / Quick Look?',
-        'faq.a2': 'macOS Preview is built for a quick glance. Folio is built to stay: tabs, cross-file search, two-way editing for notes, and 15 reading themes — turning "peek and close" into "open and work".',
+        'faq.a2': 'macOS Preview is built for a quick glance. Folio is built to stay: tabs, cross-file search, two-way editing for notes, and five accent colors — turning "peek and close" into "open and work".',
         'faq.q3': 'Can I edit files in it?',
         'faq.a3': 'Yes. Markdown, code, notes and Microsoft Office files are all editable in place; PDFs can be marked up, and pages merged, split or cropped.',
         'faq.q4': 'Which macOS versions are supported?',
         'faq.a4': 'Folio needs macOS 15 or later on an Apple Silicon (M-series) Mac, because it bundles on-device models. Windows is coming.',
         'faq.q5': 'Will searching a folder of 10,000 files be slow?',
-        'faq.a5': "Folio quietly prepares when you open a folder, then only catches up on changes. Even folders with 10,000 files respond as you type — you won't notice it working.",
+        'faq.a5': "Folio quietly prepares when you open a folder, then only catches up on changes. Even folders with 10,000 files respond as you type — you won't notice it working.",
         'faq.q6': 'Is my data safe?',
-        'faq.a6': 'Folio itself never uploads your files anywhere — it is the default, with no cloud toggle to switch off. The agents you launch run under their own terms and settings.',
+        'faq.a6': 'Folio itself never uploads your files anywhere — it is the default, with no cloud toggle to switch off. The agents you launch run under their own terms and settings.',
         'faq.q7': 'Is it free?',
         'faq.a7': 'Folio Pro is free for now. If pricing changes, it will be announced in advance, and early users get a loyalty discount.',
 
         'cta.eyebrow': 'ready?',
-        'cta.body': 'Run Claude Code, ChatGPT and Gemini side by side, with your files right there.',
 
         'footer.copy': '© 2026 Folio · Made for macOS',
 
         'lang.label': 'English',
-        'formats.list': ['PDF','Word','Excel','PowerPoint','Pages','Numbers','Keynote','Markdown','Code','Images','Audio','Video','3D Models','Databases','CSV','E-books','Comics','Notebooks','Fonts','Archives']
+        'formats.list': ['PDF','Word','Excel','PowerPoint','Pages','Numbers','Keynote','Markdown','Code','Audio','3D Models','Databases','CSV','E‑books','Comics','Notebooks','Fonts','Archives']
       }
     };
 
@@ -2971,7 +2876,7 @@
         const list = dict['formats.list'] || [];
         // Duplicate for seamless loop
         const html = [...list, ...list].map(name =>
-          `<span class="format-chip"><span class="dot"></span>${name}</span>`
+          `<span class="format-chip">${name}</span>`
         ).join('');
         track.innerHTML = html;
       }
