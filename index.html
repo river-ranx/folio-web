@@ -20,13 +20,20 @@
   <link rel="apple-touch-icon" href="assets/app-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display:ital@1&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <!-- 中文字体均为 SIL OFL 授权，可免费商用：思源黑体（Noto Sans SC）做正文与标题，霞鹜文楷（LXGW WenKai）做标题里的点睛半句。按 unicode-range 切片，只下载用到的字 -->
+  <link href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-bold.css" rel="stylesheet">
   <style>
     /* ===== Reset ===== */
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     /* ===== Design Tokens — Light (default, matches Folio landings) ===== */
     :root {
+      /* 字体栈：拉丁字形走 Inter / JetBrains Mono，中文逐字回退到思源黑体 */
+      --font-sans: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Segoe UI', sans-serif;
+      --font-mono: 'JetBrains Mono', 'Noto Sans SC', ui-monospace, monospace;
+      /* 点睛半句：DM Serif Display（SIL OFL）斜体，只有一个字重 */
+      --font-serif: 'DM Serif Display', 'Iowan Old Style', 'Georgia', serif;
       --bg: #FBF6EE;
       --bg-elevated: #FFFAF1;
       --bg-subtle: rgba(110, 75, 30, 0.045);
@@ -79,25 +86,17 @@
       --ill-mist: #DAD7E0;
       /* 画框天空（首屏 / 收尾 CTA）及其上的文字色 —— 浅蓝底上琥珀与次级文字都要加深才达标 */
       --hero-sky: #CBE8F6;
+      /* 云层（首屏底部、收尾）：浅色就是纸色 + 墨线；深色单独压暗，免得浅米色在近黑底上过亮 */
+      --cloud-fill: #FFF8E8;
+      --cloud-edge: #2B2018;
       --hero-dim: #4A4033;
       --hero-accent: #C4510B;
-      /* 大色块面板（展示区）及其上的次级文字 */
-      --pn-sky: #BFE0F0;
-      --pn-butter: #FFE08A;
-      --pn-sage: #BFE3C4;
-      --pn-blush: #F8C9BC;
-      --pn-peri: #C3CCF7;
-      --panel-dim: #4F4436;
       --theme-icon-sun: none;
       --theme-icon-moon: block;
     }
 
-    /* ===== Dark mode overrides =====
-       .pro-zone 复用同一套暗色 token：Folio Pro 的区块在浅色页面里也是深色「工作间」，
-       颜色只在这里定义一次，不另写一份。 */
-    html.dark,
-    .pro-zone,
-    .navbar.on-dark {
+    /* ===== Dark mode overrides ===== */
+    html.dark {
       --bg: #0B0907;
       --bg-elevated: #131110;
       --bg-subtle: rgba(255, 230, 200, 0.04);
@@ -145,22 +144,12 @@
       --ill-peri: #4B5A9E;
       --ill-mist: #5A5560;
       --hero-sky: #1D2535;
+      --cloud-fill: #262D3B;
+      --cloud-edge: #444B5C;
       --hero-dim: #B3A794;
       --hero-accent: #FF9A4A;
-      --pn-sky: #1F3340;
-      --pn-butter: #3A2F14;
-      --pn-sage: #1F3626;
-      --pn-blush: #3D2621;
-      --pn-peri: #262B4D;
-      --panel-dim: #B3A794;
       --theme-icon-sun: block;
       --theme-icon-moon: none;
-    }
-
-    /* 自定义属性会继承，但 color/background 是父级算好的值，需要在区块上重新取一次 */
-    .pro-zone {
-      color: var(--text);
-      background: var(--bg);
     }
 
     html {
@@ -172,7 +161,7 @@
     }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-family: var(--font-sans);
       background: var(--bg);
       color: var(--text);
       line-height: 1.5;
@@ -202,7 +191,7 @@
     h1 { font-weight: 700; letter-spacing: -0.04em; }
 
     .serif {
-      font-family: 'Instrument Serif', 'Iowan Old Style', 'Georgia', serif;
+      font-family: var(--font-serif);
       font-style: italic;
       font-weight: 400;
       letter-spacing: -0.01em;
@@ -212,7 +201,7 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-family: var(--font-mono);
       font-size: 12px;
       font-weight: 500;
       letter-spacing: 0.02em;
@@ -748,7 +737,7 @@
       max-width: 15em;
     }
 
-    /* 英文标语更长：缩小字号；宽屏下两行各占一行（衬线行约 707px，仍落在两侧插画之间），窄屏再收窄换行 */
+    /* 英文标语更长：缩小字号；宽屏下两行各占一行（衬线行宽见下方 .serif），窄屏再收窄换行 */
     html[lang="en"] .hero h1 { font-size: clamp(32px, 4.2vw, 56px); max-width: 11.5em; }
     @media (min-width: 560px) {
       html[lang="en"] .hero h1 { max-width: none; }
@@ -760,6 +749,8 @@
       font-size: 1.05em;
       display: inline-block;
     }
+    /* 英文这一行按衬线字体的字面宽度收一点，保持约 710px 宽，仍落在两侧插画之间 */
+    html[lang="en"] .hero h1 .serif { font-size: 0.88em; }
 
     .hero-subtitle {
       font-size: 19px;
@@ -787,7 +778,7 @@
       display: flex;
       align-items: center;
       gap: 18px;
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-family: var(--font-mono);
       font-size: 12px;
       color: var(--text-dim);   /* 原 --text-mute 对比度不到 AA */
     }
@@ -802,8 +793,11 @@
 
     /* ===== Hero Window ===== */
     .hero-window {
+      /* 窗口底到首屏底的距离；拼贴与云层的下沿都从这里取，不各写一份。
+         要大于截图投影的伸展距离（约 70px），否则投影会被首屏底边切出一道线 */
+      --tail: 96px;
       max-width: 1100px;
-      margin: 120px auto 72px;
+      margin: 120px auto var(--tail);
       padding: 0 28px;
       position: relative;
       z-index: 1;
@@ -918,42 +912,32 @@
     }
 
     /* ===== Pillars ===== */
-    .pillars { padding: 64px 0 96px; }
+    .pillars { padding: 40px 0 72px; }
 
     .pillars-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
+      gap: 40px 28px;
       max-width: 1200px;
       margin: 0 auto;
       padding: 0 28px;
     }
 
+    /* 卖点：不要卡片底，只留插画 + 文字；--t 只给插画里的小色条取色 */
     .pillar {
-      --t: 236, 176, 48;               /* 每张卡一个色调，渐变、线条、阴影都从它派生 */
+      --t: var(--ill-butter);
       display: flex;
       flex-direction: column;
-      padding: 10px 26px 28px;
-      border-radius: 22px;
-      background: linear-gradient(160deg, rgba(var(--t), .26), rgba(var(--t), .10));
-      box-shadow:
-        inset 0 0 0 1px rgba(var(--t), .26),
-        inset 0 1px 0 rgba(255, 255, 255, .5),
-        0 14px 30px -16px rgba(60, 40, 20, .30);
-      transition: transform .25s ease, box-shadow .25s ease;
+      align-items: center;
+      text-align: center;
+      padding: 0 10px;
     }
-    html.dark .pillar {
-      background: linear-gradient(160deg, rgba(var(--t), .24), rgba(var(--t), .08));
-      box-shadow:
-        inset 0 0 0 1px rgba(var(--t), .30),
-        inset 0 1px 0 rgba(255, 255, 255, .06),
-        0 14px 30px -16px rgba(0, 0, 0, .6);
-    }
-    .pillar:hover { transform: translateY(-3px); }
-    .pillar.t-butter { --t: 236, 176, 48; }
-    .pillar.t-sage   { --t: 96, 160, 112; }
-    .pillar.t-sky    { --t: 84, 152, 196; }
-    .pillar.t-blush  { --t: 226, 128, 106; }
+    .pillar.t-butter { --t: var(--ill-butter); }
+    .pillar.t-sage   { --t: var(--ill-sage); }
+    .pillar.t-sky    { --t: var(--ill-sky); }
+    .pillar.t-blush  { --t: var(--ill-blush); }
+    .pillar-art { transition: transform .3s cubic-bezier(.34, 1.56, .64, 1); }
+    .pillar:hover .pillar-art { transform: rotate(-3deg) scale(1.04); }
 
     .pillar h3 {
       font-size: 17px;
@@ -981,16 +965,17 @@
     .pi-sheet {
       border-radius: .85em;
       padding: .75em .7em;
-      background: linear-gradient(180deg, #FFFFFF, #F4F2EE);
-      box-shadow: 0 .1em .2em rgba(var(--t), .25), 0 .7em 1.5em rgba(var(--t), .34), inset 0 .08em 0 #FFF;
+      background: var(--ill-paper);
+      border: .15em solid var(--ill-line);
+      box-shadow: .28em .32em 0 var(--ink-shadow);
     }
-    html.dark .pi-sheet { background: linear-gradient(180deg, #F2EFE9, #DEDAD2); }
     .pi-sheet i {
       display: block;
-      height: .42em;
-      margin-bottom: .5em;
-      border-radius: .21em;
-      background: rgba(var(--t), .40);
+      height: .32em;
+      margin-bottom: .55em;
+      border-radius: .16em;
+      background: var(--ill-line);
+      opacity: .75;
     }
     .pi-tile {
       display: grid;
@@ -998,10 +983,11 @@
       width: 4.7em;
       height: 4.7em;
       border-radius: 1.15em;
-      color: #FFF;
-      font-weight: 700;
-      background: linear-gradient(160deg, rgba(var(--c), .78), rgb(var(--c)));
-      box-shadow: 0 .6em 1.3em rgba(var(--c), .40), inset 0 .09em 0 rgba(255, 255, 255, .55), inset 0 0 0 .06em rgba(255, 255, 255, .18);
+      color: var(--ill-line);
+      font-weight: 800;
+      background: var(--c);
+      border: .15em solid var(--ill-line);
+      box-shadow: .28em .32em 0 var(--ink-shadow);
     }
     .pi-tile span { font-size: 2.3em; line-height: 1; letter-spacing: -.03em; }
 
@@ -1011,18 +997,18 @@
     .pi.agents .pi-sheet:nth-child(2) { left: 2.5em; top: .2em; }
     .pi.agents .pi-sheet:nth-child(3) { left: 5em; top: 2.6em; transform: rotate(7deg); }
     .pi-who { display: flex; align-items: center; gap: .45em; margin-bottom: .6em; }
-    .pi-who::before { content: ""; width: .85em; height: .85em; border-radius: 50%; background: rgb(var(--c)); }
-    .pi-who::after { content: ""; width: 2.3em; height: .42em; border-radius: .21em; background: rgba(40, 40, 60, .40); }
-    .pi.agents .pi-sheet i:last-child { width: 45%; background: rgb(var(--c)); animation: pi-pulse 1.5s ease-in-out infinite; animation-delay: var(--dl, 0s); }
-    @keyframes pi-pulse { 0%, 100% { opacity: .4; } 50% { opacity: 1; } }
+    .pi-who::before { content: ""; width: .85em; height: .85em; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 .12em var(--ill-line); }
+    .pi-who::after { content: ""; width: 2.3em; height: .32em; border-radius: .16em; background: var(--ill-line); opacity: .75; }
+    .pi.agents .pi-sheet i:last-child { width: 45%; opacity: 1; background: var(--c); box-shadow: 0 0 0 .1em var(--ill-line); animation: pi-pulse 1.5s ease-in-out infinite; animation-delay: var(--dl, 0s); }
+    @keyframes pi-pulse { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
     @media (prefers-reduced-motion: reduce) { .pi.agents .pi-sheet i:last-child { animation: none; } }
 
     /* Markdown：# 变成排好版的页面 */
-    .pi.mdown .pi-tile { left: .5em; top: 1.9em; transform: rotate(-10deg); font-family: 'JetBrains Mono', ui-monospace, monospace; }
+    .pi.mdown .pi-tile { left: .5em; top: 1.9em; transform: rotate(-10deg); font-family: var(--font-mono); }
     .pi.mdown .pi-sheet { left: 4.6em; top: 0; width: 6em; height: 7.4em; transform: rotate(4deg); }
-    .pi.mdown .pi-sheet .hd { height: .8em; width: 68%; margin-bottom: .7em; background: rgba(var(--t), .85); }
+    .pi.mdown .pi-sheet .hd { height: .7em; width: 68%; margin-bottom: .7em; opacity: 1; background: var(--ill-tomato); box-shadow: 0 0 0 .1em var(--ill-line); }
     .pi-li { display: flex; align-items: center; gap: .4em; margin-bottom: .5em; }
-    .pi-li::before { content: ""; flex: none; width: .6em; height: .6em; border-radius: .18em; background: rgba(var(--t), .75); }
+    .pi-li::before { content: ""; flex: none; width: .6em; height: .6em; border-radius: .18em; background: var(--t); box-shadow: 0 0 0 .1em var(--ill-line); }
     .pi-li i { flex: 1; margin: 0; }
 
     /* Office：W / X / P */
@@ -1032,14 +1018,16 @@
 
     /* 版本历史：一叠旧版本 + 回退徽标 */
     .pi.hist .pi-sheet { width: 5.6em; height: 7em; top: .2em; }
-    .pi.hist .pi-sheet:nth-child(1) { left: 1.1em; transform: rotate(-13deg); opacity: .5; }
-    .pi.hist .pi-sheet:nth-child(2) { left: 2.4em; transform: rotate(-6deg); opacity: .78; }
+    .pi.hist .pi-sheet:nth-child(1) { left: 1.1em; transform: rotate(-13deg); background: var(--ill-sky); }
+    .pi.hist .pi-sheet:nth-child(2) { left: 2.4em; transform: rotate(-6deg); background: var(--ill-butter); }
     .pi.hist .pi-sheet:nth-child(3) { left: 3.9em; transform: rotate(2deg); }
     .pi.hist .back {
       left: 7.4em; top: 4.1em; width: 3.5em; height: 3.5em; border-radius: 50%;
       display: grid; place-items: center; color: #FFF;
-      background: linear-gradient(160deg, rgba(var(--t), .8), rgb(var(--t)));
-      box-shadow: 0 .5em 1.1em rgba(var(--t), .45), inset 0 .09em 0 rgba(255, 255, 255, .5), 0 0 0 .22em rgba(255, 255, 255, .85);
+      color: var(--ill-line);
+      background: var(--ill-tomato);
+      border: .15em solid var(--ill-line);
+      box-shadow: .24em .28em 0 var(--ink-shadow);
     }
     .pi.hist .back svg { width: 2em; height: 2em; }
 
@@ -1149,7 +1137,7 @@
       border-radius: 999px;
       background: var(--bg-elevated);
       border: 1px solid var(--border);
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-family: var(--font-mono);
       font-size: 13px;
       font-weight: 500;
       color: var(--text);
@@ -1306,7 +1294,7 @@
       border-radius: 999px;
       background: var(--accent);
       color: var(--btn-accent-fg);
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-family: var(--font-mono);
       font-size: 10.5px;
       font-weight: 700;
       letter-spacing: 0.06em;
@@ -1380,7 +1368,7 @@
     }
 
     .pro-req {
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-family: var(--font-mono);
       font-size: 12px;
       color: var(--text-dim);
     }
@@ -1442,7 +1430,7 @@
     .cta-section > .container > .cta-note {
       max-width: none;
       margin: 22px 0 0;
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-family: var(--font-mono);
       font-size: 12px;
       color: var(--text-dim);
     }
@@ -1465,7 +1453,7 @@
     .footer-inner .brand { font-weight: 600; }
 
     .footer-copy {
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-family: var(--font-mono);
       font-size: 12px;
       color: var(--text-mute);
     }
@@ -1507,7 +1495,8 @@
 
     @media (max-width: 768px) {
       section { padding: 72px 0; }
-      .hero { padding: 120px 0 56px; }
+      .hero { padding-top: 120px; }
+      .hero-window { --tail: 88px; }
       .hero-window { margin-top: 112px; }
       .nav-links { display: none; }
       .nav-cta { display: none; }
@@ -1595,28 +1584,39 @@
     .btn-ghost { background: var(--bg-elevated); }
     .btn-ghost:hover { background: var(--ill-butter-soft); }
 
-    /* 功能区：色带 + 手绘波浪边，格子换成描边小卡 */
-    .features { position: relative; border: 0; background: var(--ill-sage-soft); }
-    .features::before, .features::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      right: 0;
-      height: 24px;
-      background: var(--ill-sage-soft);
-      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='24' viewBox='0 0 120 24'%3E%3Cpath d='M0 12Q30 0 60 12T120 12V24H0Z'/%3E%3C/svg%3E") repeat-x bottom / 120px 24px;
-              mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='24' viewBox='0 0 120 24'%3E%3Cpath d='M0 12Q30 0 60 12T120 12V24H0Z'/%3E%3C/svg%3E") repeat-x bottom / 120px 24px;
-      pointer-events: none;
+    /* 功能条目（「还有更多」与 Agent 能力共用）：不要卡片底，图标做成贴纸——纯色块 + 墨线描边 + 硬阴影，和插画同一套笔触 */
+    .features { border: 0; background: none; }
+    .features-grid, .pro-grid {
+      gap: 44px 40px;
+      background: none;
+      border: 0;
+      border-radius: 0;
+      overflow: visible;
     }
-    .features::before { top: -23px; }
-    .features::after { bottom: -23px; transform: scaleY(-1); }
-    .feature { background: var(--bg-elevated); }
-    .feature:hover { background: var(--ill-butter-soft); }
-    .feature-icon { color: var(--ill-line); border: 0; width: 36px; height: 36px; }
-    .feature:nth-child(4n+1) .feature-icon { background: var(--ill-butter); }
-    .feature:nth-child(4n+2) .feature-icon { background: var(--ill-sage); }
-    .feature:nth-child(4n+3) .feature-icon { background: var(--ill-sky); }
-    .feature:nth-child(4n)   .feature-icon { background: var(--ill-blush); }
+    .feature, .pro-card,
+    .feature:hover, .pro-card:hover {
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: none;
+      transform: none;
+    }
+    .feature-icon {
+      width: 46px;
+      height: 46px;
+      margin-bottom: 10px;
+      border-radius: 13px;
+      border: 2.5px solid var(--ill-line);
+      box-shadow: 4px 4px 0 var(--ink-shadow);
+      color: var(--ill-line);
+      transition: transform 0.3s cubic-bezier(.34, 1.56, .64, 1);
+    }
+    .feature-icon svg { width: 20px; height: 20px; stroke-width: 2.1; }
+    .feature:hover .feature-icon, .pro-card:hover .feature-icon { transform: rotate(-6deg) translateY(-2px); }
+    .feature:nth-child(4n+1) .feature-icon, .pro-card:nth-child(4n+1) .feature-icon { background: var(--ill-butter); }
+    .feature:nth-child(4n+2) .feature-icon, .pro-card:nth-child(4n+2) .feature-icon { background: var(--ill-sage); }
+    .feature:nth-child(4n+3) .feature-icon, .pro-card:nth-child(4n+3) .feature-icon { background: var(--ill-sky); }
+    .feature:nth-child(4n)   .feature-icon, .pro-card:nth-child(4n)   .feature-icon { background: var(--ill-blush); }
 
     /* 格式条：贴纸感的小标签 */
     .format-chip:nth-child(4n+1) { background: var(--ill-butter-soft); }
@@ -1713,7 +1713,7 @@
       left: 50%;
       width: 100vw;
       top: -170px;
-      bottom: -72px;
+      bottom: calc(-1 * var(--tail));
       transform: translateX(-50%);
       pointer-events: none;
     }
@@ -1740,62 +1740,78 @@
     }
     .hero-scene .il-bob:hover { scale: 1.09; rotate: -3deg; }
 
-    /* --- 展示区：大色块面板，里面放产品截图卡片 --- */
-    .split, .split + .split { padding: 24px 0; }
-    .split-inner {
-      position: relative;
-      overflow: hidden;
-      width: calc(100% - 56px);
-      max-width: 1144px;
-      padding: 64px 60px;
-      border: 0;
-      border-radius: 32px;
-      gap: 56px;
-    }
-    .tone-sky    .split-inner { background: var(--pn-sky); }
-    .tone-butter .split-inner { background: var(--pn-butter); }
-    .tone-sage   .split-inner { background: var(--pn-sage); }
-    .tone-blush  .split-inner { background: var(--pn-blush); }
-    .tone-peri   .split-inner { background: var(--pn-peri); }
-    .split-inner > * { position: relative; z-index: 1; }
-    .split-text p { color: var(--panel-dim); }
+    /* --- 展示区：不再用色块面板，截图直接放在纸面上，角落藏两枚手绘小物（.dd） --- */
+    .split, .split + .split { padding: 64px 0; }
+    .split-inner { max-width: 1144px; gap: 72px; }
     .split-text h2 .serif { color: var(--hero-accent); }
-    /* 面板角落的撕纸碎片 */
-    .split-inner::before {
-      content: '';
+    /* isolation 让小物的 z-index:-1 只沉到截图背后，不会掉到页面底色下面 */
+    .split-image, .pro-shot-frame { position: relative; isolation: isolate; }
+    .dd {
       position: absolute;
-      z-index: 0;
-      right: -36px;
-      bottom: -46px;
-      width: 280px;
-      height: 200px;
-      background: var(--ill-paper);
-      opacity: 0.5;
-      transform: rotate(8deg);
+      z-index: -1;
+      width: 132px;
+      height: 132px;
+      overflow: visible;
       pointer-events: none;
-      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 280 200'%3E%3Cpath d='M6 40 L38 22 L70 34 L104 10 L142 26 L180 8 L214 30 L250 18 L274 52 L262 92 L276 130 L252 168 L214 158 L176 190 L138 170 L102 192 L66 172 L34 184 L12 150 L24 112 L4 78Z'/%3E%3C/svg%3E") center / contain no-repeat;
-              mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 280 200'%3E%3Cpath d='M6 40 L38 22 L70 34 L104 10 L142 26 L180 8 L214 30 L250 18 L274 52 L262 92 L276 130 L252 168 L214 158 L176 190 L138 170 L102 192 L66 172 L34 184 L12 150 L24 112 L4 78Z'/%3E%3C/svg%3E") center / contain no-repeat;
     }
-    .split.reverse .split-inner::before { right: auto; left: -36px; transform: rotate(-8deg); }
+    .dd-tl { left: -82px; top: -76px; }
+    .dd-br { right: -84px; bottom: -72px; }
+    .faq .section-head { position: relative; }
+    .dd-faq { z-index: 0; left: calc(50% - 340px); top: 16px; width: 104px; height: 104px; }
 
-    /* --- Pro / CTA：同样做成内缩画框，与首屏呼应 --- */
-    .pro { margin: 24px 12px; border: 0; border-radius: 36px; }
-    .cta-section {
-      margin: 24px 12px 12px;
-      border: 0;
-      border-radius: 36px;
-      background: var(--hero-sky);
+    /* 横向裁掉伸出页面的插画（Agent 夜空、截图角落的小物），纵向照常可见 */
+    main { overflow-x: clip; }
+
+    /* 纸飞机身后的点状航迹 */
+    .dd-trail {
+      fill: none;
+      stroke: var(--ink);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-dasharray: 1 11;
+      opacity: 0.45;
+    }
+
+    /* --- 首屏底部的云层：云的填色就是页面底色，天空由此落进下面的纸面 --- */
+    .hero-clouds {
+      position: absolute;
+      left: 50%;
+      bottom: -1px;
+      width: max(1440px, 100%);
+      height: 150px;
+      transform: translateX(-50%);
+    }
+    .f-bg { fill: var(--bg); }
+    .f-cloud { fill: var(--cloud-fill); }
+    .il-cloud-edge { stroke: var(--cloud-edge); }
+
+    /* --- Pro / CTA：去掉画框，留在同一张纸面上 --- */
+    .pro { padding-top: 112px; border: 0; background: none; overflow: visible; }
+    .cta-section { padding-top: 140px; background: none; overflow: visible; }
+    .cta-sky {
+      position: absolute;
+      top: 40px;
+      left: 50%;
+      width: max(1440px, 100%);
+      height: 260px;
+      transform: translateX(-50%);
+      pointer-events: none;
     }
     .cta-section h2 .serif { color: var(--hero-accent); }
-    .cta-section > .container > p,
-    .cta-section .cta-note,
-    .cta-section .eyebrow { color: var(--hero-dim); }
+    /* 页脚接在草地下面，就是地面 */
+    footer { border-top: 0; background: var(--ill-hill-3); }
+    footer .brand, footer .footer-copy { color: var(--ill-line); }
+    html.dark footer .brand, html.dark footer .footer-copy { color: var(--text-dim); }
     @media (max-width: 768px) {
       .navbar { top: 10px; padding: 0 12px; }
       .navbar-inner { padding: 0 8px 0 14px; height: 52px; }
       .mobile-menu { top: 72px; left: 12px; right: 12px; }
-      .pro, .cta-section { margin-left: 8px; margin-right: 8px; border-radius: 28px; }
-      .split-inner { width: calc(100% - 24px); padding: 32px 22px; gap: 28px; border-radius: 26px; }
+      .split, .split + .split { padding: 48px 0; }
+      .dd { width: 88px; height: 88px; }
+      .dd-tl { left: -16px; top: -52px; }
+      .dd-br { right: -14px; bottom: -46px; }
+      .dd-faq { left: 4px; top: 0; width: 72px; height: 72px; }
+      .cta-sky { display: none; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -1816,6 +1832,17 @@
     }
 
 
+
+    /* 中文排印：
+       · 点睛半句：英文字母是 DM Serif Display 斜体，汉字与中文标点逐字回退到霞鹜文楷粗体（和 DM Serif 的笔画粗细相当）。
+         关掉浏览器的伪斜体/伪粗体（font-synthesis）：文楷没有斜体，汉字保持正体；DM Serif 只有一个字重，不会被加粗
+       · 拉丁字形的负字距会把汉字挤在一起，中文下归零 */
+    html[lang^="zh"] { --font-serif: 'DM Serif Display', 'LXGW WenKai', serif; }
+    html[lang^="zh"] .serif { font-weight: 700; font-synthesis: none; letter-spacing: 0.01em; }
+    /* 「还有更多」的标题是同一行里两段贴着的 span：英文需要一个词间空格，中文不需要 */
+    html[lang="en"] .features .section-head h2 .serif { margin-left: 0.25em; }
+    html[lang^="zh"] body,
+    html[lang^="zh"] h1, html[lang^="zh"] h2, html[lang^="zh"] h3, html[lang^="zh"] h4 { letter-spacing: 0; }
 
     /* Chinese text flow */
     html[lang^="zh"] p,
@@ -1852,10 +1879,14 @@
 <body class="loading">
   <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
     <defs>
-      <filter id="rough" x="-3%" y="-3%" width="106%" height="106%">
+      <!-- sRGB 下计算：默认的 linearRGB 会把很暗的填色（深色模式的页面底色）算偏，和页面底色接不上 -->
+      <filter id="rough" x="-3%" y="-3%" width="106%" height="106%" color-interpolation-filters="sRGB">
         <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="4" result="n"/>
         <feDisplacementMap in="SourceGraphic" in2="n" scale="3.5" xChannelSelector="R" yChannelSelector="G"/>
       </filter>
+      <path id="dd-star" d="M0 -14 Q0 0 14 0 Q0 0 0 14 Q0 0 -14 0 Q0 0 0 -14Z"/>
+      <path id="dd-bubble" d="M24 26H104A14 14 0 0 1 118 40V78A14 14 0 0 1 104 92H62L40 112L44 92H24A14 14 0 0 1 10 78V40A14 14 0 0 1 24 26Z"/>
+      <path id="dd-cloud" d="M0 40 a22 22 0 0 1 8 -42 a30 30 0 0 1 56 -8 a24 24 0 0 1 44 20 a20 20 0 0 1 -6 30Z"/>
       <g id="il-ground">
         <path d="M0 118 C200 58 420 58 640 108 S1060 150 1240 88 S1400 78 1440 88 V190 H0Z" class="f-hill1 il-line"/>
         <path d="M0 150 C240 108 480 118 720 150 S1160 176 1440 128 V190 H0Z" class="f-hill2 il-line"/>
@@ -2061,6 +2092,12 @@
             <g clip-path="url(#ruledClip)" fill="none" class="il-sage-line"><path d="M1090 438H1470"/><path d="M1090 464H1470"/><path d="M1090 490H1470"/><path d="M1090 516H1470"/><path d="M1090 542H1470"/><path d="M1090 568H1470"/><path d="M1090 594H1470"/><path d="M1090 620H1470"/><path d="M1090 646H1470"/><path d="M1090 672H1470"/><path d="M1090 698H1470"/><path d="M1090 724H1470"/><path d="M1090 750H1470"/><path d="M1090 776H1470"/><path d="M1090 802H1470"/><path d="M1090 828H1470"/><path d="M1090 854H1470"/><path d="M1090 880H1470"/><path d="M1090 906H1470"/><path d="M1090 932H1470"/><path d="M1090 958H1470"/><path d="M1090 984H1470"/></g>
           </g>
         </svg>
+        <svg class="hero-clouds" viewBox="0 0 1440 150" preserveAspectRatio="xMidYMax slice" focusable="false">
+          <g filter="url(#rough)">
+            <path d="M-40 160 V73 C-34 12 77 15 83 75 C89 29 204 23 210 69 C217 18 343 22 350 73 C358 7 493 11 500 77 C506 28 613 31 619 81 C625 22 740 27 747 85 C754 38 875 34 881 81 C888 28 1010 27 1017 80 C1021 22 1104 28 1109 85 C1115 22 1235 22 1242 86 C1249 20 1380 11 1387 76 C1393 9 1498 20 1504 87 V160Z" class="f-cloud il-line il-cloud-edge"/>
+            <path d="M-40 160 V111 C-35 69 53 76 58 119 C63 81 149 76 153 113 C158 65 244 66 249 114 C253 78 320 73 324 109 C329 74 429 80 434 115 C440 69 547 74 553 119 C558 85 649 72 654 107 C659 69 746 68 750 105 C755 63 828 62 833 104 C837 61 920 74 925 117 C930 72 1022 66 1027 112 C1031 60 1115 56 1119 108 C1125 62 1233 71 1239 117 C1244 78 1321 68 1325 108 C1329 66 1395 75 1399 116 C1404 65 1505 59 1511 110 V160Z" class="f-bg il-line il-cloud-edge"/>
+          </g>
+        </svg>
       </div>
       <div class="hero-window-inner is-window">
         <img src="assets/welcome/folio-welcome.png" alt="Folio home: a workspace with an Ask box for agents, recent files and a format overview" data-i18n-alt="hero.shot.alt" loading="lazy">
@@ -2074,16 +2111,16 @@
       <div class="pillars-grid">
         <div class="pillar t-sky reveal reveal-d1">
           <div class="pillar-art" aria-hidden="true"><div class="pi office">
-            <div class="pi-tile" style="--c:58,112,204"><span>W</span></div>
-            <div class="pi-tile" style="--c:52,150,96"><span>X</span></div>
-            <div class="pi-tile" style="--c:226,112,58"><span>P</span></div>
+            <div class="pi-tile" style="--c:var(--ill-sky)"><span>W</span></div>
+            <div class="pi-tile" style="--c:var(--ill-sage)"><span>X</span></div>
+            <div class="pi-tile" style="--c:var(--ill-tomato)"><span>P</span></div>
           </div></div>
           <h3 data-i18n="pillar.3.h">Office 编辑</h3>
           <p data-i18n="pillar.3.body">直接打开编辑微软 Office 系列文件。</p>
         </div>
         <div class="pillar t-sage reveal reveal-d2">
           <div class="pillar-art" aria-hidden="true"><div class="pi mdown">
-            <div class="pi-tile" style="--c:96,160,112"><span>#</span></div>
+            <div class="pi-tile" style="--c:var(--ill-butter)"><span>#</span></div>
             <div class="pi-sheet"><i class="hd"></i><i></i><i style="width:80%"></i><span class="pi-li"><i></i></span><span class="pi-li"><i style="flex:.7"></i></span><i style="width:60%"></i></div>
           </div></div>
           <h3 data-i18n="pillar.2.h">Markdown 编辑</h3>
@@ -2091,9 +2128,9 @@
         </div>
         <div class="pillar t-butter reveal reveal-d3">
           <div class="pillar-art" aria-hidden="true"><div class="pi agents">
-            <div class="pi-sheet" style="--c:224,122,62"><span class="pi-who"></span><i></i><i></i></div>
-            <div class="pi-sheet" style="--c:62,154,110;--dl:.3s"><span class="pi-who"></span><i></i><i></i></div>
-            <div class="pi-sheet" style="--c:72,128,232;--dl:.6s"><span class="pi-who"></span><i></i><i></i></div>
+            <div class="pi-sheet" style="--c:var(--ill-tomato)"><span class="pi-who"></span><i></i><i></i></div>
+            <div class="pi-sheet" style="--c:var(--ill-sage);--dl:.3s"><span class="pi-who"></span><i></i><i></i></div>
+            <div class="pi-sheet" style="--c:var(--ill-sky);--dl:.6s"><span class="pi-who"></span><i></i><i></i></div>
           </div></div>
           <h3 data-i18n="pillar.1.h">Agent 并行</h3>
           <p data-i18n="pillar.1.body">多个项目忙不过来？Claude Code、ChatGPT、Gemini 并行启动！</p>
@@ -2126,6 +2163,7 @@
         </div>
         <div class="split-image is-window">
           <img src="assets/landings/05-word.png" alt="Folio editing a Word document, with the paragraph style panel on the right" data-i18n-alt="split.office.alt" loading="lazy">
+          <svg class="dd dd-br" viewBox="0 0 140 140" aria-hidden="true" focusable="false"><g class="il-bob d2"><g filter="url(#rough)"><g transform="rotate(-8 46 54)"><rect x="25" y="33" width="56" height="56" rx="13" class="il-shadow"/><rect x="18" y="26" width="56" height="56" rx="13" class="f-sage il-line"/><text x="46" y="63" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="26" class="f-ink">X</text></g><g transform="rotate(10 90 86)"><rect x="69" y="65" width="56" height="56" rx="13" class="il-shadow"/><rect x="62" y="58" width="56" height="56" rx="13" class="f-tomato il-line"/><text x="90" y="95" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="26" class="f-ink">P</text></g></g></g></svg>
         </div>
       </div>
     </section>
@@ -2135,6 +2173,7 @@
       <div class="split-inner">
         <div class="split-image is-window">
           <img src="assets/landings/05-pdf.png" alt="Folio PDF toolbox: merge, split, crop, watermark, compare and compress, with page thumbnails" data-i18n-alt="split.pdf.alt" loading="lazy">
+          <svg class="dd dd-tl" viewBox="0 0 140 140" aria-hidden="true" focusable="false"><g class="il-bob d3"><g filter="url(#rough)"><g transform="rotate(-24 70 70)"><circle cx="58" cy="115" r="16" class="il-shadow"/><circle cx="94" cy="115" r="16" class="il-shadow"/><circle cx="52" cy="108" r="16" class="f-tomato il-line"/><circle cx="88" cy="108" r="16" class="f-tomato il-line"/><circle cx="52" cy="108" r="6.5" class="f-paper il-line"/><circle cx="88" cy="108" r="6.5" class="f-paper il-line"/><path d="M50 94 L96 16 Q102 10 103 18 L62 100Z" class="f-paper il-line"/><path d="M90 94 L44 16 Q38 10 37 18 L78 100Z" class="f-paper il-line"/><circle cx="70" cy="70" r="4.5" class="f-ink"/></g></g></g></svg>
         </div>
         <div class="split-text">
           <span class="eyebrow">pdf toolbox</span>
@@ -2164,12 +2203,13 @@
         </div>
         <div class="split-image is-window">
           <img src="assets/landings/04-markdown.png" alt="Folio Markdown editor with the Format panel: headings, display modes, text format and colors" data-i18n-alt="split.md.alt" loading="lazy">
+          <svg class="dd dd-br" viewBox="0 0 140 140" aria-hidden="true" focusable="false"><g class="il-bob d3"><g filter="url(#rough)"><g transform="rotate(-35 70 70)"><path d="M8 58H98L124 70L98 82H8Z" class="il-shadow" transform="translate(5 6)"/><rect x="8" y="58" width="20" height="24" rx="6" class="f-blush il-line"/><rect x="22" y="58" width="12" height="24" class="f-paper il-line"/><rect x="34" y="58" width="64" height="24" class="f-sun il-line"/><path d="M34 70H98" fill="none" class="il-line" style="stroke-width:2"/><path d="M98 58L124 70L98 82Z" class="f-paper il-line"/><path d="M115 66L124 70L115 74Z" class="f-ink"/></g></g></g></svg>
         </div>
       </div>
     </section>
 
     <!-- Agents（Folio Pro） -->
-    <section class="pro pro-zone" id="pro">
+    <section class="pro" id="pro">
     <svg class="pro-sky" viewBox="0 0 1440 320" aria-hidden="true" focusable="false">
       <g transform="translate(1196 112)"><g class="il-bob d2">
         <circle r="46" class="f-butter il-line"/>
@@ -2194,6 +2234,7 @@
           <figure class="pro-shot reveal">
             <div class="pro-shot-frame">
               <img src="assets/landings/10-agent-terminal.png" alt="Folio's AI tab running Antigravity CLI, with agent sessions listed per folder in the sidebar" data-i18n-alt="pro.shot1.alt" loading="lazy">
+          <svg class="dd dd-br" viewBox="0 0 140 140" aria-hidden="true" focusable="false"><g class="il-bob d2"><g filter="url(#rough)"><g transform="rotate(7 70 70)"><path d="M70 34V18" fill="none" class="il-line il-deco" style="stroke-width:4"/><circle cx="70" cy="15" r="7" class="f-tomato il-line"/><rect x="22" y="58" width="12" height="24" rx="4" class="f-sage il-line"/><rect x="106" y="58" width="12" height="24" rx="4" class="f-sage il-line"/><rect x="37" y="42" width="80" height="66" rx="18" class="il-shadow"/><rect x="30" y="34" width="80" height="66" rx="18" class="f-butter il-line"/><circle cx="54" cy="62" r="7" class="f-ink"/><circle cx="86" cy="62" r="7" class="f-ink"/><circle cx="44" cy="78" r="5" class="f-blush"/><circle cx="96" cy="78" r="5" class="f-blush"/><path d="M58 80q12 9 24 0" fill="none" class="il-line" style="stroke-width:3.5"/></g></g></g></svg>
             </div>
           </figure>
         </div>
@@ -2247,6 +2288,7 @@
       <div class="split-inner">
         <div class="split-image is-window">
           <img src="assets/landings/11-ask-ai.png" alt="The Ask AI panel floating over a Markdown document, with a translation request typed in" data-i18n-alt="split.ask.alt" loading="lazy">
+          <svg class="dd dd-tl" viewBox="0 0 140 140" aria-hidden="true" focusable="false"><g class="il-bob d2"><g filter="url(#rough)"><g transform="rotate(5 64 64)"><use href="#dd-bubble" class="il-shadow" x="7" y="8"/><use href="#dd-bubble" class="f-paper il-line"/><use href="#dd-star" class="f-sun il-line" style="stroke-width:2" transform="translate(64 59) scale(1.6)"/><use href="#dd-star" class="f-blush il-line" style="stroke-width:3" transform="translate(96 42) scale(.7)"/></g></g></g></svg>
         </div>
         <div class="split-text">
           <span class="eyebrow">ask ai</span>
@@ -2276,6 +2318,7 @@
         </div>
         <div class="split-image is-window">
           <img src="assets/landings/08-epub.png" alt="Folio reading an EPUB, with layout, font size, column width, typeface and background controls" data-i18n-alt="split.epub.alt" loading="lazy">
+          <svg class="dd dd-br" viewBox="0 0 140 140" aria-hidden="true" focusable="false"><g class="il-bob d2"><g filter="url(#rough)"><path d="M56 34q-9 -10 0 -20M78 34q-9 -10 0 -20" fill="none" class="il-line il-deco"/><ellipse cx="74" cy="116" rx="50" ry="10" class="il-shadow"/><ellipse cx="70" cy="110" rx="50" ry="10" class="f-paper il-line"/><path d="M106 56a16 16 0 0 1 0 32" fill="none" class="il-line il-deco" style="stroke-width:7"/><path d="M30 46H108V64a39 40 0 0 1 -78 0Z" class="il-shadow" transform="translate(6 6)"/><path d="M30 46H108V64a39 40 0 0 1 -78 0Z" class="f-blush il-line"/><ellipse cx="69" cy="46" rx="39" ry="7" class="f-paper il-line"/></g></g></svg>
         </div>
       </div>
     </section>
@@ -2285,6 +2328,7 @@
       <div class="split-inner">
         <div class="split-image is-window">
           <img src="assets/landings/02-code-reading.png" alt="Folio reading a SQL file: syntax colors, line numbers and indent guides, with the project folder tree on the left" loading="lazy">
+          <svg class="dd dd-tl" viewBox="0 0 140 140" aria-hidden="true" focusable="false"><g class="il-bob d1"><g filter="url(#rough)"><g transform="rotate(-8 64 64)"><rect x="23" y="35" width="96" height="74" rx="16" class="il-shadow"/><rect x="16" y="27" width="96" height="74" rx="16" class="f-sky il-line"/><path d="M48 50L34 64L48 78M80 50L94 64L80 78M70 46L58 82" fill="none" class="il-line" style="stroke-width:6"/></g></g></g></svg>
         </div>
         <div class="split-text">
           <span class="eyebrow">code reading</span>
@@ -2313,7 +2357,7 @@
     </section>
 
     <!-- Themes -->
-    <section class="split tone-blush reveal" id="themes" style="padding-top:96px;">
+    <section class="split tone-blush reveal" id="themes">
       <div class="split-inner">
         <div class="split-text">
           <span class="eyebrow">themes</span>
@@ -2327,6 +2371,7 @@
         </div>
         <div class="split-image is-window is-fan">
           <img src="assets/landings/07-themes.png" alt="Five Folio color themes — graphite, purple, yellow, green and blue — stacked as windows" data-i18n-alt="split.themes.alt" loading="lazy">
+          <svg class="dd dd-br" viewBox="0 0 140 140" aria-hidden="true" focusable="false"><g class="il-bob d1"><g filter="url(#rough)"><g transform="rotate(-40 70 70)"><path d="M8 62H70V58H90Q118 56 128 70Q118 84 90 82H70V78H8Z" class="il-shadow" transform="translate(5 6)"/><rect x="8" y="62" width="66" height="16" rx="8" class="f-tomato il-line"/><rect x="70" y="58" width="20" height="24" rx="3" class="f-paper il-line"/><path d="M90 58Q118 56 128 70Q118 84 90 82Z" class="f-peri il-line"/></g><circle cx="112" cy="116" r="7" class="f-peri il-line"/></g></g></svg>
         </div>
       </div>
     </section>
@@ -2336,6 +2381,7 @@
       <div class="split-inner">
         <div class="split-image is-window">
           <img src="assets/landings/09-history.png" alt="Folio version history: a list of versions on the left and a side-by-side comparison on the right" data-i18n-alt="split.history.alt" loading="lazy">
+          <svg class="dd dd-tl" viewBox="0 0 140 140" aria-hidden="true" focusable="false"><g class="il-bob d3"><g filter="url(#rough)"><circle cx="78" cy="80" r="40" class="il-shadow"/><circle cx="72" cy="74" r="40" class="f-paper il-line"/><path d="M72 40v7M72 101v7M38 74h7M99 74h7" fill="none" class="il-line"/><path d="M72 74V52M72 74L88 84" fill="none" class="il-line" style="stroke-width:5"/><circle cx="72" cy="74" r="4.5" class="f-tomato il-line"/><path d="M72 22A52 52 0 0 0 20 74M11 64L20 76L29 64" fill="none" class="il-line il-deco" style="stroke-width:4.5"/></g></g></svg>
         </div>
         <div class="split-text">
           <span class="eyebrow">version history</span>
@@ -2399,6 +2445,10 @@
         <div class="section-head reveal">
           <span class="eyebrow" data-i18n="faq.eyebrow">常见问题</span>
           <h2 data-i18n="faq.h2">仍有疑问？</h2>
+          <svg class="dd dd-faq" viewBox="0 0 140 140" aria-hidden="true" focusable="false"><g class="il-bob d2"><g filter="url(#rough)"><g transform="rotate(-8 64 64)">
+            <use href="#dd-bubble" class="il-shadow" x="7" y="8"/><use href="#dd-bubble" class="f-butter il-line"/>
+            <text x="64" y="76" text-anchor="middle" font-family="Inter, sans-serif" font-weight="800" font-size="44" class="f-ink">?</text>
+          </g></g></g></svg>
         </div>
         <div class="faq-list">
           <div class="faq-item reveal">
@@ -2470,6 +2520,19 @@
 
     <!-- Final CTA -->
     <section class="cta-section" id="download">
+      <svg class="cta-sky" viewBox="0 0 1440 260" aria-hidden="true" focusable="false">
+        <g class="il-bob d1"><use href="#dd-cloud" class="f-cloud il-line il-cloud-edge" transform="translate(150 120) scale(1.15)"/></g>
+        <g class="il-bob d2"><use href="#dd-cloud" class="f-cloud il-line il-cloud-edge" transform="translate(1190 60) scale(0.85)"/></g>
+        <g class="il-bob d3"><use href="#dd-cloud" class="f-cloud il-line il-cloud-edge" transform="translate(1290 190) scale(0.6)"/></g>
+        <use href="#dd-star" class="f-sun il-line" transform="translate(340 60)"/>
+        <use href="#dd-star" class="f-blush il-line" transform="translate(96 220) scale(0.8)"/>
+        <use href="#dd-star" class="f-sun il-line" transform="translate(1110 220) scale(0.9)"/>
+        <path class="dd-trail" d="M1440 30 Q1300 10 1215 100"/>
+        <g transform="translate(1232 108) rotate(133)"><g filter="url(#rough)">
+          <path d="M0 0 L58 18 L0 38 L12 18Z" class="f-paper il-line"/>
+          <path d="M12 18 H58" fill="none" class="il-line" style="stroke-width:2"/>
+        </g></g>
+      </svg>
       <svg class="cta-ground" viewBox="0 0 1440 190" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false"><use href="#il-ground"/></svg>
       <div class="container">
         <span class="eyebrow reveal" style="margin-bottom:20px;" data-i18n="cta.eyebrow">准备好了吗？</span>
@@ -2834,9 +2897,15 @@
     };
 
     function detectInitialLang() {
-      // 默认英文；用户手动切换后记在 localStorage
+      // 用户手动切换过就用那次的选择（记在 localStorage）；
+      // 否则按浏览器语言偏好的顺序取第一个支持的语言（zh-CN / zh-TW 等都归到 zh）；都不匹配用英文
       const saved = localStorage.getItem('lang');
       if (saved && I18N[saved]) return saved;
+      const prefs = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ''];
+      for (const tag of prefs) {
+        const base = String(tag).toLowerCase().split('-')[0];
+        if (I18N[base]) return base;
+      }
       return 'en';
     }
 
@@ -2938,8 +3007,8 @@
 
     (function bootstrap() {
       // Theme
-      // 默认深色；仅当用户手动切到浅色并记在 localStorage 时才用浅色（不再跟随系统）
-      const isDark = localStorage.getItem('theme') !== 'light';
+      // 默认浅色；仅当用户手动切到深色并记在 localStorage 时才用深色
+      const isDark = localStorage.getItem('theme') === 'dark';
       if (isDark) document.documentElement.classList.add('dark');
       updateThemeColor(isDark);
 
@@ -2964,16 +3033,7 @@
       parallaxQueued = false;
       heroEl.style.setProperty('--py', Math.min(window.scrollY, 2400));
     }
-    // 导航正压在深色的 Pro 画框上时，切到深色 token（CSS 里 .navbar.on-dark 复用 .pro-zone 那一套）
-    const proZoneEl = document.getElementById('pro');
-    function syncNavTone() {
-      const r = proZoneEl.getBoundingClientRect();
-      const navMid = navbar.getBoundingClientRect().top + 28;
-      navbar.classList.toggle('on-dark', r.top < navMid && r.bottom > navMid);
-    }
-    syncNavTone();
     window.addEventListener('scroll', () => {
-      syncNavTone();
       if (window.scrollY > 12) navbar.classList.add('scrolled');
       else navbar.classList.remove('scrolled');
       if (!reduceMotion && !parallaxQueued) {
