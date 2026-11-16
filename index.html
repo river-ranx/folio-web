@@ -18,12 +18,50 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="icon" type="image/png" href="assets/app-icon.png">
   <link rel="apple-touch-icon" href="assets/app-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display:ital@1&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
-  <!-- 中文字体均为 SIL OFL 授权，可免费商用：思源黑体（Noto Sans SC）做正文与标题，霞鹜文楷（LXGW WenKai）做标题里的点睛半句。按 unicode-range 切片，只下载用到的字 -->
-  <link href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-bold.css" rel="stylesheet">
+  <!-- 首屏就要用到的两款字体提前下载 -->
+  <link rel="preload" href="assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/dm-serif-display-italic.woff2" as="font" type="font/woff2" crossorigin>
   <style>
+    /* ===== Fonts（自托管，不依赖 Google Fonts / jsDelivr）=====
+       全部为 SIL OFL 1.1，可免费商用，授权文件见 assets/fonts/licenses/。
+       文件由 scripts/build-fonts.py 生成：拉丁字体保留完整 Latin 字符集；
+       中文字体只含 index.html 里出现的字 —— 中文文案出现新字时重跑脚本，否则新字会退回系统字体。 */
+    @font-face {
+      font-family: 'Inter';
+      src: url('assets/fonts/inter.woff2') format('woff2');
+      font-weight: 400 700;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'DM Serif Display';
+      src: url('assets/fonts/dm-serif-display-italic.woff2') format('woff2');
+      font-weight: 400;
+      font-style: italic;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'JetBrains Mono';
+      src: url('assets/fonts/jetbrains-mono.woff2') format('woff2');
+      font-weight: 400 500;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Noto Sans SC';   /* 思源黑体：中文正文与标题 */
+      src: url('assets/fonts/noto-sans-sc.woff2') format('woff2');
+      font-weight: 400 700;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'LXGW WenKai';    /* 霞鹜文楷粗体：中文标题里的点睛半句 */
+      src: url('assets/fonts/lxgw-wenkai-bold.woff2') format('woff2');
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
     /* ===== Reset ===== */
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
